@@ -109,7 +109,23 @@ function Get-GkAdminRoleAssignment {
                 }
 
                 $roleDefId = [string](Get-GkDictValue $item 'roleDefinitionId')
-                $roleDisplayName = if ($roleMap.ContainsKey($roleDefId)) { $roleMap[$roleDefId] } else { $roleDefId }
+                if (-not $roleMap.ContainsKey($roleDefId)) {
+                    # The bulk roleDefinitions list is not exhaustive for every assigned role
+                    # (e.g. some first-party/service-principal assignments). Resolve this one by id
+                    # and cache the result (or the id itself if it cannot be resolved at all).
+                    $resolved = $roleDefId
+                    try {
+                        $one = Invoke-GkGraphRequest -Raw -CallerFunction 'Get-GkAdminRoleAssignment' `
+                            -Uri "/roleManagement/directory/roleDefinitions/$roleDefId`?`$select=id,displayName"
+                        $nm = [string](Get-GkDictValue $one 'displayName')
+                        if ($nm) { $resolved = $nm }
+                    }
+                    catch {
+                        Write-Verbose "PSGraphKit: could not resolve roleDefinition $roleDefId : $($_.Exception.Message)"
+                    }
+                    $roleMap[$roleDefId] = $resolved
+                }
+                $roleDisplayName = $roleMap[$roleDefId]
                 if ($RoleName -and $roleDisplayName -notlike $RoleName) { continue }
 
                 $scope = [string](Get-GkDictValue $item 'directoryScopeId')

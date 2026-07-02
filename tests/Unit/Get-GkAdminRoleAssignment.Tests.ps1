@@ -82,6 +82,38 @@ InModuleScope PSGraphKit {
             $r[0].RoleName | Should -Be 'Custom Reader'
         }
 
+        It 'lazily resolves a roleDefinition missing from the bulk list (by id)' {
+            Mock Invoke-GkGraphRequest {
+                if ($Uri -like '*roleDefinitions/orphan-1*') { return @{ id = 'orphan-1'; displayName = 'Rediscovered Role' } }
+                if ($Uri -like '*roleDefinitions*')          { return @() }   # bulk list does NOT include it
+                if ($Uri -like '*ScheduleInstances*')        { return @() }
+                if ($Uri -like '*roleAssignments*') {
+                    return @(@{ id = 'a'; principalId = 'p'; roleDefinitionId = 'orphan-1'; directoryScopeId = '/'
+                                principal = @{ '@odata.type' = '#microsoft.graph.servicePrincipal'; displayName = 'Some SP' } })
+                }
+                @()
+            }
+            $r = Get-GkAdminRoleAssignment -AssignmentKind Active
+            $r[0].RoleName | Should -Be 'Rediscovered Role'
+            # cached: only one by-id lookup even though it could be referenced again
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter { $Uri -like '*roleDefinitions/orphan-1*' }
+        }
+
+        It 'falls back to the roleDefinitionId when it cannot be resolved at all' {
+            Mock Invoke-GkGraphRequest {
+                if ($Uri -like '*roleDefinitions/ghost*') { throw 'Request_ResourceNotFound' }
+                if ($Uri -like '*roleDefinitions*')       { return @() }
+                if ($Uri -like '*ScheduleInstances*')     { return @() }
+                if ($Uri -like '*roleAssignments*') {
+                    return @(@{ id = 'a'; principalId = 'p'; roleDefinitionId = 'ghost'; directoryScopeId = '/'
+                                principal = @{ '@odata.type' = '#microsoft.graph.user'; displayName = 'Z' } })
+                }
+                @()
+            }
+            $r = Get-GkAdminRoleAssignment -AssignmentKind Active
+            $r[0].RoleName | Should -Be 'ghost'
+        }
+
         It 'only queries the requested kind' {
             Get-GkAdminRoleAssignment -AssignmentKind Active | Out-Null
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Uri -like '*Eligibility*' }
