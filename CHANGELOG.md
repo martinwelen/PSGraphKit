@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `Connect-GkGraph` — optional connect helper over Connect-MgGraph that derives the required scopes
+  from the cmdlets you plan to run (`-ForCommand`) or the whole module (`-AllCommands`), and supports
+  app-only auth (`-ClientId`/`-TenantId`/`-CertificateThumbprint`/`-Certificate`); returns the session.
 - Project scaffold: module manifest, root loader, CI (PSScriptAnalyzer + Pester), analyzer settings.
 - Internal `Invoke-GkGraphRequest` — single Graph chokepoint: pagination, 429/503 backoff,
   `ConsistencyLevel` re-injection on paged requests, curated permission/role error translation.
@@ -48,3 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from approximateLastSignInDateTime. `-StaleOnly`/`-StaleDays`, `-JoinType`, `-AsReport`.
 - `docs/` — per-cmdlet markdown reference (PlatyPS-style) generated from comment-based help by
   `build/Build-GkDocs.ps1`, kept in sync by a CI test.
+
+### Fixed
+- `Get-GkUserAccessReport` now percent-encodes the user id in request URLs, so guest UPNs containing
+  `#` (e.g. `user_x.com#EXT#@tenant.onmicrosoft.com`) are no longer truncated at the `#` fragment.

@@ -40,6 +40,14 @@ Connect-MgGraph -Scopes User.Read.All, AuditLog.Read.All
 Connect-MgGraph -ClientId <appId> -TenantId <tenantId> -CertificateThumbprint <thumb>
 ```
 
+Or let PSGraphKit derive the scopes for the cmdlets you plan to run:
+
+```powershell
+Connect-GkGraph -ForCommand Get-GkStaleUser, Get-GkGuestInventory   # only what those need
+Connect-GkGraph -AllCommands                                         # full read-only footprint
+Connect-GkGraph -ClientId <appId> -TenantId <tid> -CertificateThumbprint <thumb>   # app-only
+```
+
 One caveat: `Get-GkUserAccessReport` reads `licenseDetails`, a Graph API with no application
 permission, so it requires a **delegated** session.
 
@@ -69,6 +77,7 @@ Run: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All
 
 | Cmdlet | Purpose |
 |--------|---------|
+| `Connect-GkGraph` | Connect to Graph, deriving required scopes from the cmdlets you plan to run. |
 | `Get-GkConnectionInfo` | Show the current Graph session: identity, auth type, scopes, active roles. |
 | `Get-GkStaleUser` | Users with no sign-in for N days (signInActivity), flagging disabled/guest. |
 | `Get-GkGuestInventory` | Guest accounts with sponsor, invitation state, age, and inactivity. |

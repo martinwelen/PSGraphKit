@@ -17,6 +17,12 @@ $script:GkGraphBaseUri = 'https://graph.microsoft.com'
 # an equivalent custom role also works. Sourced from each Graph "list" API doc.
 $script:GkScopeMap = @{
 
+    'Connect-GkGraph' = @{
+        Groups        = @()  # establishes the session; nothing to pre-validate
+        DelegatedOnly = $false
+        RoleHints     = @()
+    }
+
     'Get-GkConnectionInfo' = @{
         Groups       = @()  # uses /me with the User.Read baseline; no extra scope required
         DelegatedOnly = $false

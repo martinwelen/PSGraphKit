@@ -65,9 +65,14 @@ function Get-GkUserAccessReport {
         foreach ($uid in $UserId) {
             if ([string]::IsNullOrWhiteSpace($uid)) { continue }
 
+            # Percent-encode the id for the URL path segment. Object IDs (GUIDs) are unaffected,
+            # but guest UPNs contain '#' (e.g. bob_x.com#EXT#@contoso.onmicrosoft.com) which a URL
+            # otherwise treats as a fragment delimiter and truncates the request.
+            $enc = [uri]::EscapeDataString($uid)
+
             try {
                 $user = Invoke-GkGraphRequest -Raw `
-                    -Uri "/users/$uid`?`$select=id,displayName,userPrincipalName,accountEnabled,userType" `
+                    -Uri "/users/$enc`?`$select=id,displayName,userPrincipalName,accountEnabled,userType" `
                     -CallerFunction 'Get-GkUserAccessReport'
             }
             catch {
@@ -85,9 +90,9 @@ function Get-GkUserAccessReport {
                 }
             }
 
-            $memberOf = & $facet "/users/$uid/transitiveMemberOf?`$select=id,displayName,@odata.type" 'group/role memberships'
-            $appRoles = & $facet "/users/$uid/appRoleAssignments" 'app role assignments'
-            $licenses = & $facet "/users/$uid/licenseDetails" 'license details'
+            $memberOf = & $facet "/users/$enc/transitiveMemberOf?`$select=id,displayName,@odata.type" 'group/role memberships'
+            $appRoles = & $facet "/users/$enc/appRoleAssignments" 'app role assignments'
+            $licenses = & $facet "/users/$enc/licenseDetails" 'license details'
 
             $groups = @(); $roles = @()
             foreach ($m in $memberOf) {

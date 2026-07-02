@@ -71,6 +71,24 @@ InModuleScope PSGraphKit {
             ($warnings -join ' ') | Should -Match 'ghost'
         }
 
+        It 'percent-encodes a guest UPN so the # is not treated as a URL fragment' {
+            $captured = [System.Collections.Generic.List[string]]::new()
+            Mock Invoke-GkGraphRequest {
+                $captured.Add($Uri)
+                if ($Uri -like '*transitiveMemberOf*') { return $script:MemberOf }
+                if ($Uri -like '*appRoleAssignments*') { return $script:AppRoles }
+                if ($Uri -like '*licenseDetails*')     { return $script:LicDetails }
+                return $script:UserObj
+            }
+            $guestUpn = "bob_partner.com#EXT#@contoso.onmicrosoft.com"
+            Get-GkUserAccessReport -UserId $guestUpn | Out-Null
+
+            # every request must carry the encoded id and never a raw '#'
+            $captured | Should -Not -BeNullOrEmpty
+            foreach ($u in $captured) { $u | Should -Not -BeLike '*#*' }
+            ($captured | Where-Object { $_ -like '*%23EXT%23*' }).Count | Should -BeGreaterThan 0
+        }
+
         It 'continues when one facet is denied' {
             Mock Invoke-GkGraphRequest {
                 if ($Uri -like '*licenseDetails*')     { throw 'Authorization_RequestDenied' }

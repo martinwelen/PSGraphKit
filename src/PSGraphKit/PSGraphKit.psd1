@@ -19,6 +19,7 @@
 
     # Explicit export list — updated as each function lands (priority order).
     FunctionsToExport = @(
+        'Connect-GkGraph',
         'Get-GkConnectionInfo',
         'Get-GkStaleUser',
         'Get-GkGuestInventory',
