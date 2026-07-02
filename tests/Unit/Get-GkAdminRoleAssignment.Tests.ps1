@@ -65,6 +65,23 @@ InModuleScope PSGraphKit {
             }
         }
 
+        It 'resolves role names referenced by templateId (not just id)' {
+            Mock Invoke-GkGraphRequest {
+                if ($Uri -like '*roleDefinitions*') {
+                    return @(@{ id = 'def-abc'; templateId = 'tmpl-xyz'; displayName = 'Custom Reader' })
+                }
+                if ($Uri -like '*ScheduleInstances*') { return @() }
+                if ($Uri -like '*roleAssignments*') {
+                    return @(@{ id = 'a1'; principalId = 'p1'; roleDefinitionId = 'tmpl-xyz'; directoryScopeId = '/'
+                                principal = @{ '@odata.type' = '#microsoft.graph.user'; displayName = 'Someone' } })
+                }
+                @()
+            }
+            $r = Get-GkAdminRoleAssignment -AssignmentKind Active
+            $r.Count | Should -Be 1
+            $r[0].RoleName | Should -Be 'Custom Reader'
+        }
+
         It 'only queries the requested kind' {
             Get-GkAdminRoleAssignment -AssignmentKind Active | Out-Null
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Uri -like '*Eligibility*' }

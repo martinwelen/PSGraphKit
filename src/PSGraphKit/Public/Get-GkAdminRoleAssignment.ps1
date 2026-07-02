@@ -66,10 +66,15 @@ function Get-GkAdminRoleAssignment {
         # Resolve role names via a one-time roleDefinitions lookup. (Graph rejects expanding both
         # principal and roleDefinition in one query — "only one property can be expanded" — so we
         # expand principal and map roleDefinitionId -> displayName ourselves.)
+        # Key the map on BOTH id and templateId: an assignment's roleDefinitionId may reference
+        # either, and for some built-in roles the two differ (an unresolved id would otherwise
+        # surface as a raw GUID in RoleName).
         $roleMap = @{}
-        foreach ($rd in (Invoke-GkGraphRequest -Uri '/roleManagement/directory/roleDefinitions?$select=id,displayName' -CallerFunction 'Get-GkAdminRoleAssignment')) {
-            $rid = [string](Get-GkDictValue $rd 'id')
-            if ($rid) { $roleMap[$rid] = [string](Get-GkDictValue $rd 'displayName') }
+        foreach ($rd in (Invoke-GkGraphRequest -Uri '/roleManagement/directory/roleDefinitions?$select=id,displayName,templateId' -CallerFunction 'Get-GkAdminRoleAssignment')) {
+            $rdName = [string](Get-GkDictValue $rd 'displayName')
+            foreach ($key in @([string](Get-GkDictValue $rd 'id'), [string](Get-GkDictValue $rd 'templateId'))) {
+                if ($key) { $roleMap[$key] = $rdName }
+            }
         }
 
         $sources = @(
