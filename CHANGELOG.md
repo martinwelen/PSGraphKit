@@ -43,3 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkCaPolicyReport` — Conditional Access policies with state and readable summaries of targeted
   users/apps, grant controls (e.g. "mfa AND compliantDevice" / "Block"), and enabled session controls.
   `-State` filter (Enabled/Disabled/ReportOnly), `-AsReport`.
+- `Get-GkDeviceInventory` — Entra devices with OS, join type (trustType AzureAd/ServerAd/Workplace
+  mapped to AzureADJoined/HybridJoined/Registered), compliance/management/ownership, and inactivity
+  from approximateLastSignInDateTime. `-StaleOnly`/`-StaleDays`, `-JoinType`, `-AsReport`.

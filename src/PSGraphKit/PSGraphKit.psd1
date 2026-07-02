@@ -28,7 +28,8 @@
         'Get-GkUserAccessReport',
         'Get-GkAppRegistrationReport',
         'Get-GkGroupReport',
-        'Get-GkCaPolicyReport'
+        'Get-GkCaPolicyReport',
+        'Get-GkDeviceInventory'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
