@@ -37,3 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   expiry, expired/expiring-soon) and high-privilege application permissions resolved live against each
   resource service principal (GUIDs never guessed, cached per run). `-ExpiringOnly`/`-ExpiringInDays`,
   `-HighPrivilegeOnly`, `-SkipPermissionResolution`, `-AsReport`.
+- `Get-GkGroupReport` — groups classified by type (Microsoft365/Security/MailEnabledSecurity/
+  Distribution) with dynamic flag, membership count (/members/$count), owners, and ownerless flag.
+  `-GroupType`, `-OwnerlessOnly`, `-SkipMemberCount`, `-AsReport`.

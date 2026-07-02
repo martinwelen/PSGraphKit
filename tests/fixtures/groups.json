@@ -1,0 +1,49 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
+  "value": [
+    {
+      "id": "m365-1",
+      "displayName": "Marketing (M365)",
+      "mail": "marketing@contoso.com",
+      "groupTypes": ["Unified"],
+      "securityEnabled": false,
+      "mailEnabled": true,
+      "visibility": "Private",
+      "membershipRule": null,
+      "membershipRuleProcessingState": null
+    },
+    {
+      "id": "sec-1",
+      "displayName": "VPN Users (Security)",
+      "mail": null,
+      "groupTypes": [],
+      "securityEnabled": true,
+      "mailEnabled": false,
+      "visibility": null,
+      "membershipRule": null,
+      "membershipRuleProcessingState": null
+    },
+    {
+      "id": "dyn-1",
+      "displayName": "All Sales (Dynamic)",
+      "mail": null,
+      "groupTypes": ["DynamicMembership"],
+      "securityEnabled": true,
+      "mailEnabled": false,
+      "visibility": null,
+      "membershipRule": "(user.department -eq \"Sales\")",
+      "membershipRuleProcessingState": "On"
+    },
+    {
+      "id": "dist-1",
+      "displayName": "Announcements (Distribution)",
+      "mail": "announce@contoso.com",
+      "groupTypes": [],
+      "securityEnabled": false,
+      "mailEnabled": true,
+      "visibility": null,
+      "membershipRule": null,
+      "membershipRuleProcessingState": null
+    }
+  ]
+}

@@ -232,5 +232,36 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.GroupReport</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.GroupReport</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>GroupType</Label><Width>20</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Dyn</Label><Width>5</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Members</Label><Width>8</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Owners</Label><Width>7</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Ownerless</Label><Width>9</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>GroupType</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IsDynamic</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($null -eq $_.MemberCount) { '-' } else { $_.MemberCount }</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem><PropertyName>OwnerCount</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IsOwnerless</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>
