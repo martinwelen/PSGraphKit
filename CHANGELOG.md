@@ -27,3 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkAdminRoleAssignment` — active, PIM-eligible, and PIM time-bound directory role
   assignments via the roleManagement RBAC API, with principal/role resolved and directory scope;
   `-AssignmentKind`, `-RoleName`; warns and continues when PIM (P2) endpoints are unavailable.
+- `Get-GkUserMfaStatus` — per-user MFA capability and registered methods from the
+  userRegistrationDetails report (AuditLog.Read.All); IsMfaCapable vs IsMfaRegistered, SSPR and
+  passwordless flags; `-NotMfaCapableOnly`/`-AdminsOnly` server-side filters, `-AsReport`.

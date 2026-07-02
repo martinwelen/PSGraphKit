@@ -148,5 +148,34 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.UserMfaStatus</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.UserMfaStatus</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Admin</Label><Width>6</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MfaCapable</Label><Width>11</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MfaReg</Label><Width>7</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Methods</Label><Width>34</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IsAdmin</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IsMfaCapable</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IsMfaRegistered</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($_.MethodsRegistered -is [array]) { $_.MethodsRegistered -join '; ' } else { $_.MethodsRegistered }</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>
