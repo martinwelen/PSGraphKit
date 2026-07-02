@@ -51,6 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from approximateLastSignInDateTime. `-StaleOnly`/`-StaleDays`, `-JoinType`, `-AsReport`.
 - `docs/` — per-cmdlet markdown reference (PlatyPS-style) generated from comment-based help by
   `build/Build-GkDocs.ps1`, kept in sync by a CI test.
+- `build/Invoke-GkSmokeTest.ps1` — read-only live smoke test that exercises every cmdlet against a
+  real tenant and prints a per-cmdlet OK/WARN/FAIL summary.
 
 ### Fixed
 - `Get-GkUserAccessReport` now percent-encodes the user id in request URLs, so guest UPNs containing
