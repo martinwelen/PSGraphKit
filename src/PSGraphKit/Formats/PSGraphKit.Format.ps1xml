@@ -199,5 +199,38 @@
       </ListControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.AppRegistration</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.AppRegistration</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Secrets</Label><Width>7</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Certs</Label><Width>5</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>DaysToExpiry</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>HighPriv</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>HighPrivPerms</Label><Width>34</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>SecretCount</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>CertificateCount</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($null -eq $_.DaysUntilExpiry) { '(none)' } else { $_.DaysUntilExpiry }</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem><PropertyName>HasHighPrivilege</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($_.HighPrivilegePermissions -is [array]) { $_.HighPrivilegePermissions -join '; ' } else { $_.HighPrivilegePermissions }</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

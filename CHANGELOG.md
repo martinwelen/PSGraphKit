@@ -33,3 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkUserAccessReport` — one user's full footprint: groups and directory roles (from
   transitiveMemberOf), licenses, and app role assignments, with counts. Pipeline-friendly
   (`-UserId` by value/property); delegated-only (licenseDetails); per-facet warn-and-continue.
+- `Get-GkAppRegistrationReport` — app registrations with secret/certificate expiry (counts, earliest
+  expiry, expired/expiring-soon) and high-privilege application permissions resolved live against each
+  resource service principal (GUIDs never guessed, cached per run). `-ExpiringOnly`/`-ExpiringInDays`,
+  `-HighPrivilegeOnly`, `-SkipPermissionResolution`, `-AsReport`.

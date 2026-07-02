@@ -1,0 +1,42 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
+  "value": [
+    {
+      "id": "app1",
+      "appId": "aaaaaaaa-1111-1111-1111-111111111111",
+      "displayName": "Legacy Sync App",
+      "signInAudience": "AzureADMyOrg",
+      "passwordCredentials": [
+        { "keyId": "k1", "displayName": "sync secret", "startDateTime": "2019-01-01T00:00:00Z", "endDateTime": "2020-01-01T00:00:00Z" }
+      ],
+      "keyCredentials": [],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            { "id": "ROLE-DIRW", "type": "Role" },
+            { "id": "SCOPE-USERREAD", "type": "Scope" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app2",
+      "appId": "bbbbbbbb-2222-2222-2222-222222222222",
+      "displayName": "Report Reader",
+      "signInAudience": "AzureADMyOrg",
+      "passwordCredentials": [],
+      "keyCredentials": [
+        { "keyId": "c1", "displayName": "signing cert", "startDateTime": "2024-01-01T00:00:00Z", "endDateTime": "2035-01-01T00:00:00Z", "type": "AsymmetricX509Cert", "usage": "Verify" }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            { "id": "SCOPE-USERREAD", "type": "Scope" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals(appId,displayName,appRoles,oauth2PermissionScopes)/$entity",
+  "appId": "00000003-0000-0000-c000-000000000000",
+  "displayName": "Microsoft Graph",
+  "appRoles": [
+    { "id": "ROLE-DIRW", "value": "Directory.ReadWrite.All", "displayName": "Read and write directory data" },
+    { "id": "ROLE-USERREADALL", "value": "User.Read.All", "displayName": "Read all users' full profiles" }
+  ],
+  "oauth2PermissionScopes": [
+    { "id": "SCOPE-USERREAD", "value": "User.Read", "adminConsentDisplayName": "Sign in and read user profile" }
+  ]
+}
