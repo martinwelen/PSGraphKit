@@ -124,4 +124,4 @@ foreach ($cmd in $commands) {
 }
 Set-Content -Path (Join-Path $OutputDir 'README.md') -Value $idx.ToString().TrimEnd() -Encoding utf8NoBOM
 
-Write-Host "Generated docs for $($commands.Count) cmdlets in $OutputDir"
+Write-Information "Generated docs for $($commands.Count) cmdlets in $OutputDir" -InformationAction Continue
