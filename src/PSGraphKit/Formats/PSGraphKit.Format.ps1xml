@@ -92,5 +92,32 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.LicenseOverview</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.LicenseOverview</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>FriendlyName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>SkuPartNumber</Label><Width>26</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Enabled</Label><Width>8</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Assigned</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Available</Label><Width>10</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>FriendlyName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>SkuPartNumber</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Enabled</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Assigned</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Available</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

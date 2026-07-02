@@ -21,7 +21,8 @@
     FunctionsToExport = @(
         'Get-GkConnectionInfo',
         'Get-GkStaleUser',
-        'Get-GkGuestInventory'
+        'Get-GkGuestInventory',
+        'Get-GkLicenseOverview'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

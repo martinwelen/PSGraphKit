@@ -1,0 +1,30 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#subscribedSkus",
+  "value": [
+    {
+      "id": "sku-e3",
+      "skuId": "6fd2c87f-b296-42f0-b197-1e91e994b900",
+      "skuPartNumber": "ENTERPRISEPACK",
+      "appliesTo": "User",
+      "capabilityStatus": "Enabled",
+      "consumedUnits": 92,
+      "prepaidUnits": { "enabled": 100, "suspended": 0, "warning": 0, "lockedOut": 0 },
+      "servicePlans": [
+        { "servicePlanId": "sp1", "servicePlanName": "EXCHANGE_S_ENTERPRISE", "provisioningStatus": "Success", "appliesTo": "User" },
+        { "servicePlanId": "sp2", "servicePlanName": "SHAREPOINTENTERPRISE", "provisioningStatus": "Success", "appliesTo": "User" }
+      ]
+    },
+    {
+      "id": "sku-p2",
+      "skuId": "84a661c4-e949-4bd2-a560-ed7766fcaf2b",
+      "skuPartNumber": "AAD_PREMIUM_P2",
+      "appliesTo": "User",
+      "capabilityStatus": "Warning",
+      "consumedUnits": 50,
+      "prepaidUnits": { "enabled": 50, "suspended": 0, "warning": 5, "lockedOut": 0 },
+      "servicePlans": [
+        { "servicePlanId": "sp3", "servicePlanName": "AAD_PREMIUM_P2", "provisioningStatus": "Success", "appliesTo": "User" }
+      ]
+    }
+  ]
+}

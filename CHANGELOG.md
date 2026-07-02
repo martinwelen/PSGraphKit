@@ -21,3 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkGuestInventory` — guest accounts with sponsor (via /users/{id}/sponsors), invitation state,
   account age, and inactivity. `-StaleOnly`, `-SkipSponsor` (avoids the per-guest N+1), `-AsReport`;
   warns and continues when a sponsor lookup is denied.
+- `Get-GkLicenseOverview` — subscribed SKUs with enabled/assigned/available seat counts,
+  warning/suspended units, and best-effort friendly product names; `-IncludeDisabledLicensed`
+  counts licenses held by disabled accounts (per-SKU user query). `-AsReport`.

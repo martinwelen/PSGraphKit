@@ -111,3 +111,36 @@ $script:GkScopeMap = @{
 
 # Session cache for the signed-in admin's active directory roles (populated on first need).
 $script:GkCurrentUserRoleCache = $null
+
+# Best-effort friendly names for common license SKU part numbers. This is a convenience
+# only — the raw skuPartNumber is always the source of truth and is emitted alongside.
+# Microsoft's full product-names/SKU reference is large and changes; this covers the SKUs
+# an M365 consultant sees most often. Unknown part numbers fall back to the part number.
+$script:GkSkuFriendlyName = @{
+    'ENTERPRISEPACK'           = 'Office 365 E3'
+    'ENTERPRISEPREMIUM'        = 'Office 365 E5'
+    'STANDARDPACK'             = 'Office 365 E1'
+    'DESKLESSPACK'             = 'Office 365 F3'
+    'SPE_E3'                   = 'Microsoft 365 E3'
+    'SPE_E5'                   = 'Microsoft 365 E5'
+    'SPE_F1'                   = 'Microsoft 365 F3'
+    'SPB'                      = 'Microsoft 365 Business Premium'
+    'O365_BUSINESS_PREMIUM'    = 'Microsoft 365 Business Standard'
+    'O365_BUSINESS_ESSENTIALS' = 'Microsoft 365 Business Basic'
+    'AAD_PREMIUM'              = 'Microsoft Entra ID P1'
+    'AAD_PREMIUM_P2'           = 'Microsoft Entra ID P2'
+    'EMS'                      = 'Enterprise Mobility + Security E3'
+    'EMSPREMIUM'               = 'Enterprise Mobility + Security E5'
+    'EXCHANGESTANDARD'         = 'Exchange Online (Plan 1)'
+    'EXCHANGEENTERPRISE'       = 'Exchange Online (Plan 2)'
+    'POWER_BI_STANDARD'        = 'Power BI (free)'
+    'POWER_BI_PRO'             = 'Power BI Pro'
+    'FLOW_FREE'                = 'Power Automate Free'
+    'MCOMEETADV'               = 'Microsoft 365 Audio Conferencing'
+    'MCOEV'                    = 'Microsoft Teams Phone Standard'
+    'TEAMS_EXPLORATORY'        = 'Microsoft Teams Exploratory'
+    'WIN_DEF_ATP'              = 'Microsoft Defender for Endpoint'
+    'IDENTITY_THREAT_PROTECTION' = 'Microsoft 365 E5 Security'
+    'VISIOCLIENT'              = 'Visio Plan 2'
+    'PROJECTPROFESSIONAL'      = 'Project Plan 3'
+}
