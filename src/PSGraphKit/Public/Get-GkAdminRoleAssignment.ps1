@@ -63,10 +63,19 @@ function Get-GkAdminRoleAssignment {
     }
 
     process {
+        # Resolve role names via a one-time roleDefinitions lookup. (Graph rejects expanding both
+        # principal and roleDefinition in one query — "only one property can be expanded" — so we
+        # expand principal and map roleDefinitionId -> displayName ourselves.)
+        $roleMap = @{}
+        foreach ($rd in (Invoke-GkGraphRequest -Uri '/roleManagement/directory/roleDefinitions?$select=id,displayName' -CallerFunction 'Get-GkAdminRoleAssignment')) {
+            $rid = [string](Get-GkDictValue $rd 'id')
+            if ($rid) { $roleMap[$rid] = [string](Get-GkDictValue $rd 'displayName') }
+        }
+
         $sources = @(
-            @{ Kind = 'Active';    Uri = '/roleManagement/directory/roleAssignments?$expand=principal,roleDefinition';                 Optional = $false }
-            @{ Kind = 'Eligible';  Uri = '/roleManagement/directory/roleEligibilityScheduleInstances?$expand=principal,roleDefinition'; Optional = $true }
-            @{ Kind = 'TimeBound'; Uri = '/roleManagement/directory/roleAssignmentScheduleInstances?$expand=principal,roleDefinition';  Optional = $true }
+            @{ Kind = 'Active';    Uri = '/roleManagement/directory/roleAssignments?$expand=principal';                 Optional = $false }
+            @{ Kind = 'Eligible';  Uri = '/roleManagement/directory/roleEligibilityScheduleInstances?$expand=principal'; Optional = $true }
+            @{ Kind = 'TimeBound'; Uri = '/roleManagement/directory/roleAssignmentScheduleInstances?$expand=principal';  Optional = $true }
         )
 
         foreach ($source in $sources) {
@@ -85,7 +94,6 @@ function Get-GkAdminRoleAssignment {
 
             foreach ($item in $items) {
                 $principal = Get-GkDictValue $item 'principal'
-                $roleDef   = Get-GkDictValue $item 'roleDefinition'
 
                 $odataType = [string](Get-GkDictValue $principal '@odata.type')
                 $pType = switch ($odataType) {
@@ -95,7 +103,8 @@ function Get-GkAdminRoleAssignment {
                     default { if ($odataType) { ($odataType -split '\.')[-1] } else { 'Unknown' } }
                 }
 
-                $roleDisplayName = [string](Get-GkDictValue $roleDef 'displayName')
+                $roleDefId = [string](Get-GkDictValue $item 'roleDefinitionId')
+                $roleDisplayName = if ($roleMap.ContainsKey($roleDefId)) { $roleMap[$roleDefId] } else { $roleDefId }
                 if ($RoleName -and $roleDisplayName -notlike $RoleName) { continue }
 
                 $scope = [string](Get-GkDictValue $item 'directoryScopeId')

@@ -57,3 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `Get-GkUserAccessReport` now percent-encodes the user id in request URLs, so guest UPNs containing
   `#` (e.g. `user_x.com#EXT#@tenant.onmicrosoft.com`) are no longer truncated at the `#` fragment.
+- `Get-GkAdminRoleAssignment` no longer expands both `principal` and `roleDefinition` in one query
+  (Graph allows only one `$expand`); it expands `principal` and resolves role names from a
+  `roleDefinitions` lookup. (Found by live smoke test — Graph 400 "Only one property can be expanded".)
+- `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
+  (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)

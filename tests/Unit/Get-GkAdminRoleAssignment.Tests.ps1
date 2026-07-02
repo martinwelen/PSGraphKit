@@ -9,11 +9,13 @@ InModuleScope PSGraphKit {
             $script:ActiveValue    = (Get-Content (Join-Path $fx 'roleAssignments-active.json')            -Raw | ConvertFrom-Json -AsHashtable)['value']
             $script:EligibleValue  = (Get-Content (Join-Path $fx 'roleEligibility-instances.json')          -Raw | ConvertFrom-Json -AsHashtable)['value']
             $script:TimeBoundValue = (Get-Content (Join-Path $fx 'roleAssignmentSchedule-instances.json')   -Raw | ConvertFrom-Json -AsHashtable)['value']
+            $script:RoleDefValue   = (Get-Content (Join-Path $fx 'roleDefinitions.json')                    -Raw | ConvertFrom-Json -AsHashtable)['value']
         }
 
         BeforeEach {
             Mock Test-GkConnection { [pscustomobject]@{ AuthType = 'Delegated'; Scopes = @('RoleManagement.Read.All') } }
             Mock Invoke-GkGraphRequest {
+                if ($Uri -like '*roleDefinitions*')                    { return $script:RoleDefValue }
                 if ($Uri -like '*roleEligibilityScheduleInstances*')   { return $script:EligibleValue }
                 if ($Uri -like '*roleAssignmentScheduleInstances*')    { return $script:TimeBoundValue }
                 if ($Uri -like '*roleAssignments*')                    { return $script:ActiveValue }
@@ -53,6 +55,16 @@ InModuleScope PSGraphKit {
             $r[0].RoleName | Should -Be 'User Administrator'
         }
 
+        It 'expands only principal and resolves role names via roleDefinitions (Graph allows one $expand)' {
+            Get-GkAdminRoleAssignment -AssignmentKind Active | Out-Null
+            # roleDefinitions must be fetched for the name map
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter { $Uri -like '*roleDefinitions*' }
+            # the active assignments call must NOT try to expand roleDefinition as well
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Uri -like '*roleAssignments*' -and $Uri -notlike '*Schedule*' -and $Uri -notlike '*roleDefinition*'
+            }
+        }
+
         It 'only queries the requested kind' {
             Get-GkAdminRoleAssignment -AssignmentKind Active | Out-Null
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Uri -like '*Eligibility*' }
@@ -60,6 +72,7 @@ InModuleScope PSGraphKit {
 
         It 'warns and continues when PIM endpoints are unavailable (no P2)' {
             Mock Invoke-GkGraphRequest {
+                if ($Uri -like '*roleDefinitions*') { return $script:RoleDefValue }
                 # Both PIM endpoints contain 'ScheduleInstances'; the active endpoint does not.
                 if ($Uri -like '*ScheduleInstances*') { throw 'The tenant needs a Microsoft Entra ID P2 license' }
                 return $script:ActiveValue

@@ -29,6 +29,19 @@ InModuleScope PSGraphKit {
             $r.AccountEnabled     | Should -BeTrue
         }
 
+        It 'does not put @odata.type in the transitiveMemberOf $select (Graph rejects it)' {
+            $seen = [System.Collections.Generic.List[string]]::new()
+            Mock Invoke-GkGraphRequest {
+                $seen.Add($Uri)
+                if ($Uri -like '*transitiveMemberOf*') { return $script:MemberOf }
+                if ($Uri -like '*appRoleAssignments*') { return $script:AppRoles }
+                if ($Uri -like '*licenseDetails*')     { return $script:LicDetails }
+                return $script:UserObj
+            }
+            Get-GkUserAccessReport -UserId 'ada@contoso.com' | Out-Null
+            ($seen | Where-Object { $_ -like '*transitiveMemberOf*' }) | Should -Not -BeLike '*@odata.type*'
+        }
+
         It 'classifies transitiveMemberOf into groups and roles (ignoring AUs)' {
             $r = Get-GkUserAccessReport -UserId 'ada@contoso.com'
             $r.GroupCount | Should -Be 2

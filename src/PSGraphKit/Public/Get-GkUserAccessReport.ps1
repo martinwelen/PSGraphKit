@@ -90,7 +90,9 @@ function Get-GkUserAccessReport {
                 }
             }
 
-            $memberOf = & $facet "/users/$enc/transitiveMemberOf?`$select=id,displayName,@odata.type" 'group/role memberships'
+            # Note: @odata.type must NOT be in $select (Graph rejects it) — it is auto-included for
+            # the derived types in this heterogeneous directoryObject collection, so classification still works.
+            $memberOf = & $facet "/users/$enc/transitiveMemberOf?`$select=id,displayName" 'group/role memberships'
             $appRoles = & $facet "/users/$enc/appRoleAssignments" 'app role assignments'
             $licenses = & $facet "/users/$enc/licenseDetails" 'license details'
 
