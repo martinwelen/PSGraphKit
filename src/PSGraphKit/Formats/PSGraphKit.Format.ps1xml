@@ -177,5 +177,27 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.UserAccessReport</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.UserAccessReport</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem><PropertyName>UserPrincipalName</PropertyName></ListItem>
+              <ListItem><PropertyName>DisplayName</PropertyName></ListItem>
+              <ListItem><PropertyName>AccountEnabled</PropertyName></ListItem>
+              <ListItem><Label>Groups</Label><ScriptBlock>if ($_.Groups -is [array]) { "$($_.GroupCount): " + ($_.Groups -join ', ') } else { $_.Groups }</ScriptBlock></ListItem>
+              <ListItem><Label>DirectoryRoles</Label><ScriptBlock>if ($_.DirectoryRoles -is [array]) { "$($_.RoleCount): " + ($_.DirectoryRoles -join ', ') } else { $_.DirectoryRoles }</ScriptBlock></ListItem>
+              <ListItem><Label>Licenses</Label><ScriptBlock>if ($_.Licenses -is [array]) { "$($_.LicenseCount): " + ($_.Licenses -join ', ') } else { $_.Licenses }</ScriptBlock></ListItem>
+              <ListItem><Label>AppRoleAssignments</Label><ScriptBlock>if ($_.AppRoleAssignments -is [array]) { "$($_.AppCount): " + ($_.AppRoleAssignments -join ', ') } else { $_.AppRoleAssignments }</ScriptBlock></ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

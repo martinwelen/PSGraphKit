@@ -24,7 +24,8 @@
         'Get-GkGuestInventory',
         'Get-GkLicenseOverview',
         'Get-GkAdminRoleAssignment',
-        'Get-GkUserMfaStatus'
+        'Get-GkUserMfaStatus',
+        'Get-GkUserAccessReport'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

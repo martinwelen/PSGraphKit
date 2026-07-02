@@ -30,3 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkUserMfaStatus` — per-user MFA capability and registered methods from the
   userRegistrationDetails report (AuditLog.Read.All); IsMfaCapable vs IsMfaRegistered, SSPR and
   passwordless flags; `-NotMfaCapableOnly`/`-AdminsOnly` server-side filters, `-AsReport`.
+- `Get-GkUserAccessReport` — one user's full footprint: groups and directory roles (from
+  transitiveMemberOf), licenses, and app role assignments, with counts. Pipeline-friendly
+  (`-UserId` by value/property); delegated-only (licenseDetails); per-facet warn-and-continue.

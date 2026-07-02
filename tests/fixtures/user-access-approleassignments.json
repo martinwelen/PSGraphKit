@@ -1,0 +1,7 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('u1')/appRoleAssignments",
+  "value": [
+    { "id": "ara1", "appRoleId": "00000000-0000-0000-0000-000000000000", "principalDisplayName": "Ada Admin", "principalType": "User", "resourceDisplayName": "Salesforce" },
+    { "id": "ara2", "appRoleId": "11111111-1111-1111-1111-111111111111", "principalDisplayName": "Ada Admin", "principalType": "User", "resourceDisplayName": "ServiceNow" }
+  ]
+}

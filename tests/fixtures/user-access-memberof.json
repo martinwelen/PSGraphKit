@@ -1,0 +1,9 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#directoryObjects",
+  "value": [
+    { "@odata.type": "#microsoft.graph.group",         "id": "grp1", "displayName": "Finance Team" },
+    { "@odata.type": "#microsoft.graph.group",         "id": "grp2", "displayName": "All Staff" },
+    { "@odata.type": "#microsoft.graph.directoryRole", "id": "rol1", "displayName": "Global Administrator" },
+    { "@odata.type": "#microsoft.graph.administrativeUnit", "id": "au1", "displayName": "EMEA" }
+  ]
+}

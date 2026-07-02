@@ -1,0 +1,7 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('u1')/licenseDetails",
+  "value": [
+    { "id": "lic1", "skuId": "6fd2c87f-b296-42f0-b197-1e91e994b900", "skuPartNumber": "ENTERPRISEPACK", "servicePlans": [] },
+    { "id": "lic2", "skuId": "84a661c4-e949-4bd2-a560-ed7766fcaf2b", "skuPartNumber": "AAD_PREMIUM_P2", "servicePlans": [] }
+  ]
+}
