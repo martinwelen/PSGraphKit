@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Curated default views for PSGraphKit output types. One view per PSTypeName. -->
+<Configuration>
+  <ViewDefinitions>
+
+    <View>
+      <Name>PSGraphKit.ConnectionInfo</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.ConnectionInfo</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem><PropertyName>IsConnected</PropertyName></ListItem>
+              <ListItem><PropertyName>Account</PropertyName></ListItem>
+              <ListItem><PropertyName>AuthType</PropertyName></ListItem>
+              <ListItem><PropertyName>TenantId</PropertyName></ListItem>
+              <ListItem>
+                <Label>Scopes</Label>
+                <ScriptBlock>($_.Scopes -join ', ')</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>ActiveRoles</Label>
+                <ScriptBlock>($_.ActiveRoles -join ', ')</ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+  </ViewDefinitions>
+</Configuration>

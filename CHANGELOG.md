@@ -1,0 +1,17 @@
+# Changelog
+
+All notable changes to PSGraphKit are documented here.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Project scaffold: module manifest, root loader, CI (PSScriptAnalyzer + Pester), analyzer settings.
+- Internal `Invoke-GkGraphRequest` — single Graph chokepoint: pagination, 429/503 backoff,
+  `ConsistencyLevel` re-injection on paged requests, curated permission/role error translation.
+- Internal `Test-GkConnection` — pre-flight scope + auth-type validation with actionable errors.
+- Internal `Get-GkCurrentUserRole` — session-cached lookup of the signed-in admin's active roles,
+  used to make 403 messages name what you have vs. what the operation needs.
+- `Get-GkConnectionInfo` — "whoami" for the current Graph session (identity, auth type, scopes, roles).

@@ -1,0 +1,21 @@
+# PowerShell / build output
+*.log
+TestResults*.xml
+coverage*.xml
+/output/
+/.vs/
+
+# Editor
+.vscode/
+*.suo
+*.user
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Never commit real tenant data or secrets
+*.secret
+*.pfx
+*.cer
+local.settings.json
