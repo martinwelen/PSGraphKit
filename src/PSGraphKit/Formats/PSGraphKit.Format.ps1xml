@@ -263,5 +263,30 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.CaPolicy</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.CaPolicy</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>State</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>IncludedUsers</Label><Width>22</Width></TableColumnHeader>
+          <TableColumnHeader><Label>GrantControls</Label><Width>28</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>State</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IncludedUsers</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>GrantControls</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

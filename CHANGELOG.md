@@ -40,3 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkGroupReport` — groups classified by type (Microsoft365/Security/MailEnabledSecurity/
   Distribution) with dynamic flag, membership count (/members/$count), owners, and ownerless flag.
   `-GroupType`, `-OwnerlessOnly`, `-SkipMemberCount`, `-AsReport`.
+- `Get-GkCaPolicyReport` — Conditional Access policies with state and readable summaries of targeted
+  users/apps, grant controls (e.g. "mfa AND compliantDevice" / "Block"), and enabled session controls.
+  `-State` filter (Enabled/Disabled/ReportOnly), `-AsReport`.

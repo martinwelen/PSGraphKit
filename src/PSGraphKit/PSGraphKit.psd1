@@ -27,7 +27,8 @@
         'Get-GkUserMfaStatus',
         'Get-GkUserAccessReport',
         'Get-GkAppRegistrationReport',
-        'Get-GkGroupReport'
+        'Get-GkGroupReport',
+        'Get-GkCaPolicyReport'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
