@@ -30,5 +30,36 @@
       </ListControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.StaleUser</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.StaleUser</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>28</Width></TableColumnHeader>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Enabled</Label><Width>7</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Guest</Label><Width>5</Width></TableColumnHeader>
+          <TableColumnHeader><Label>LastActivity</Label><Width>20</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InactiveDays</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>AccountEnabled</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>IsGuest</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($_.LastActivity) { $_.LastActivity.ToString('yyyy-MM-dd HH:mm') } else { '(never)' }</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem><PropertyName>InactiveDays</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

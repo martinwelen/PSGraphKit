@@ -19,7 +19,8 @@
 
     # Explicit export list — updated as each function lands (priority order).
     FunctionsToExport = @(
-        'Get-GkConnectionInfo'
+        'Get-GkConnectionInfo',
+        'Get-GkStaleUser'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

@@ -15,3 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Internal `Get-GkCurrentUserRole` — session-cached lookup of the signed-in admin's active roles,
   used to make 403 messages name what you have vs. what the operation needs.
 - `Get-GkConnectionInfo` — "whoami" for the current Graph session (identity, auth type, scopes, roles).
+- `Get-GkStaleUser` — users with no sign-in for N days (from signInActivity), flagging disabled and
+  guest accounts; computes LastActivity/InactiveDays/NeverSignedIn; warns when P1/P2 signInActivity
+  data is unavailable. `-UserType`, `-IncludeAll`, `-AsReport`.
