@@ -1,0 +1,21 @@
+# Normalize line endings. PowerShell 7+ and cross-platform tooling handle LF fine.
+* text=auto eol=lf
+
+# PowerShell sources and data
+*.ps1   text eol=lf
+*.psm1  text eol=lf
+*.psd1  text eol=lf
+*.ps1xml text eol=lf
+
+# Docs / config
+*.md    text eol=lf
+*.yml   text eol=lf
+*.json  text eol=lf
+
+# Treat sample Graph payloads as text
+*.json  text eol=lf
+
+# Binary / never normalize
+*.pfx   binary
+*.cer   binary
+*.png   binary
