@@ -41,6 +41,16 @@ Describe 'PSGraphKit module' {
         }
     }
 
+    It 'has a docs page carrying the current synopsis for every exported cmdlet' {
+        $docsDir = Join-Path $PSScriptRoot '..' '..' 'docs'
+        foreach ($name in (Get-Command -Module PSGraphKit).Name) {
+            $doc = Join-Path $docsDir "$name.md"
+            Test-Path $doc | Should -BeTrue -Because "docs/$name.md should exist (run build/Build-GkDocs.ps1)"
+            $firstLine = (((Get-Help $name).Synopsis.Trim()) -split "`n")[0].Trim()
+            (Get-Content $doc -Raw) | Should -BeLike "*$firstLine*" -Because "docs/$name.md should carry the current synopsis"
+        }
+    }
+
     It 'every public function declares required scopes in the scope map' {
         $names = @((Get-Command -Module PSGraphKit).Name)   # exported functions only (outside module scope)
         InModuleScope PSGraphKit -Parameters @{ Names = $names } {

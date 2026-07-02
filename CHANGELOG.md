@@ -46,3 +46,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkDeviceInventory` — Entra devices with OS, join type (trustType AzureAd/ServerAd/Workplace
   mapped to AzureADJoined/HybridJoined/Registered), compliance/management/ownership, and inactivity
   from approximateLastSignInDateTime. `-StaleOnly`/`-StaleDays`, `-JoinType`, `-AsReport`.
+- `docs/` — per-cmdlet markdown reference (PlatyPS-style) generated from comment-based help by
+  `build/Build-GkDocs.ps1`, kept in sync by a CI test.

@@ -82,8 +82,8 @@ Run: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All
 | `Get-GkDeviceInventory` | Entra devices with OS, join type, last activity, and stale flag. |
 
 All reporting cmdlets support `-AsReport` (export-shaped output) and emit typed `PSGraphKit.*`
-objects with curated default views. See each cmdlet's `Get-Help <name> -Full` for details and
-examples, and [DESIGN.md](DESIGN.md) for the endpoint/scope plan.
+objects with curated default views. Full per-cmdlet reference is in **[docs/](docs/README.md)**
+(and via `Get-Help <name> -Full`); see [DESIGN.md](DESIGN.md) for the endpoint/scope plan.
 
 ## Development
 
@@ -93,6 +93,9 @@ Invoke-Pester -Path ./tests
 
 # Lint
 Invoke-ScriptAnalyzer -Path ./src -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+
+# Regenerate the docs/ reference after changing any function's help
+./build/Build-GkDocs.ps1
 ```
 
 CI runs PSScriptAnalyzer + Pester on every push/PR (`.github/workflows/ci.yml`).
