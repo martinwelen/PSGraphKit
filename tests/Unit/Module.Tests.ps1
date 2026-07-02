@@ -25,4 +25,29 @@ Describe 'PSGraphKit module' {
         $exported | Should -Not -Contain 'Test-GkConnection'
         $exported | Should -Not -Contain 'Invoke-GkRawGraphCall'
     }
+
+    It 'exports exactly the Public/*.ps1 functions (manifest stays in sync)' {
+        $publicRoot = Join-Path (Split-Path $script:ManifestPath) 'Public'
+        $files    = @(Get-ChildItem -Path $publicRoot -Filter '*.ps1' | Select-Object -ExpandProperty BaseName | Sort-Object)
+        $exported = @((Get-Command -Module PSGraphKit).Name | Sort-Object)
+        $exported | Should -Be $files
+    }
+
+    It 'every public function has comment-based help with a synopsis and at least 3 examples' {
+        foreach ($name in (Get-Command -Module PSGraphKit).Name) {
+            $help = Get-Help $name -ErrorAction Stop
+            $help.Synopsis            | Should -Not -BeNullOrEmpty -Because "$name needs a synopsis"
+            @($help.Examples.Example).Count | Should -BeGreaterOrEqual 3 -Because "$name needs >= 3 examples"
+        }
+    }
+
+    It 'every public function declares required scopes in the scope map' {
+        $names = @((Get-Command -Module PSGraphKit).Name)   # exported functions only (outside module scope)
+        InModuleScope PSGraphKit -Parameters @{ Names = $names } {
+            param($Names)
+            foreach ($name in $Names) {
+                $script:GkScopeMap.ContainsKey($name) | Should -BeTrue -Because "$name must have a scope-map entry"
+            }
+        }
+    }
 }

@@ -70,10 +70,20 @@ Run: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All
 | Cmdlet | Purpose |
 |--------|---------|
 | `Get-GkConnectionInfo` | Show the current Graph session: identity, auth type, scopes, active roles. |
+| `Get-GkStaleUser` | Users with no sign-in for N days (signInActivity), flagging disabled/guest. |
+| `Get-GkGuestInventory` | Guest accounts with sponsor, invitation state, age, and inactivity. |
+| `Get-GkLicenseOverview` | Subscribed SKUs with assigned/available seats; optional disabled-but-licensed counts. |
+| `Get-GkAdminRoleAssignment` | Directory role assignments — active, PIM-eligible, and PIM time-bound. |
+| `Get-GkUserMfaStatus` | Per-user MFA capability and registered methods (registration report). |
+| `Get-GkUserAccessReport` | One user's footprint: groups, roles, licenses, app assignments (delegated-only). |
+| `Get-GkAppRegistrationReport` | App registrations with expiring secrets/certs and high-privilege permissions. |
+| `Get-GkGroupReport` | Groups with type, membership count, owners, and ownerless flag. |
+| `Get-GkCaPolicyReport` | Conditional Access policies with state and summarized conditions/controls. |
+| `Get-GkDeviceInventory` | Entra devices with OS, join type, last activity, and stale flag. |
 
-_Phase 1 reporting cmdlets (stale users, guests, licenses, roles, MFA, access, app
-registrations, groups, Conditional Access, devices) are being added one at a time in
-priority order — see DESIGN.md._
+All reporting cmdlets support `-AsReport` (export-shaped output) and emit typed `PSGraphKit.*`
+objects with curated default views. See each cmdlet's `Get-Help <name> -Full` for details and
+examples, and [DESIGN.md](DESIGN.md) for the endpoint/scope plan.
 
 ## Development
 
