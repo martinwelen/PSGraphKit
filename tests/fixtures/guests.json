@@ -1,0 +1,31 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users",
+  "value": [
+    {
+      "id": "g1111111-1111-1111-1111-111111111111",
+      "displayName": "Gita Guest",
+      "userPrincipalName": "gita_partner.com#EXT#@contoso.onmicrosoft.com",
+      "mail": "gita@partner.com",
+      "userType": "Guest",
+      "accountEnabled": true,
+      "externalUserState": "Accepted",
+      "externalUserStateChangeDateTime": "2023-01-10T00:00:00Z",
+      "createdDateTime": "2023-01-01T00:00:00Z",
+      "signInActivity": {
+        "lastSignInDateTime": "2023-02-01T00:00:00Z",
+        "lastNonInteractiveSignInDateTime": "2023-02-15T00:00:00Z"
+      }
+    },
+    {
+      "id": "g2222222-2222-2222-2222-222222222222",
+      "displayName": "Pending Pat",
+      "userPrincipalName": "pat_partner.com#EXT#@contoso.onmicrosoft.com",
+      "mail": "pat@partner.com",
+      "userType": "Guest",
+      "accountEnabled": true,
+      "externalUserState": "PendingAcceptance",
+      "externalUserStateChangeDateTime": "2024-11-01T00:00:00Z",
+      "createdDateTime": "2024-11-01T00:00:00Z"
+    }
+  ]
+}

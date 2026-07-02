@@ -18,3 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkStaleUser` — users with no sign-in for N days (from signInActivity), flagging disabled and
   guest accounts; computes LastActivity/InactiveDays/NeverSignedIn; warns when P1/P2 signInActivity
   data is unavailable. `-UserType`, `-IncludeAll`, `-AsReport`.
+- `Get-GkGuestInventory` — guest accounts with sponsor (via /users/{id}/sponsors), invitation state,
+  account age, and inactivity. `-StaleOnly`, `-SkipSponsor` (avoids the per-guest N+1), `-AsReport`;
+  warns and continues when a sponsor lookup is denied.

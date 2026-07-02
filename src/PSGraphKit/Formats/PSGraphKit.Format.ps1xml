@@ -61,5 +61,36 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.GuestInventory</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.GuestInventory</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>24</Width></TableColumnHeader>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>36</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InvitationState</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InactiveDays</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Sponsors</Label><Width>24</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>InvitationState</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($null -eq $_.InactiveDays) { '(never)' } else { $_.InactiveDays }</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($_.Sponsors -is [array]) { $_.Sponsors -join '; ' } else { $_.Sponsors }</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>
