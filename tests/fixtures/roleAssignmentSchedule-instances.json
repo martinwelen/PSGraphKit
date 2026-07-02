@@ -1,0 +1,24 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#roleManagement/directory/roleAssignmentScheduleInstances",
+  "value": [
+    {
+      "id": "as1",
+      "principalId": "p3",
+      "roleDefinitionId": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "directoryScopeId": "/administrativeUnits/au1",
+      "assignmentType": "Activated",
+      "memberType": "Direct",
+      "startDateTime": "2026-06-01T00:00:00Z",
+      "endDateTime": "2026-07-01T00:00:00Z",
+      "principal": {
+        "@odata.type": "#microsoft.graph.group",
+        "id": "p3",
+        "displayName": "Helpdesk PIM Group"
+      },
+      "roleDefinition": {
+        "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+        "displayName": "Helpdesk Administrator"
+      }
+    }
+  ]
+}

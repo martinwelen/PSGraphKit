@@ -119,5 +119,34 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.AdminRoleAssignment</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.AdminRoleAssignment</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>RoleName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Kind</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>PrincipalName</Label><Width>26</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Type</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Scope</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>RoleName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>AssignmentKind</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>PrincipalName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>PrincipalType</PropertyName></TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>if ($_.IsTenantScope) { 'Tenant' } else { $_.Scope }</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

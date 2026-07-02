@@ -24,3 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Get-GkLicenseOverview` — subscribed SKUs with enabled/assigned/available seat counts,
   warning/suspended units, and best-effort friendly product names; `-IncludeDisabledLicensed`
   counts licenses held by disabled accounts (per-SKU user query). `-AsReport`.
+- `Get-GkAdminRoleAssignment` — active, PIM-eligible, and PIM time-bound directory role
+  assignments via the roleManagement RBAC API, with principal/role resolved and directory scope;
+  `-AssignmentKind`, `-RoleName`; warns and continues when PIM (P2) endpoints are unavailable.

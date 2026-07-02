@@ -1,0 +1,24 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#roleManagement/directory/roleEligibilityScheduleInstances",
+  "value": [
+    {
+      "id": "es1",
+      "principalId": "p2",
+      "roleDefinitionId": "fe930be7-5e62-47db-91af-98c3a49a38b1",
+      "directoryScopeId": "/",
+      "startDateTime": "2024-01-01T00:00:00Z",
+      "endDateTime": null,
+      "memberType": "Direct",
+      "principal": {
+        "@odata.type": "#microsoft.graph.user",
+        "id": "p2",
+        "displayName": "Eli Eligible",
+        "userPrincipalName": "eli@contoso.com"
+      },
+      "roleDefinition": {
+        "id": "fe930be7-5e62-47db-91af-98c3a49a38b1",
+        "displayName": "User Administrator"
+      }
+    }
+  ]
+}

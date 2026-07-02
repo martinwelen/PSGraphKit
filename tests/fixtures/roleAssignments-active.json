@@ -1,0 +1,21 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#roleManagement/directory/roleAssignments",
+  "value": [
+    {
+      "id": "ra1",
+      "principalId": "p1",
+      "roleDefinitionId": "62e90394-69f5-4237-9190-012177145e10",
+      "directoryScopeId": "/",
+      "principal": {
+        "@odata.type": "#microsoft.graph.user",
+        "id": "p1",
+        "displayName": "Ada Admin",
+        "userPrincipalName": "ada@contoso.com"
+      },
+      "roleDefinition": {
+        "id": "62e90394-69f5-4237-9190-012177145e10",
+        "displayName": "Global Administrator"
+      }
+    }
+  ]
+}
