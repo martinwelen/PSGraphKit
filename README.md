@@ -1,13 +1,28 @@
 # PSGraphKit
 
-A curated PowerShell module for everyday **Entra ID / Microsoft Graph** administration and
-reporting. It is a hand-built layer over the Microsoft Graph SDK that exposes admin
-*intentions* as cmdlets — the read-only inventory and assessment tasks an M365 consultant
-performs at every engagement — without the raw OData, manual pagination, and cryptic errors
-of the auto-generated SDK.
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/PSGraphKit?logo=powershell&label=PSGallery)](https://www.powershellgallery.com/packages/PSGraphKit)
+[![Downloads](https://img.shields.io/powershellgallery/dt/PSGraphKit?logo=powershell)](https://www.powershellgallery.com/packages/PSGraphKit)
+[![CI](https://github.com/martinwelen/PSGraphKit/actions/workflows/ci.yml/badge.svg)](https://github.com/martinwelen/PSGraphKit/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PowerShell 7.4+](https://img.shields.io/badge/PowerShell-7.4%2B-5391FE?logo=powershell)](https://learn.microsoft.com/powershell/)
 
-> **Status:** Phase 1 (read-only reporting/inventory) is under active development.
-> See [DESIGN.md](DESIGN.md) for the endpoint/scope plan and [CHANGELOG.md](CHANGELOG.md).
+A curated PowerShell module for everyday **Entra ID / Microsoft Graph** administration,
+reporting, and remediation. It is a hand-built layer over the Microsoft Graph SDK that exposes
+admin *intentions* as cmdlets — the inventory, assessment, and remediation tasks an M365
+consultant performs at every engagement — without the raw OData, manual pagination, and cryptic
+errors of the auto-generated SDK.
+
+**50 cmdlets** across reporting, remediation, and a one-file tenant assessment export.
+Dependency: `Microsoft.Graph.Authentication` only.
+
+## Install
+
+```powershell
+Install-PSResource PSGraphKit      # or: Install-Module PSGraphKit
+```
+
+See [DESIGN.md](DESIGN.md) / [DESIGN-phase2.md](DESIGN-phase2.md) for the endpoint/scope plan,
+[ROADMAP.md](ROADMAP.md) for what's planned, and [CHANGELOG.md](CHANGELOG.md) for history.
 
 ## Requirements
 

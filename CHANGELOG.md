@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `about_PSGraphKit` conceptual help topic (`Get-Help about_PSGraphKit`).
+- README install section and status badges; `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+  and GitHub issue/PR templates.
+- CI now runs on Windows, Linux, and macOS with code coverage; a tag-triggered workflow publishes
+  to the PowerShell Gallery.
+
 ## [0.3.0] - 2026-07-03
 
 20 new cmdlets across five themes — security posture/risk, access & CA hardening, apps/consent/

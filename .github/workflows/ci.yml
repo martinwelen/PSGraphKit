@@ -8,16 +8,21 @@ on:
 
 jobs:
   analyze-and-test:
-    name: PSScriptAnalyzer + Pester
-    runs-on: windows-latest
+    name: Analyze + Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install PSScriptAnalyzer and Pester
+      - name: Install dependencies
         shell: pwsh
         run: |
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module Microsoft.Graph.Authentication -MinimumVersion 2.10.0 -Force -Scope CurrentUser
           Install-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force -Scope CurrentUser
           Install-Module Pester -MinimumVersion 5.5.0 -Force -SkipPublisherCheck -Scope CurrentUser
 
@@ -39,11 +44,17 @@ jobs:
           $config.Output.Verbosity = 'Detailed'
           $config.TestResult.Enabled = $true
           $config.TestResult.OutputPath = 'TestResults.xml'
+          $config.CodeCoverage.Enabled = $true
+          $config.CodeCoverage.Path = './src'
+          $config.CodeCoverage.OutputFormat = 'JaCoCo'
+          $config.CodeCoverage.OutputPath = 'coverage.xml'
           Invoke-Pester -Configuration $config
 
-      - name: Upload test results
+      - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pester-results
-          path: TestResults.xml
+          name: results-${{ matrix.os }}
+          path: |
+            TestResults.xml
+            coverage.xml

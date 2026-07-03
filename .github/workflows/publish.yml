@@ -1,0 +1,40 @@
+name: Publish to PowerShell Gallery
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module Microsoft.Graph.Authentication -MinimumVersion 2.10.0 -Force -Scope CurrentUser
+
+      - name: Verify manifest matches tag
+        shell: pwsh
+        run: |
+          $version = (Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1).Version.ToString()
+          $tag = '${{ github.ref_name }}'.TrimStart('v')
+          Write-Host "Manifest: $version   Tag: $tag"
+          if ($version -ne $tag) { throw "Manifest version ($version) does not match tag ($tag)." }
+
+      - name: Stage package docs
+        shell: pwsh
+        run: |
+          # Ship README/LICENSE/CHANGELOG inside the module so the Gallery page is complete.
+          Copy-Item README.md, LICENSE, CHANGELOG.md ./src/PSGraphKit/ -Force
+
+      - name: Publish to PSGallery
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          Publish-PSResource -Path ./src/PSGraphKit -Repository PSGallery -ApiKey $env:PSGALLERY_API_KEY -Verbose

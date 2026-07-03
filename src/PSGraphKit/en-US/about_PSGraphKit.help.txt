@@ -1,0 +1,70 @@
+TOPIC
+    about_PSGraphKit
+
+SHORT DESCRIPTION
+    A curated PowerShell module over Microsoft Graph for everyday Entra ID / Microsoft 365
+    administration, reporting, and remediation.
+
+LONG DESCRIPTION
+    PSGraphKit is a hand-built layer over the Microsoft Graph SDK that exposes admin
+    intentions as cmdlets: the read-only inventory/assessment tasks and the write/remediation
+    actions an M365 consultant performs at every engagement — without the raw OData filters,
+    manual pagination, and cryptic errors of the auto-generated SDK.
+
+    The module depends on Microsoft.Graph.Authentication only (for Connect-MgGraph and
+    Invoke-MgGraphRequest). It does not require the full Microsoft.Graph meta-module.
+
+    Requirements:
+      - PowerShell 7.4 or later (Windows PowerShell 5.1 is not supported).
+      - Microsoft.Graph.Authentication 2.10.0 or later.
+
+  CONNECTING
+    PSGraphKit runs against whatever Connect-MgGraph session exists. Connect directly, or use
+    Connect-GkGraph, which derives the required scopes from the cmdlets you plan to run:
+
+        Connect-GkGraph -ForCommand Get-GkStaleUser, Get-GkGuestInventory   # only those scopes
+        Connect-GkGraph -AllCommands                                        # full read-only set
+        Connect-GkGraph -ClientId <id> -TenantId <tid> -CertificateThumbprint <t>   # app-only
+
+    Get-GkConnectionInfo shows the current identity, auth type, granted scopes, and active roles.
+
+  SCOPES AND ERRORS
+    Each public function declares its required scopes. Before any Graph call, a pre-flight check
+    validates the session and, on a missing scope, returns an actionable error naming the exact
+    Connect-MgGraph command to run. At runtime, 401/403 responses are translated into readable
+    messages — including which Entra role you hold versus which the operation needs.
+
+  READING AND REMEDIATING
+    Report cmdlets (Get-Gk*) emit typed PSCustomObjects (PSGraphKit.*) with curated default views
+    and real [datetime] values, and support -AsReport for export-shaped output. Write cmdlets
+    (Disable-Gk*, Remove-Gk*, Set-Gk*, New-Gk*, Add-Gk*, Reset-Gk*, Revoke-Gk*) support -WhatIf
+    and -Confirm, prompt by default, and emit a per-item result object; destructive actions are
+    opt-in and default to the safest behavior (for example, disable rather than delete).
+
+    Reports compose into their remediation through the pipeline, for example:
+
+        Get-GkStaleUser -InactiveDays 180 | Disable-GkStaleUser -WhatIf
+
+  ASSESSMENT EXPORT
+    Export-GkTenantAssessment runs the read suite into a single self-contained HTML report (and
+    optional per-section CSVs) suitable to hand to a customer.
+
+EXAMPLES
+    Connect-GkGraph -AllCommands
+    Get-GkStaleUser -InactiveDays 90
+    Get-GkPrivilegedRoleMember -PermanentOnly
+    Get-GkSecureScore
+    Export-GkTenantAssessment -Path .\assessment.html
+
+NOTE
+    Some reports require a Microsoft Entra ID P1 or P2 license (for example signInActivity,
+    sign-in logs, Identity Protection risk, and PIM data). Where a license or scope is missing,
+    the affected cmdlet warns and continues rather than failing the whole run.
+
+SEE ALSO
+    Get-Command -Module PSGraphKit
+    Get-Help Connect-GkGraph -Full
+    https://github.com/martinwelen/PSGraphKit
+
+KEYWORDS
+    Entra EntraID AzureAD MicrosoftGraph M365 Reporting Remediation Security
