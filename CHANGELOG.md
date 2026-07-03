@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-03
+
+Phase 1 — read-only Entra ID / Microsoft Graph reporting. 12 cmdlets, validated end-to-end
+against a live tenant. Dependency: Microsoft.Graph.Authentication only.
+
 ### Added
 - `Connect-GkGraph` — optional connect helper over Connect-MgGraph that derives the required scopes
   from the cmdlets you plan to run (`-ForCommand`) or the whole module (`-AllCommands`), and supports
@@ -62,3 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `roleDefinitions` lookup. (Found by live smoke test — Graph 400 "Only one property can be expanded".)
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
+
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.1.0
