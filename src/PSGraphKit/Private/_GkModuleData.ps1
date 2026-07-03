@@ -29,6 +29,14 @@ $script:GkScopeMap = @{
         RoleHints    = @()
     }
 
+    'Revoke-GkUserSession' = @{
+        Groups = @(
+            @{ For = 'revoke sign-in sessions'; Any = @('User.RevokeSessions.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
+    }
+
     'Get-GkStaleUser' = @{
         Groups = @(
             @{ For = 'read user objects';   Any = @('User.Read.All', 'Directory.Read.All') }

@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ROADMAP.md` — planned cmdlet backlog (Phase 2 write/remediation, Phase 3 reports, Phase 4 export).
 - `DESIGN-phase2.md` — endpoint- and scope-verified plan for the Phase 2+ cmdlets, plus the
   `Invoke-GkGraphRequest` changes (PATCH/DELETE) and write-safety conventions they require.
+- `Revoke-GkUserSession` — first Phase 2 write cmdlet: revokes users' sign-in sessions
+  (POST /users/{id}/revokeSignInSessions). SupportsShouldProcess (-WhatIf/-Confirm), pipeline
+  input, per-user PSGraphKit.SessionRevokeResult, warn-and-continue on failure.
+
+### Changed
+- `Invoke-GkGraphRequest` now supports PATCH and DELETE (and only paginates GET), enabling write
+  cmdlets; 204 No Content responses return cleanly.
 
 ## [0.1.0] - 2026-07-03
 

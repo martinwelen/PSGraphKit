@@ -319,5 +319,28 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.SessionRevokeResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.SessionRevokeResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserId</Label><Width>40</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Action</Label><Width>22</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>UserId</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Action</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>
