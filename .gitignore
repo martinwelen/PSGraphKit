@@ -19,3 +19,6 @@ Thumbs.db
 *.pfx
 *.cer
 local.settings.json
+
+# Local, un-tracked scratch: live-test runner + its logs (may contain tenant data)
+/local/
