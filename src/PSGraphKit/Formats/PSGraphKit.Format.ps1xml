@@ -441,5 +441,157 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.ServicePrincipal</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.ServicePrincipal</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Type</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Enabled</Label><Width>7</Width></TableColumnHeader>
+          <TableColumnHeader><Label>AssignReq</Label><Width>9</Width></TableColumnHeader>
+          <TableColumnHeader><Label>AppId</Label><Width>38</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ServicePrincipalType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AccountEnabled</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AppRoleAssignmentRequired</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AppId</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.SignIn</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.SignIn</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>CreatedDateTime</Label><Width>20</Width></TableColumnHeader>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>AppDisplayName</Label><Width>24</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Status</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>RiskLevel</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><ScriptBlock>if ($_.CreatedDateTime) { $_.CreatedDateTime.ToString('yyyy-MM-dd HH:mm') }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AppDisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Status</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>RiskLevel</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.AuthMethodState</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.AuthMethodState</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Method</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>State</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Method</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>State</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.NamedLocation</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.NamedLocation</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>28</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Type</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Trusted</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Ranges/Countries</Label><Width>40</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Type</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsTrusted</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>$v = if ($_.Type -eq 'IP') { $_.IpRanges } else { $_.Countries }; if ($v -is [array]) { $v -join '; ' } else { $v }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.CrossTenantAccess</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.CrossTenantAccess</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Scope</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>TrustMfa</Label><Width>9</Width></TableColumnHeader>
+          <TableColumnHeader><Label>TrustCompliant</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>TrustHybrid</Label><Width>11</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Scope</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TrustMfa</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TrustCompliantDevice</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TrustHybridJoinedDevice</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.CustomRole</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.CustomRole</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Enabled</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Permissions</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsEnabled</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>PermissionCount</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.AdministrativeUnit</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.AdministrativeUnit</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MembershipType</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Visibility</Label><Width>12</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Members</Label><Width>8</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MembershipType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Visibility</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($null -eq $_.MemberCount) { '-' } else { $_.MemberCount }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.LicenseAssignmentError</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.LicenseAssignmentError</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>SkuPartNumber</Label><Width>22</Width></TableColumnHeader>
+          <TableColumnHeader><Label>State</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>ErrorCode</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>ByGroup</Label><Width>8</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>SkuPartNumber</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>State</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ErrorCode</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AssignedByGroup</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

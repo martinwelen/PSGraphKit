@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   an app client secret; PSGraphKit.AppCredentialResult. Certificate rotation is out of scope.
 - `Remove-GkAdminRoleAssignment` — remove a role assignment: DELETE for direct active, `adminRemove`
   request for PIM eligible/active; PSGraphKit.RoleRemovalResult.
+- Phase 3 reports: `Get-GkServicePrincipalReport` (enterprise apps + optional consent grants, flags
+  tenant-wide AllPrincipals consent), `Get-GkSignInReport` (audit sign-ins; P1/P2), `Get-GkAuthMethodPolicy`
+  (per-method state), `Get-GkNamedLocation`, `Get-GkCrossTenantAccess`, `Get-GkCustomRole`,
+  `Get-GkAdministrativeUnit`, `Get-GkLicenseAssignmentError`.
+- Phase 4: `Export-GkTenantAssessment` — runs the read suite into one self-contained HTML report
+  (inline CSS, no external assets) and optional per-section CSVs; a failing section is noted, not fatal.
+  Uses only Microsoft.PowerShell.Utility.
 
 ### Changed
 - `Invoke-GkGraphRequest` now supports PATCH and DELETE (and only paginates GET), enabling write

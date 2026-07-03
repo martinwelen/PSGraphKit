@@ -75,10 +75,17 @@ Run: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All
 
 ## Available cmdlets
 
+**Connection**
+
 | Cmdlet | Purpose |
 |--------|---------|
 | `Connect-GkGraph` | Connect to Graph, deriving required scopes from the cmdlets you plan to run. |
 | `Get-GkConnectionInfo` | Show the current Graph session: identity, auth type, scopes, active roles. |
+
+**Reports (read-only)**
+
+| Cmdlet | Purpose |
+|--------|---------|
 | `Get-GkStaleUser` | Users with no sign-in for N days (signInActivity), flagging disabled/guest. |
 | `Get-GkGuestInventory` | Guest accounts with sponsor, invitation state, age, and inactivity. |
 | `Get-GkLicenseOverview` | Subscribed SKUs with assigned/available seats; optional disabled-but-licensed counts. |
@@ -89,10 +96,39 @@ Run: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All
 | `Get-GkGroupReport` | Groups with type, membership count, owners, and ownerless flag. |
 | `Get-GkCaPolicyReport` | Conditional Access policies with state and summarized conditions/controls. |
 | `Get-GkDeviceInventory` | Entra devices with OS, join type, last activity, and stale flag. |
+| `Get-GkServicePrincipalReport` | Enterprise apps with type/state and optional tenant-wide consent grants. |
+| `Get-GkSignInReport` | Failed and risky sign-ins over a recent window (P1/P2). |
+| `Get-GkAuthMethodPolicy` | Authentication-methods policy: which methods are enabled/disabled. |
+| `Get-GkNamedLocation` | Conditional Access named locations (IP ranges / countries). |
+| `Get-GkCrossTenantAccess` | Cross-tenant (B2B) access: default policy and partner trust settings. |
+| `Get-GkCustomRole` | Custom directory role definitions and their permissions. |
+| `Get-GkAdministrativeUnit` | Administrative units with membership type and member count. |
+| `Get-GkLicenseAssignmentError` | Users with failing license assignments (incl. group-based). |
+
+**Remediation (write — `-WhatIf`/`-Confirm`)**
+
+| Cmdlet | Purpose |
+|--------|---------|
+| `Disable-GkStaleUser` | Block user sign-in (accountEnabled = false). |
+| `Revoke-GkUserSession` | Revoke a user's sign-in sessions. |
+| `Remove-GkUserLicense` | Reclaim license SKUs from a user. |
+| `Set-GkGroupOwner` | Add an owner to a group. |
+| `Remove-GkStaleGuest` | Disable (default) or delete a stale guest; refuses non-guests. |
+| `Disable-GkStaleDevice` | Disable (default) or delete a device. |
+| `Reset-GkAppCredential` | Add or remove an app registration client secret. |
+| `Remove-GkAdminRoleAssignment` | Remove an active or PIM role assignment. |
+
+**Deliverable**
+
+| Cmdlet | Purpose |
+|--------|---------|
+| `Export-GkTenantAssessment` | Run the read suite into one self-contained HTML report (+ optional CSVs). |
 
 All reporting cmdlets support `-AsReport` (export-shaped output) and emit typed `PSGraphKit.*`
-objects with curated default views. Full per-cmdlet reference is in **[docs/](docs/README.md)**
-(and via `Get-Help <name> -Full`); see [DESIGN.md](DESIGN.md) for the endpoint/scope plan.
+objects with curated default views; write cmdlets support `-WhatIf`/`-Confirm`. Full per-cmdlet
+reference is in **[docs/](docs/README.md)** (and via `Get-Help <name> -Full`); see
+[DESIGN.md](DESIGN.md) / [DESIGN-phase2.md](DESIGN-phase2.md) for the endpoint/scope plan and
+[ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Development
 

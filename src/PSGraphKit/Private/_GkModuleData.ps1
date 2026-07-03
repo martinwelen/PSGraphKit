@@ -29,6 +29,12 @@ $script:GkScopeMap = @{
         RoleHints    = @()
     }
 
+    'Export-GkTenantAssessment' = @{
+        Groups        = @()  # composes the read cmdlets, each of which validates its own scopes
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader')
+    }
+
     'Revoke-GkUserSession' = @{
         Groups = @(
             @{ For = 'revoke sign-in sessions'; Any = @('User.RevokeSessions.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
@@ -176,6 +182,71 @@ $script:GkScopeMap = @{
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Cloud Device Administrator', 'Intune Administrator')
+    }
+
+    'Get-GkServicePrincipalReport' = @{
+        Groups = @(
+            @{ For = 'read service principals (and consent grants)'; Any = @('Application.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Directory Readers', 'Cloud Application Administrator')
+    }
+
+    'Get-GkSignInReport' = @{
+        Groups = @(
+            @{ For = 'read sign-in logs'; Any = @('AuditLog.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
+    }
+
+    'Get-GkAuthMethodPolicy' = @{
+        Groups = @(
+            @{ For = 'read the authentication methods policy'; Any = @('Policy.Read.AuthenticationMethod', 'Policy.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Authentication Policy Administrator')
+    }
+
+    'Get-GkNamedLocation' = @{
+        Groups = @(
+            @{ For = 'read named locations'; Any = @('Policy.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Security Reader', 'Conditional Access Administrator')
+    }
+
+    'Get-GkCrossTenantAccess' = @{
+        Groups = @(
+            @{ For = 'read cross-tenant access policy'; Any = @('Policy.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Security Reader')
+    }
+
+    'Get-GkCustomRole' = @{
+        Groups = @(
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Privileged Role Administrator')
+    }
+
+    'Get-GkAdministrativeUnit' = @{
+        Groups = @(
+            @{ For = 'read administrative units'; Any = @('AdministrativeUnit.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Directory Readers')
+    }
+
+    'Get-GkLicenseAssignmentError' = @{
+        Groups = @(
+            @{ For = 'read users'; Any = @('User.Read.All', 'Directory.Read.All') }
+            @{ For = 'read subscribed SKUs'; Any = @('Organization.Read.All', 'LicenseAssignment.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'License Administrator')
     }
 }
 

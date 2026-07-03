@@ -17,7 +17,7 @@ Status legend: **shipped** · **planned** · **idea**
 
 ---
 
-## Phase 2 — write / remediation (planned)
+## Phase 2 — write / remediation (shipped)
 
 Action counterparts to the Phase 1 reports. All are state-changing and outward-facing, so each
 supports `-WhatIf` / `-Confirm` (SupportsShouldProcess) and requires an explicit opt-in for bulk
@@ -36,27 +36,26 @@ runs. Designed to compose with the reports (`Get-Gk… | <action>`).
 
 ---
 
-## Phase 3 — broader read coverage (idea)
+## Phase 3 — broader read coverage (shipped)
 
 Lower-risk reports that widen the assessment surface.
 
-- `Get-GkServicePrincipalReport` — enterprise apps and their OAuth2 consent grants
-- `Get-GkRiskyConsentGrant` — over-privileged / illegal delegated consents
-- `Get-GkSignInReport` — risky and failed sign-ins (audit log)
+- `Get-GkServicePrincipalReport` — enterprise apps and their OAuth2 consent grants (flags tenant-wide consent)
+- `Get-GkSignInReport` — failed and risky sign-ins (audit log; P1/P2)
 - `Get-GkAuthMethodPolicy` — tenant authentication-methods policy posture
 - `Get-GkNamedLocation` — Conditional Access named locations
 - `Get-GkCrossTenantAccess` — B2B / cross-tenant access settings
 - `Get-GkCustomRole` — custom directory role definitions
-- `Get-GkAdministrativeUnit` — administrative units and scoped admins
+- `Get-GkAdministrativeUnit` — administrative units
 - `Get-GkLicenseAssignmentError` — users with failing license assignments
 
 ---
 
-## Phase 4 — engagement deliverables (idea)
+## Phase 4 — engagement deliverables (shipped / idea)
 
-- `Export-GkTenantAssessment` — run the read suite into a single self-contained HTML (and CSV)
-  workbook suitable to hand to a client. Highest-value orchestration item; pure read.
-- `Get-GkSecurityBaseline` — compare tenant posture against a configurable checklist.
+- `Export-GkTenantAssessment` (shipped) — runs the read suite into a single self-contained HTML
+  (and optional CSVs) suitable to hand to a client. Pure read.
+- `Get-GkSecurityBaseline` (idea) — compare tenant posture against a configurable checklist.
 
 ---
 

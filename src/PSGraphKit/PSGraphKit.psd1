@@ -38,7 +38,16 @@
         'Get-GkAppRegistrationReport',
         'Get-GkGroupReport',
         'Get-GkCaPolicyReport',
-        'Get-GkDeviceInventory'
+        'Get-GkDeviceInventory',
+        'Get-GkServicePrincipalReport',
+        'Get-GkSignInReport',
+        'Get-GkAuthMethodPolicy',
+        'Get-GkNamedLocation',
+        'Get-GkCrossTenantAccess',
+        'Get-GkCustomRole',
+        'Get-GkAdministrativeUnit',
+        'Get-GkLicenseAssignmentError',
+        'Export-GkTenantAssessment'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
