@@ -59,6 +59,51 @@ Lower-risk reports that widen the assessment surface.
 
 ---
 
+## Phase 5 — security & governance expansion (shipped, v0.3.0)
+
+20 cmdlets across five themes, taking the module to 50 total:
+
+- **Security posture & risk:** `Get-GkSecureScore`, `Get-GkRiskyUser`, `Get-GkRiskDetection`,
+  `Get-GkDirectoryAudit`, `Get-GkPrivilegedRoleMember`
+- **Access & CA hardening:** `Get-GkExternalCollaborationSetting`, `Get-GkRoleAssignableGroup`,
+  `Get-GkLegacyAuthSignIn`, `Get-GkAuthStrengthPolicy`, `Get-GkConditionalAccessTemplate`
+- **Apps, consent & credentials:** `Get-GkInactiveApp`, `Get-GkStaleAppCredential`,
+  `Get-GkConsentRequest`, `Remove-GkConsentGrant`
+- **Tenant, domains & licensing:** `Get-GkTenantInfo`, `Get-GkDomain`, `Get-GkSubscription`,
+  `Get-GkGroupExpirationPolicy`
+- **Membership & invitation (write):** `New-GkGuestInvitation`, `Add-GkGroupMember`, `Remove-GkGroupMember`
+
+---
+
+## v0.4 — candidates (idea)
+
+Endpoint- and scope-verified against Microsoft Learn; not yet committed.
+
+| Cmdlet | Endpoint | Scope | Channel |
+|--------|----------|-------|---------|
+| `Get-GkGroupMember` | `GET /groups/{id}/members` | GroupMember.Read.All | v1.0 |
+| `Get-GkDeletedItem` | `GET /directory/deletedItems/microsoft.graph.{user\|group\|application}` | User/Group/Application.Read.All | v1.0 |
+| `Get-GkRoleDefinition` | `GET /roleManagement/directory/roleDefinitions` | RoleManagement.Read.Directory | v1.0 |
+| `New-GkTemporaryAccessPass` (write) | `POST /users/{id}/authentication/temporaryAccessPassMethods` | UserAuthenticationMethod.ReadWrite.All | v1.0 |
+| `Reset-GkUserPassword` (write) | `PATCH /users/{id}` (passwordProfile) | User.ReadWrite.All | v1.0 |
+| `Get-GkLapsPassword` | `GET /directory/deviceLocalCredentials/{deviceId}` | DeviceLocalCredential.Read.All (+ Device.Read.All) | v1.0 |
+| `Get-GkUserAuthMethod` | `GET /users/{id}/authentication/methods` | UserAuthenticationMethod.Read.All | v1.0 |
+| `Get-GkServiceHealth` | `GET /admin/serviceAnnouncement/healthOverviews` (+ `/issues`) | ServiceHealth.Read.All | v1.0 |
+| `Get-GkServiceMessage` | `GET /admin/serviceAnnouncement/messages` | ServiceMessage.Read.All | v1.0 |
+| `Get-GkGroupBasedLicense` | `GET /groups?$select=assignedLicenses,licenseProcessingState` | Group.Read.All | v1.0 |
+
+Notes: `Get-GkGroupMember` is the read companion to the shipped `Add`/`Remove-GkGroupMember`.
+`Get-GkDeletedItem` pairs with the honorable-mention `Restore-GkDeletedObject`. `Get-GkLapsPassword`
+returns a clear-text secret — treat as sensitive (mask by default).
+
+## Honorable mentions (idea)
+
+`Restore-GkDeletedObject`, `Set-GkUserManager`, `Get-GkEnterpriseAppAssignment`,
+`Get-GkBreakGlassAccount`, `Test-GkCaCoverage`, plus P2/governance reports (`Get-GkAccessReview`,
+`Get-GkTermsOfUse`, `Get-GkAccessPackage`) and `Get-GkDelegatedAdminRelationship` (GDAP).
+
+---
+
 ## Cross-cutting considerations
 
 - **Dependency constraint holds:** Microsoft.Graph.Authentication only. Exports use native
