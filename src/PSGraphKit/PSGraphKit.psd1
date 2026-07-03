@@ -57,6 +57,10 @@
         'Get-GkLegacyAuthSignIn',
         'Get-GkAuthStrengthPolicy',
         'Get-GkConditionalAccessTemplate',
+        'Get-GkInactiveApp',
+        'Get-GkStaleAppCredential',
+        'Get-GkConsentRequest',
+        'Remove-GkConsentGrant',
         'Export-GkTenantAssessment'
     )
     CmdletsToExport   = @()

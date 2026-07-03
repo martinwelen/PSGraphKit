@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Access & CA hardening reports: `Get-GkExternalCollaborationSetting` (guest-invite + default-user
   permissions), `Get-GkRoleAssignableGroup` (privileged groups + ownerless flag), `Get-GkLegacyAuthSignIn`
   (sign-ins using legacy protocols), `Get-GkAuthStrengthPolicy`, `Get-GkConditionalAccessTemplate`.
+- Apps, consent & credentials: `Get-GkInactiveApp` (beta SP sign-in activity), `Get-GkStaleAppCredential`
+  (beta app-credential activity), `Get-GkConsentRequest` (pending admin consent), and the write cmdlet
+  `Remove-GkConsentGrant` (revoke a delegated consent grant).
 
 ## [0.2.0] - 2026-07-03
 

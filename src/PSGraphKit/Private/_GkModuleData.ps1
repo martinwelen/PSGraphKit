@@ -308,6 +308,36 @@ $script:GkScopeMap = @{
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Conditional Access Administrator', 'Security Reader')
     }
+
+    'Get-GkInactiveApp' = @{
+        Groups = @(
+            @{ For = 'read service principal sign-in activity'; Any = @('AuditLog.Read.All') }
+            @{ For = 'read service principals'; Any = @('Application.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
+    }
+
+    'Get-GkStaleAppCredential' = @{
+        Groups = @(
+            @{ For = 'read app credential sign-in activity'; Any = @('AuditLog.Read.All') }
+            @{ For = 'read service principals'; Any = @('Application.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
+    }
+
+    'Get-GkConsentRequest' = @{
+        Groups = @(@{ For = 'read admin-consent requests'; Any = @('ConsentRequest.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Cloud Application Administrator')
+    }
+
+    'Remove-GkConsentGrant' = @{
+        Groups = @(@{ For = 'revoke delegated consent grants'; Any = @('DelegatedPermissionGrant.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Application Administrator', 'Cloud Application Administrator', 'Privileged Role Administrator')
+    }
 }
 
 # Session cache for the signed-in admin's active directory roles (populated on first need).

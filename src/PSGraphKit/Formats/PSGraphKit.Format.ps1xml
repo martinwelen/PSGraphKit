@@ -758,5 +758,79 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.InactiveApp</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.InactiveApp</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>AppDisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>LastActivity</Label><Width>20</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InactiveDays</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Stale</Label><Width>5</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>AppDisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.LastActivity) { $_.LastActivity.ToString('yyyy-MM-dd') } else { '(never)' }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($null -eq $_.InactiveDays) { '-' } else { $_.InactiveDays }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>IsStale</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.StaleAppCredential</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.StaleAppCredential</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>AppDisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>KeyType</Label><Width>12</Width></TableColumnHeader>
+          <TableColumnHeader><Label>LastUsed</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InactiveDays</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>NeverUsed</Label><Width>9</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>AppDisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>KeyType</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.LastUsed) { $_.LastUsed.ToString('yyyy-MM-dd') } else { '(never)' }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($null -eq $_.InactiveDays) { '-' } else { $_.InactiveDays }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>NeverUsed</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.ConsentRequest</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.ConsentRequest</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>AppDisplayName</Label><Width>36</Width></TableColumnHeader>
+          <TableColumnHeader><Label>PendingScopes</Label><Width>14</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>ConsentType</Label><Width>14</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>AppDisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>PendingScopeCount</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ConsentType</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.ConsentGrantRemovalResult</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.ConsentGrantRemovalResult</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>GrantId</Label><Width>44</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Action</Label><Width>20</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>GrantId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Action</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

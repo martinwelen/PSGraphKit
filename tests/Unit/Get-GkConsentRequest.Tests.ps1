@@ -1,0 +1,31 @@
+Import-Module (Join-Path $PSScriptRoot '..' '..' 'src' 'PSGraphKit' 'PSGraphKit.psd1') -Force
+
+InModuleScope PSGraphKit {
+
+    Describe 'Get-GkConsentRequest' {
+
+        BeforeEach {
+            Mock Test-GkConnection { [pscustomobject]@{ AuthType = 'Delegated'; Scopes = @('ConsentRequest.Read.All') } }
+            Mock Invoke-GkGraphRequest {
+                @(
+                    @{ id = 'r1'; appDisplayName = 'Cool App'; appId = 'app-1'; pendingScopeCount = 3; consentType = 'Static' }
+                    @{ id = 'r2'; appDisplayName = 'Other App'; appId = 'app-2'; pendingScopeCount = 1; consentType = 'Static' }
+                )
+            }
+        }
+
+        It 'emits typed rows with pending scope counts' {
+            $r = Get-GkConsentRequest
+            $r.Count | Should -Be 2
+            $r[0].PSTypeNames[0] | Should -Be 'PSGraphKit.ConsentRequest'
+            ($r | Where-Object Id -eq 'r1').PendingScopeCount | Should -Be 3
+        }
+
+        It 'warns and returns nothing when unavailable' {
+            Mock Invoke-GkGraphRequest { throw 'workflow not enabled' }
+            $warnings = @()
+            Get-GkConsentRequest -WarningVariable warnings -WarningAction SilentlyContinue | Should -BeNullOrEmpty
+            ($warnings -join ' ') | Should -Match 'consent'
+        }
+    }
+}
