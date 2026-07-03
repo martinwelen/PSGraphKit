@@ -6,6 +6,7 @@ Do not edit these files by hand — edit the function help and regenerate.
 | Cmdlet | Synopsis |
 |--------|----------|
 | [Connect-GkGraph](Connect-GkGraph.md) | Connect to Microsoft Graph for PSGraphKit — a thin wrapper over Connect-MgGraph that can derive the required scopes from the cmdlets you intend to run. |
+| [Disable-GkStaleUser](Disable-GkStaleUser.md) | Block sign-in for one or more users by setting accountEnabled = false. |
 | [Get-GkAdminRoleAssignment](Get-GkAdminRoleAssignment.md) | Report Entra directory role assignments — active, PIM-eligible, and PIM active/time-bound — with the assigned principal and role resolved. |
 | [Get-GkAppRegistrationReport](Get-GkAppRegistrationReport.md) | Report app registrations with credential (secret/certificate) expiry and high-privilege API permissions. |
 | [Get-GkCaPolicyReport](Get-GkCaPolicyReport.md) | Report Conditional Access policies with their state and human-readable summaries of the targeted users/apps and the grant/session controls. |

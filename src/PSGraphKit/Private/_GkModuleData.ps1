@@ -37,6 +37,14 @@ $script:GkScopeMap = @{
         RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
     }
 
+    'Disable-GkStaleUser' = @{
+        Groups = @(
+            @{ For = 'block user sign-in (accountEnabled)'; Any = @('User.EnableDisableAccount.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
+    }
+
     'Get-GkStaleUser' = @{
         Groups = @(
             @{ For = 'read user objects';   Any = @('User.Read.All', 'Directory.Read.All') }

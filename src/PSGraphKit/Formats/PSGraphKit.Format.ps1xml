@@ -320,9 +320,10 @@
     </View>
 
     <View>
-      <Name>PSGraphKit.SessionRevokeResult</Name>
+      <Name>PSGraphKit.WriteResult</Name>
       <ViewSelectedBy>
         <TypeName>PSGraphKit.SessionRevokeResult</TypeName>
+        <TypeName>PSGraphKit.UserDisableResult</TypeName>
       </ViewSelectedBy>
       <TableControl>
         <TableHeaders>

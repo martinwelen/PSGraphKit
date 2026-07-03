@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Revoke-GkUserSession` — first Phase 2 write cmdlet: revokes users' sign-in sessions
   (POST /users/{id}/revokeSignInSessions). SupportsShouldProcess (-WhatIf/-Confirm), pipeline
   input, per-user PSGraphKit.SessionRevokeResult, warn-and-continue on failure.
+- `Disable-GkStaleUser` — block sign-in for users (PATCH /users/{id} accountEnabled=false), same
+  write pattern; per-user PSGraphKit.UserDisableResult. Composes with `Get-GkStaleUser`.
 
 ### Changed
 - `Invoke-GkGraphRequest` now supports PATCH and DELETE (and only paginates GET), enabling write
