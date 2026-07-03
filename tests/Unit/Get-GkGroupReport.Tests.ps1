@@ -12,7 +12,7 @@ InModuleScope PSGraphKit {
         BeforeEach {
             Mock Test-GkConnection { [pscustomobject]@{ AuthType = 'Delegated'; Scopes = @('Group.Read.All', 'GroupMember.Read.All') } }
             Mock Invoke-GkGraphRequest {
-                if ($Uri -like '*/members*') { return 7 }                       # /$count
+                if ($Uri -like '*/members*') { return @{ '@odata.count' = 7; value = @() } }   # $count=true query
                 if ($Uri -like '*/owners*') {
                     if ($Uri -like '*m365-1*') { return @() }                    # ownerless
                     return @(@{ id = 'o1'; displayName = 'Olga Owner' })
@@ -31,10 +31,25 @@ InModuleScope PSGraphKit {
             $dyn.IsDynamic | Should -BeTrue
         }
 
-        It 'fetches membership count per group' {
+        It 'fetches membership count per group from @odata.count' {
             $r = Get-GkGroupReport
             $r[0].MemberCount | Should -Be 7
             $r[0].PSTypeNames[0] | Should -Be 'PSGraphKit.GroupReport'
+            # must use the JSON $count=true query, not the text/plain /$count endpoint
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like '*/members?*$count=true*' }
+            Should -Not -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like '*/members/$count*' }
+        }
+
+        It 'warns (does not silently null) when the membership count fails' {
+            Mock Invoke-GkGraphRequest {
+                if ($Uri -like '*/members*') { throw 'Non-Json response' }
+                if ($Uri -like '*/owners*')  { return @() }
+                return $script:GroupValue
+            }
+            $warnings = @()
+            $r = Get-GkGroupReport -WarningVariable warnings -WarningAction SilentlyContinue
+            $r[0].MemberCount | Should -BeNullOrEmpty
+            ($warnings -join ' ') | Should -Match 'Membership count'
         }
 
         It 'flags an ownerless group and lists owners otherwise' {

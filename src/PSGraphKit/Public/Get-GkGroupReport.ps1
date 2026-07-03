@@ -65,6 +65,8 @@ function Get-GkGroupReport {
     process {
         $select = 'id,displayName,mail,groupTypes,securityEnabled,mailEnabled,membershipRule,membershipRuleProcessingState,visibility'
         $groups = Invoke-GkGraphRequest -Uri "/groups?`$select=$select&`$top=999" -CallerFunction 'Get-GkGroupReport'
+        $memberCountFailures = 0
+        $ownerFailures = 0
 
         foreach ($g in $groups) {
             $id         = [string](Get-GkDictValue $g 'id')
@@ -86,10 +88,15 @@ function Get-GkGroupReport {
             $memberCount = $null
             if (-not $SkipMemberCount -and $id) {
                 try {
-                    $memberCount = [int](Invoke-GkGraphRequest -Raw -CallerFunction 'Get-GkGroupReport' `
-                        -Uri "/groups/$id/members/`$count" -Headers @{ ConsistencyLevel = 'eventual' })
+                    # NOTE: /members/$count returns text/plain, which breaks -OutputType Hashtable.
+                    # Read @odata.count from a $count=true collection query (JSON) instead; $top=1
+                    # keeps the payload tiny. Requires the ConsistencyLevel: eventual header.
+                    $countResp = Invoke-GkGraphRequest -Raw -CallerFunction 'Get-GkGroupReport' `
+                        -Uri "/groups/$id/members?`$count=true&`$top=1" -Headers @{ ConsistencyLevel = 'eventual' }
+                    $memberCount = [int](Get-GkDictValue $countResp '@odata.count')
                 }
                 catch {
+                    $memberCountFailures++
                     Write-Verbose "PSGraphKit: member count unavailable for group $id : $($_.Exception.Message)"
                 }
             }
@@ -102,6 +109,7 @@ function Get-GkGroupReport {
                     $ownerNames = @($owners | ForEach-Object { [string](Get-GkDictValue $_ 'displayName') } | Where-Object { $_ })
                 }
                 catch {
+                    $ownerFailures++
                     Write-Verbose "PSGraphKit: owners unavailable for group $id : $($_.Exception.Message)"
                 }
             }
@@ -124,6 +132,13 @@ function Get-GkGroupReport {
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }
             [pscustomobject]$obj
+        }
+
+        if ($memberCountFailures -gt 0) {
+            Write-Warning "Membership count could not be read for $memberCountFailures group(s) — MemberCount is null for those. Needs GroupMember.Read.All (or Group.Read.All) and the ConsistencyLevel: eventual header."
+        }
+        if ($ownerFailures -gt 0) {
+            Write-Warning "Owner lookup failed for $ownerFailures group(s) — IsOwnerless may be inaccurate for those (as opposed to genuinely having no owners)."
         }
     }
 }
