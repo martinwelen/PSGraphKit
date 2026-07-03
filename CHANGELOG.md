@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-03
+
+20 new cmdlets across five themes — security posture/risk, access & CA hardening, apps/consent/
+credentials, tenant/domains/licensing lifecycle, and membership/invitation writes. 50 cmdlets total;
+all endpoint- and scope-verified against Microsoft Learn and validated live. Dependency:
+Microsoft.Graph.Authentication only.
+
 ### Added
 - Security posture & risk reports: `Get-GkSecureScore` (latest score + per-control breakdown),
   `Get-GkRiskyUser` (P2), `Get-GkRiskDetection` (P1+), `Get-GkDirectoryAudit` (who-changed-what),
@@ -122,6 +129,7 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.2.0
 [0.1.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.1.0
