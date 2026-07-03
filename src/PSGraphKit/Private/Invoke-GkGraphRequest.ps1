@@ -22,7 +22,7 @@ function Invoke-GkGraphRequest {
         [Parameter(Mandatory)]
         [string] $Uri,
 
-        [ValidateSet('GET', 'POST')]
+        [ValidateSet('GET', 'POST', 'PATCH', 'DELETE')]
         [string] $Method = 'GET',
 
         [hashtable] $Body,
@@ -56,7 +56,7 @@ function Invoke-GkGraphRequest {
         $current = '{0}/{1}/{2}' -f $script:GkGraphBaseUri, $ApiVersion, $Uri.TrimStart('/')
     }
 
-    $doPaging  = -not $Raw
+    $doPaging  = (-not $Raw) -and ($Method -eq 'GET')   # only GET collections paginate
     $triedBeta = $false
     $items     = [System.Collections.Generic.List[object]]::new()
     $attempt   = 0

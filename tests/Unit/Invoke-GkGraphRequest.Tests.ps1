@@ -58,6 +58,38 @@ InModuleScope PSGraphKit {
             }
         }
 
+        Context 'Write methods (PATCH/DELETE/POST)' {
+            It 'sends PATCH with a JSON body and returns the entity' {
+                Mock Invoke-GkRawGraphCall {
+                    [pscustomobject]@{ StatusCode = 200; Headers = @{}; Body = @{ id = 'u1'; accountEnabled = $false } }
+                }
+                $r = Invoke-GkGraphRequest -Method PATCH -Uri '/users/u1' -Body @{ accountEnabled = $false } -Raw
+                $r['accountEnabled'] | Should -BeFalse
+                Should -Invoke Invoke-GkRawGraphCall -Times 1 -Exactly -ParameterFilter {
+                    $RequestParams.Method -eq 'PATCH' -and $RequestParams.Body.accountEnabled -eq $false
+                }
+            }
+
+            It 'handles a 204 No Content (DELETE) without error' {
+                Mock Invoke-GkRawGraphCall {
+                    [pscustomobject]@{ StatusCode = 204; Headers = @{}; Body = $null }
+                }
+                { Invoke-GkGraphRequest -Method DELETE -Uri '/users/u1' } | Should -Not -Throw
+                (Invoke-GkGraphRequest -Method DELETE -Uri '/users/u1') | Should -BeNullOrEmpty
+            }
+
+            It 'does not paginate a non-GET response even if it carries a nextLink' {
+                Mock Invoke-GkRawGraphCall {
+                    [pscustomobject]@{ StatusCode = 200; Headers = @{}; Body = @{
+                        value             = @(@{ id = 1 })
+                        '@odata.nextLink' = 'https://graph.microsoft.com/v1.0/x?$skiptoken=z'
+                    } }
+                }
+                Invoke-GkGraphRequest -Method POST -Uri '/x' -Body @{ a = 1 } | Out-Null
+                Should -Invoke Invoke-GkRawGraphCall -Times 1 -Exactly
+            }
+        }
+
         Context 'Throttling' {
             It 'retries on 429 honoring Retry-After, then succeeds' {
                 Mock Start-Sleep {}
