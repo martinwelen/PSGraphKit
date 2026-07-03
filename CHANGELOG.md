@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `ROADMAP.md` — planned cmdlet backlog (Phase 2 write/remediation, Phase 3 reports, Phase 4 export).
+- `DESIGN-phase2.md` — endpoint- and scope-verified plan for the Phase 2+ cmdlets, plus the
+  `Invoke-GkGraphRequest` changes (PATCH/DELETE) and write-safety conventions they require.
+
 ## [0.1.0] - 2026-07-03
 
 Phase 1 — read-only Entra ID / Microsoft Graph reporting. 12 cmdlets, validated end-to-end
