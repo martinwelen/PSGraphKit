@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-03
+
+Phase 2 write/remediation, Phase 3 reports, and the Phase 4 assessment export. 29 cmdlets;
+validated end-to-end against a live tenant. Dependency: Microsoft.Graph.Authentication only.
+
 ### Added
 - `ROADMAP.md` — planned cmdlet backlog (Phase 2 write/remediation, Phase 3 reports, Phase 4 export).
 - `DESIGN-phase2.md` — endpoint- and scope-verified plan for the Phase 2+ cmdlets, plus the
@@ -102,5 +107,6 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.2.0
 [0.1.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.1.0
