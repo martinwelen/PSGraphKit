@@ -22,7 +22,9 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkCustomRole](Get-GkCustomRole.md) | Report custom (non-built-in) directory role definitions and their permissions. |
 | [Get-GkDeviceInventory](Get-GkDeviceInventory.md) | Inventory Entra-registered/joined devices with OS, join type, last activity, and a stale flag. |
 | [Get-GkDirectoryAudit](Get-GkDirectoryAudit.md) | Report directory audit events (who changed what) over a recent window. |
+| [Get-GkDomain](Get-GkDomain.md) | Report the tenant's domains with verification status and authentication (managed/federated) type. |
 | [Get-GkExternalCollaborationSetting](Get-GkExternalCollaborationSetting.md) | Report the tenant's external-collaboration and default-user-permission settings. |
+| [Get-GkGroupExpirationPolicy](Get-GkGroupExpirationPolicy.md) | Report the Microsoft 365 group expiration (lifecycle) policy, if one is configured. |
 | [Get-GkGroupReport](Get-GkGroupReport.md) | Report groups with their type (Microsoft 365 / security / distribution / dynamic), membership count, owners, and an ownerless flag. |
 | [Get-GkGuestInventory](Get-GkGuestInventory.md) | Inventory guest (external) accounts with their sponsor, invitation state, last sign-in, and inactivity/age in days. |
 | [Get-GkInactiveApp](Get-GkInactiveApp.md) | Report enterprise apps / service principals with no recent sign-in activity (decommission candidates). |
@@ -39,6 +41,8 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkSignInReport](Get-GkSignInReport.md) | Report Entra sign-ins over a recent window, with risk and Conditional Access status. |
 | [Get-GkStaleAppCredential](Get-GkStaleAppCredential.md) | Report app credentials (secrets/certificates) that have never been used or are long unused. |
 | [Get-GkStaleUser](Get-GkStaleUser.md) | Report users with no sign-in activity for a threshold number of days, flagging disabled and guest accounts. |
+| [Get-GkSubscription](Get-GkSubscription.md) | Report tenant subscriptions with their renewal/expiry date and status. |
+| [Get-GkTenantInfo](Get-GkTenantInfo.md) | Report high-level tenant information: name, type, directory size, sync status, contacts. |
 | [Get-GkUserAccessReport](Get-GkUserAccessReport.md) | Report a single user's full access footprint: group memberships, directory roles, licenses, and application role assignments. |
 | [Get-GkUserMfaStatus](Get-GkUserMfaStatus.md) | Report per-user authentication-method registration and MFA capability from the authentication methods registration report. |
 | [Remove-GkAdminRoleAssignment](Remove-GkAdminRoleAssignment.md) | Remove a directory role assignment — direct active, PIM-eligible, or PIM active. |

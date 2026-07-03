@@ -832,5 +832,75 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.TenantInfo</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.TenantInfo</TypeName></ViewSelectedBy>
+      <ListControl>
+        <ListEntries><ListEntry><ListItems>
+          <ListItem><PropertyName>DisplayName</PropertyName></ListItem>
+          <ListItem><PropertyName>TenantId</PropertyName></ListItem>
+          <ListItem><PropertyName>TenantType</PropertyName></ListItem>
+          <ListItem><PropertyName>DefaultDomain</PropertyName></ListItem>
+          <ListItem><PropertyName>OnPremisesSyncEnabled</PropertyName></ListItem>
+          <ListItem><PropertyName>DirectoryUsersUsed</PropertyName></ListItem>
+        </ListItems></ListEntry></ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.Domain</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.Domain</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Verified</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Default</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>AuthenticationType</Label><Width>18</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsVerified</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsDefault</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AuthenticationType</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.Subscription</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.Subscription</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>SkuPartNumber</Label><Width>24</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Status</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Licenses</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>NextLifecycle</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>DaysLeft</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>SkuPartNumber</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Status</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TotalLicenses</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.NextLifecycleDate) { $_.NextLifecycleDate.ToString('yyyy-MM-dd') }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>DaysUntilRenewal</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.GroupExpirationPolicy</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.GroupExpirationPolicy</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>GroupLifetimeInDays</Label><Width>20</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>ManagedGroupTypes</Label><Width>18</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>GroupLifetimeInDays</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ManagedGroupTypes</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

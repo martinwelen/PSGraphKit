@@ -61,6 +61,10 @@
         'Get-GkStaleAppCredential',
         'Get-GkConsentRequest',
         'Remove-GkConsentGrant',
+        'Get-GkTenantInfo',
+        'Get-GkDomain',
+        'Get-GkSubscription',
+        'Get-GkGroupExpirationPolicy',
         'Export-GkTenantAssessment'
     )
     CmdletsToExport   = @()

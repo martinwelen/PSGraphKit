@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Apps, consent & credentials: `Get-GkInactiveApp` (beta SP sign-in activity), `Get-GkStaleAppCredential`
   (beta app-credential activity), `Get-GkConsentRequest` (pending admin consent), and the write cmdlet
   `Remove-GkConsentGrant` (revoke a delegated consent grant).
+- Tenant, domains & licensing lifecycle: `Get-GkTenantInfo` (/organization), `Get-GkDomain` (verified +
+  federation), `Get-GkSubscription` (renewal/expiry via nextLifecycleDateTime), `Get-GkGroupExpirationPolicy`.
 
 ## [0.2.0] - 2026-07-03
 

@@ -338,6 +338,30 @@ $script:GkScopeMap = @{
         DelegatedOnly = $false
         RoleHints     = @('Application Administrator', 'Cloud Application Administrator', 'Privileged Role Administrator')
     }
+
+    'Get-GkTenantInfo' = @{
+        Groups = @(@{ For = 'read organization info'; Any = @('Organization.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader')
+    }
+
+    'Get-GkDomain' = @{
+        Groups = @(@{ For = 'read domains'; Any = @('Domain.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Domain Name Administrator')
+    }
+
+    'Get-GkSubscription' = @{
+        Groups = @(@{ For = 'read directory subscriptions'; Any = @('Organization.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Billing Administrator')
+    }
+
+    'Get-GkGroupExpirationPolicy' = @{
+        Groups = @(@{ For = 'read group lifecycle policies'; Any = @('Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Groups Administrator')
+    }
 }
 
 # Session cache for the signed-in admin's active directory roles (populated on first need).
