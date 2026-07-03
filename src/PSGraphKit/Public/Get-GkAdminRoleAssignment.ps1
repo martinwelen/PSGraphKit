@@ -145,6 +145,7 @@ function Get-GkAdminRoleAssignment {
                     EndDateTime       = ConvertTo-GkDateTime (Get-GkDictValue $item 'endDateTime')
                     RoleDefinitionId  = [string](Get-GkDictValue $item 'roleDefinitionId')
                     PrincipalId       = [string](Get-GkDictValue $item 'principalId')
+                    AssignmentId      = [string](Get-GkDictValue $item 'id')
                 }
                 if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }
                 [pscustomobject]$obj

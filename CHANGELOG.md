@@ -20,10 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   removeLicenses); per-user PSGraphKit.LicenseRemoveResult. Composes with `Get-GkLicenseOverview`.
 - `Set-GkGroupOwner` — add an owner to groups (POST /groups/{id}/owners/$ref); per-group
   PSGraphKit.GroupOwnerResult. Composes with `Get-GkGroupReport -OwnerlessOnly`.
+- `Remove-GkStaleGuest` — disable (default) or `-Delete` (soft) stale guests, with a `userType eq
+  Guest` safety check (`-Force` overrides); PSGraphKit.GuestRemovalResult.
+- `Disable-GkStaleDevice` — disable (default) or `-Delete` (soft) devices; PSGraphKit.DeviceDisableResult.
+- `Reset-GkAppCredential` — add (`addPassword`, returns secretText once) or remove (`removePassword`)
+  an app client secret; PSGraphKit.AppCredentialResult. Certificate rotation is out of scope.
+- `Remove-GkAdminRoleAssignment` — remove a role assignment: DELETE for direct active, `adminRemove`
+  request for PIM eligible/active; PSGraphKit.RoleRemovalResult.
 
 ### Changed
 - `Invoke-GkGraphRequest` now supports PATCH and DELETE (and only paginates GET), enabling write
   cmdlets; 204 No Content responses return cleanly.
+- `Get-GkAdminRoleAssignment` output now includes `AssignmentId` (the roleAssignment id), so
+  `Remove-GkAdminRoleAssignment` can pipe directly from the report.
 
 ## [0.1.0] - 2026-07-03
 

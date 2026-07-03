@@ -38,6 +38,7 @@ InModuleScope PSGraphKit {
             $active[0].PrincipalUpn   | Should -Be 'ada@contoso.com'
             $active[0].PrincipalType  | Should -Be 'User'
             $active[0].IsTenantScope  | Should -BeTrue
+            $active[0].AssignmentId   | Should -Be 'ra1'   # the roleAssignment id, for removal
         }
 
         It 'maps group principals and AU scope for time-bound assignments' {

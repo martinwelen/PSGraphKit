@@ -6,6 +6,7 @@ Do not edit these files by hand — edit the function help and regenerate.
 | Cmdlet | Synopsis |
 |--------|----------|
 | [Connect-GkGraph](Connect-GkGraph.md) | Connect to Microsoft Graph for PSGraphKit — a thin wrapper over Connect-MgGraph that can derive the required scopes from the cmdlets you intend to run. |
+| [Disable-GkStaleDevice](Disable-GkStaleDevice.md) | Disable (default) or delete stale Entra devices. |
 | [Disable-GkStaleUser](Disable-GkStaleUser.md) | Block sign-in for one or more users by setting accountEnabled = false. |
 | [Get-GkAdminRoleAssignment](Get-GkAdminRoleAssignment.md) | Report Entra directory role assignments — active, PIM-eligible, and PIM active/time-bound — with the assigned principal and role resolved. |
 | [Get-GkAppRegistrationReport](Get-GkAppRegistrationReport.md) | Report app registrations with credential (secret/certificate) expiry and high-privilege API permissions. |
@@ -18,6 +19,9 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkStaleUser](Get-GkStaleUser.md) | Report users with no sign-in activity for a threshold number of days, flagging disabled and guest accounts. |
 | [Get-GkUserAccessReport](Get-GkUserAccessReport.md) | Report a single user's full access footprint: group memberships, directory roles, licenses, and application role assignments. |
 | [Get-GkUserMfaStatus](Get-GkUserMfaStatus.md) | Report per-user authentication-method registration and MFA capability from the authentication methods registration report. |
+| [Remove-GkAdminRoleAssignment](Remove-GkAdminRoleAssignment.md) | Remove a directory role assignment — direct active, PIM-eligible, or PIM active. |
+| [Remove-GkStaleGuest](Remove-GkStaleGuest.md) | Disable (default) or delete stale guest accounts, with a guest-type safety check. |
 | [Remove-GkUserLicense](Remove-GkUserLicense.md) | Remove one or more license SKUs from users, reclaiming the seats. |
+| [Reset-GkAppCredential](Reset-GkAppCredential.md) | Add or remove an app registration's client secret. |
 | [Revoke-GkUserSession](Revoke-GkUserSession.md) | Revoke the active sign-in sessions (refresh tokens) of one or more users, forcing re-authentication. |
 | [Set-GkGroupOwner](Set-GkGroupOwner.md) | Add an owner to one or more groups (e.g. to remediate ownerless groups). |

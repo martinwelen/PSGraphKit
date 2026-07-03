@@ -325,6 +325,7 @@
         <TypeName>PSGraphKit.SessionRevokeResult</TypeName>
         <TypeName>PSGraphKit.UserDisableResult</TypeName>
         <TypeName>PSGraphKit.LicenseRemoveResult</TypeName>
+        <TypeName>PSGraphKit.GuestRemovalResult</TypeName>
       </ViewSelectedBy>
       <TableControl>
         <TableHeaders>
@@ -360,6 +361,79 @@
             <TableColumnItems>
               <TableColumnItem><PropertyName>GroupId</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>OwnerId</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.DeviceDisableResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.DeviceDisableResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DeviceId</Label><Width>40</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Action</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>DeviceId</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Action</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.AppCredentialResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.AppCredentialResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>ApplicationId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Action</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>KeyId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>12</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>ApplicationId</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Action</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>KeyId</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.RoleRemovalResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.RoleRemovalResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>RoleName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>AssignmentKind</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>PrincipalId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>RoleName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>AssignmentKind</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>PrincipalId</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>

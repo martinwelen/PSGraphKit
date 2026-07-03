@@ -61,6 +61,38 @@ $script:GkScopeMap = @{
         RoleHints     = @('Groups Administrator', 'User Administrator')
     }
 
+    'Remove-GkStaleGuest' = @{
+        Groups = @(
+            @{ For = 'disable or delete a user'; Any = @('User.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
+    }
+
+    'Disable-GkStaleDevice' = @{
+        Groups = @(
+            @{ For = 'disable or delete a device'; Any = @('Directory.AccessAsUser.All', 'Device.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Cloud Device Administrator', 'Intune Administrator')
+    }
+
+    'Reset-GkAppCredential' = @{
+        Groups = @(
+            @{ For = 'manage application secrets'; Any = @('Application.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Application Administrator', 'Cloud Application Administrator')
+    }
+
+    'Remove-GkAdminRoleAssignment' = @{
+        Groups = @(
+            @{ For = 'remove role assignments (active and PIM)'; Any = @('RoleManagement.ReadWrite.Directory') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Privileged Role Administrator')
+    }
+
     'Get-GkStaleUser' = @{
         Groups = @(
             @{ For = 'read user objects';   Any = @('User.Read.All', 'Directory.Read.All') }
