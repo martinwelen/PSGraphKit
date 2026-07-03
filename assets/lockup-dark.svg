@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1385" height="320" viewBox="0 0 1385 320">
+
+<rect x="24" y="40" width="240" height="240" rx="58" fill="#2F5FD8"></rect>
+<text x="144" y="160" font-family="JBM, &#39;JetBrains Mono&#39;, monospace" font-weight="700" font-size="88" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">PS<tspan fill-opacity="0.55">&gt;</tspan></text>
+<text x="328" y="160" font-family="SG, &#39;Space Grotesk&#39;, sans-serif" font-weight="700" font-size="190" fill="#EEF2F8" dominant-baseline="central">PSGraphKit</text>
+</svg>

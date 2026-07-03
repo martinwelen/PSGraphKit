@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and GitHub issue/PR templates.
 - CI now runs on Windows, Linux, and macOS with code coverage; a tag-triggered workflow publishes
   to the PowerShell Gallery.
+- Brand assets under `assets/` (icon, lockups, README banners, social preview, favicons, brand
+  sheet); manifest `IconUri` for the Gallery listing and a README hero banner (light/dark).
+
+### Fixed
+- Manifest `ProjectUri` pointed to the wrong GitHub account (`mwelen` → `martinwelen`).
 
 ## [0.3.0] - 2026-07-03
 

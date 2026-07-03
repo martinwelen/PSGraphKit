@@ -76,9 +76,10 @@
 
     PrivateData = @{
         PSData = @{
-            Tags         = @('Entra', 'EntraID', 'AzureAD', 'MicrosoftGraph', 'M365', 'Reporting', 'Inventory', 'Security')
+            Tags         = @('Entra', 'EntraID', 'AzureAD', 'MicrosoftGraph', 'M365', 'Reporting', 'Inventory', 'Remediation', 'Security')
             LicenseUri   = 'https://opensource.org/licenses/MIT'
-            ProjectUri   = 'https://github.com/mwelen/PSGraphKit'
+            ProjectUri   = 'https://github.com/martinwelen/PSGraphKit'
+            IconUri      = 'https://raw.githubusercontent.com/martinwelen/PSGraphKit/main/assets/icon-256.png'
             ReleaseNotes = 'See CHANGELOG.md'
         }
     }

@@ -1,10 +1,17 @@
-# PSGraphKit
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/martinwelen/PSGraphKit/main/assets/readme-banner-dark.png">
+    <img alt="PSGraphKit — Curated PowerShell cmdlets for Entra ID & Microsoft Graph" src="https://raw.githubusercontent.com/martinwelen/PSGraphKit/main/assets/readme-banner-light.png" width="820">
+  </picture>
+</p>
 
-[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/PSGraphKit?logo=powershell&label=PSGallery)](https://www.powershellgallery.com/packages/PSGraphKit)
-[![Downloads](https://img.shields.io/powershellgallery/dt/PSGraphKit?logo=powershell)](https://www.powershellgallery.com/packages/PSGraphKit)
-[![CI](https://github.com/martinwelen/PSGraphKit/actions/workflows/ci.yml/badge.svg)](https://github.com/martinwelen/PSGraphKit/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![PowerShell 7.4+](https://img.shields.io/badge/PowerShell-7.4%2B-5391FE?logo=powershell)](https://learn.microsoft.com/powershell/)
+<p align="center">
+  <a href="https://www.powershellgallery.com/packages/PSGraphKit"><img alt="PowerShell Gallery" src="https://img.shields.io/powershellgallery/v/PSGraphKit?logo=powershell&label=PSGallery"></a>
+  <a href="https://www.powershellgallery.com/packages/PSGraphKit"><img alt="Downloads" src="https://img.shields.io/powershellgallery/dt/PSGraphKit?logo=powershell"></a>
+  <a href="https://github.com/martinwelen/PSGraphKit/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/martinwelen/PSGraphKit/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+  <a href="https://learn.microsoft.com/powershell/"><img alt="PowerShell 7.4+" src="https://img.shields.io/badge/PowerShell-7.4%2B-5391FE?logo=powershell"></a>
+</p>
 
 A curated PowerShell module for everyday **Entra ID / Microsoft Graph** administration,
 reporting, and remediation. It is a hand-built layer over the Microsoft Graph SDK that exposes
