@@ -22,6 +22,8 @@
         'Connect-GkGraph',
         'Revoke-GkUserSession',
         'Disable-GkStaleUser',
+        'Remove-GkUserLicense',
+        'Set-GkGroupOwner',
         'Get-GkConnectionInfo',
         'Get-GkStaleUser',
         'Get-GkGuestInventory',

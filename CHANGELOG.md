@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   input, per-user PSGraphKit.SessionRevokeResult, warn-and-continue on failure.
 - `Disable-GkStaleUser` — block sign-in for users (PATCH /users/{id} accountEnabled=false), same
   write pattern; per-user PSGraphKit.UserDisableResult. Composes with `Get-GkStaleUser`.
+- `Remove-GkUserLicense` — reclaim license SKUs from users (POST /users/{id}/assignLicense with
+  removeLicenses); per-user PSGraphKit.LicenseRemoveResult. Composes with `Get-GkLicenseOverview`.
+- `Set-GkGroupOwner` — add an owner to groups (POST /groups/{id}/owners/$ref); per-group
+  PSGraphKit.GroupOwnerResult. Composes with `Get-GkGroupReport -OwnerlessOnly`.
 
 ### Changed
 - `Invoke-GkGraphRequest` now supports PATCH and DELETE (and only paginates GET), enabling write

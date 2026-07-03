@@ -45,6 +45,22 @@ $script:GkScopeMap = @{
         RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
     }
 
+    'Remove-GkUserLicense' = @{
+        Groups = @(
+            @{ For = 'remove license assignments'; Any = @('LicenseAssignment.ReadWrite.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('License Administrator', 'User Administrator')
+    }
+
+    'Set-GkGroupOwner' = @{
+        Groups = @(
+            @{ For = 'add a group owner'; Any = @('Group.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Groups Administrator', 'User Administrator')
+    }
+
     'Get-GkStaleUser' = @{
         Groups = @(
             @{ For = 'read user objects';   Any = @('User.Read.All', 'Directory.Read.All') }

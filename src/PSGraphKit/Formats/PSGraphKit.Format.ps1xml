@@ -324,6 +324,7 @@
       <ViewSelectedBy>
         <TypeName>PSGraphKit.SessionRevokeResult</TypeName>
         <TypeName>PSGraphKit.UserDisableResult</TypeName>
+        <TypeName>PSGraphKit.LicenseRemoveResult</TypeName>
       </ViewSelectedBy>
       <TableControl>
         <TableHeaders>
@@ -336,6 +337,29 @@
             <TableColumnItems>
               <TableColumnItem><PropertyName>UserId</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>Action</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.GroupOwnerResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PSGraphKit.GroupOwnerResult</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>GroupId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>OwnerId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>GroupId</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>OwnerId</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>

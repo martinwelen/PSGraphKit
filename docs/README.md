@@ -18,4 +18,6 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkStaleUser](Get-GkStaleUser.md) | Report users with no sign-in activity for a threshold number of days, flagging disabled and guest accounts. |
 | [Get-GkUserAccessReport](Get-GkUserAccessReport.md) | Report a single user's full access footprint: group memberships, directory roles, licenses, and application role assignments. |
 | [Get-GkUserMfaStatus](Get-GkUserMfaStatus.md) | Report per-user authentication-method registration and MFA capability from the authentication methods registration report. |
+| [Remove-GkUserLicense](Remove-GkUserLicense.md) | Remove one or more license SKUs from users, reclaiming the seats. |
 | [Revoke-GkUserSession](Revoke-GkUserSession.md) | Revoke the active sign-in sessions (refresh tokens) of one or more users, forcing re-authentication. |
+| [Set-GkGroupOwner](Set-GkGroupOwner.md) | Add an owner to one or more groups (e.g. to remediate ownerless groups). |
