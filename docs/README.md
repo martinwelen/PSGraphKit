@@ -18,11 +18,16 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkCrossTenantAccess](Get-GkCrossTenantAccess.md) | Report cross-tenant access (B2B) settings: the default policy and any partner overrides. |
 | [Get-GkCustomRole](Get-GkCustomRole.md) | Report custom (non-built-in) directory role definitions and their permissions. |
 | [Get-GkDeviceInventory](Get-GkDeviceInventory.md) | Inventory Entra-registered/joined devices with OS, join type, last activity, and a stale flag. |
+| [Get-GkDirectoryAudit](Get-GkDirectoryAudit.md) | Report directory audit events (who changed what) over a recent window. |
 | [Get-GkGroupReport](Get-GkGroupReport.md) | Report groups with their type (Microsoft 365 / security / distribution / dynamic), membership count, owners, and an ownerless flag. |
 | [Get-GkGuestInventory](Get-GkGuestInventory.md) | Inventory guest (external) accounts with their sponsor, invitation state, last sign-in, and inactivity/age in days. |
 | [Get-GkLicenseAssignmentError](Get-GkLicenseAssignmentError.md) | Report users whose license assignments are in an error state. |
 | [Get-GkLicenseOverview](Get-GkLicenseOverview.md) | Report subscribed license SKUs with enabled/assigned/available counts, and optionally the number of disabled-but-licensed users per SKU. |
 | [Get-GkNamedLocation](Get-GkNamedLocation.md) | Report Conditional Access named locations (IP ranges and countries). |
+| [Get-GkPrivilegedRoleMember](Get-GkPrivilegedRoleMember.md) | Report members of highly privileged directory roles, flagging permanent (non-PIM) assignments. |
+| [Get-GkRiskDetection](Get-GkRiskDetection.md) | Report Microsoft Entra ID Protection risk detections (e.g. impossible travel, leaked credentials, anonymous IP). |
+| [Get-GkRiskyUser](Get-GkRiskyUser.md) | Report users flagged by Microsoft Entra ID Protection with their risk level and state. |
+| [Get-GkSecureScore](Get-GkSecureScore.md) | Report the tenant's latest Microsoft Secure Score, or the per-control breakdown. |
 | [Get-GkServicePrincipalReport](Get-GkServicePrincipalReport.md) | Report service principals (enterprise apps) with type, state, and optionally their tenant-wide OAuth2 consent grants. |
 | [Get-GkSignInReport](Get-GkSignInReport.md) | Report Entra sign-ins over a recent window, with risk and Conditional Access status. |
 | [Get-GkStaleUser](Get-GkStaleUser.md) | Report users with no sign-in activity for a threshold number of days, flagging disabled and guest accounts. |

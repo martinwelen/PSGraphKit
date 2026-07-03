@@ -248,10 +248,62 @@ $script:GkScopeMap = @{
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'License Administrator')
     }
+
+    'Get-GkSecureScore' = @{
+        Groups = @(@{ For = 'read Secure Score'; Any = @('SecurityEvents.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Security Reader')
+    }
+
+    'Get-GkRiskyUser' = @{
+        Groups = @(@{ For = 'read risky users'; Any = @('IdentityRiskyUser.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Security Reader', 'Security Operator')
+    }
+
+    'Get-GkRiskDetection' = @{
+        Groups = @(@{ For = 'read risk detections'; Any = @('IdentityRiskEvent.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Security Reader', 'Security Operator')
+    }
+
+    'Get-GkDirectoryAudit' = @{
+        Groups = @(@{ For = 'read directory audit logs'; Any = @('AuditLog.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
+    }
+
+    'Get-GkPrivilegedRoleMember' = @{
+        Groups = @(@{ For = 'read role assignments'; Any = @('RoleManagement.Read.All', 'RoleManagement.Read.Directory') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Privileged Role Administrator', 'Security Reader')
+    }
 }
 
 # Session cache for the signed-in admin's active directory roles (populated on first need).
 $script:GkCurrentUserRoleCache = $null
+
+# Directory roles considered highly privileged, for Get-GkPrivilegedRoleMember. Curated (display
+# names are English in Graph); the v1.0 API has no isPrivileged flag (that is beta-only).
+$script:GkPrivilegedRoleNames = @(
+    'Global Administrator'
+    'Privileged Role Administrator'
+    'Privileged Authentication Administrator'
+    'Security Administrator'
+    'Conditional Access Administrator'
+    'Application Administrator'
+    'Cloud Application Administrator'
+    'Exchange Administrator'
+    'SharePoint Administrator'
+    'User Administrator'
+    'Authentication Administrator'
+    'Helpdesk Administrator'
+    'Intune Administrator'
+    'Hybrid Identity Administrator'
+    'Domain Name Administrator'
+    'Directory Synchronization Accounts'
+    'Partner Tier2 Support'
+)
 
 # Best-effort friendly names for common license SKU part numbers. This is a convenience
 # only — the raw skuPartNumber is always the source of truth and is emitted alongside.

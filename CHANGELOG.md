@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Security posture & risk reports: `Get-GkSecureScore` (latest score + per-control breakdown),
+  `Get-GkRiskyUser` (P2), `Get-GkRiskDetection` (P1+), `Get-GkDirectoryAudit` (who-changed-what),
+  `Get-GkPrivilegedRoleMember` (privileged role holders, flags permanent/non-PIM).
+
 ## [0.2.0] - 2026-07-03
 
 Phase 2 write/remediation, Phase 3 reports, and the Phase 4 assessment export. 29 cmdlets;

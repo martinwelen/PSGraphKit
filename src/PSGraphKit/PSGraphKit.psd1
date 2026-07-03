@@ -47,6 +47,11 @@
         'Get-GkCustomRole',
         'Get-GkAdministrativeUnit',
         'Get-GkLicenseAssignmentError',
+        'Get-GkSecureScore',
+        'Get-GkRiskyUser',
+        'Get-GkRiskDetection',
+        'Get-GkDirectoryAudit',
+        'Get-GkPrivilegedRoleMember',
         'Export-GkTenantAssessment'
     )
     CmdletsToExport   = @()

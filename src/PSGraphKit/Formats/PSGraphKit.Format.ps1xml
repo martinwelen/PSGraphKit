@@ -593,5 +593,102 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.SecureScore</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.SecureScore</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>CurrentScore</Label><Width>12</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>MaxScore</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Percentage</Label><Width>10</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Controls</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>ScoreDate</Label><Width>20</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>CurrentScore</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MaxScore</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Percentage</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ControlCount</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.ScoreDate) { $_.ScoreDate.ToString('yyyy-MM-dd') }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.RiskyUser</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.RiskyUser</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>32</Width></TableColumnHeader>
+          <TableColumnHeader><Label>RiskLevel</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>RiskState</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>RiskDetail</Label><Width>22</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>RiskLevel</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>RiskState</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>RiskDetail</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.RiskDetection</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.RiskDetection</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DetectedDateTime</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>28</Width></TableColumnHeader>
+          <TableColumnHeader><Label>RiskEventType</Label><Width>22</Width></TableColumnHeader>
+          <TableColumnHeader><Label>RiskLevel</Label><Width>9</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><ScriptBlock>if ($_.DetectedDateTime) { $_.DetectedDateTime.ToString('yyyy-MM-dd HH:mm') }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>RiskEventType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>RiskLevel</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.DirectoryAudit</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.DirectoryAudit</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>ActivityDateTime</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>ActivityDisplayName</Label><Width>28</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Category</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InitiatedBy</Label><Width>24</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><ScriptBlock>if ($_.ActivityDateTime) { $_.ActivityDateTime.ToString('yyyy-MM-dd HH:mm') }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>ActivityDisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Category</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>InitiatedBy</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.PrivilegedRoleMember</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.PrivilegedRoleMember</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>RoleName</Label><Width>32</Width></TableColumnHeader>
+          <TableColumnHeader><Label>PrincipalName</Label><Width>26</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Kind</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Permanent</Label><Width>9</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>RoleName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>PrincipalName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AssignmentKind</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsPermanent</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>
