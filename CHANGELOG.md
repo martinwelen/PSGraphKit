@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-03
+
+First PowerShell Gallery release. Adds the professional release kit and brand package; no cmdlet
+behavior changes.
+
 ### Added
 - `about_PSGraphKit` conceptual help topic (`Get-Help about_PSGraphKit`).
 - README install section and status badges; `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
@@ -141,7 +146,8 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.1
 [0.3.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.2.0
 [0.1.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.1.0

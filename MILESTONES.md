@@ -20,3 +20,4 @@ From an empty folder to a published, branded, professional module.
 | 3 Jul 2026 | v0.1.0 | Phase 1 — 12 read-only reporting cmdlets |
 | 3 Jul 2026 | v0.2.0 | Phases 2–4 — writes, broader reports, HTML assessment (29 cmdlets) |
 | 3 Jul 2026 | v0.3.0 | 20 more across five security/governance themes — **50 cmdlets**; repo made public |
+| 3 Jul 2026 | v0.3.1 | Release kit + brand package; **first PowerShell Gallery release** |
