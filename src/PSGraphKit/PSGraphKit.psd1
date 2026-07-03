@@ -52,6 +52,11 @@
         'Get-GkRiskDetection',
         'Get-GkDirectoryAudit',
         'Get-GkPrivilegedRoleMember',
+        'Get-GkExternalCollaborationSetting',
+        'Get-GkRoleAssignableGroup',
+        'Get-GkLegacyAuthSignIn',
+        'Get-GkAuthStrengthPolicy',
+        'Get-GkConditionalAccessTemplate',
         'Export-GkTenantAssessment'
     )
     CmdletsToExport   = @()

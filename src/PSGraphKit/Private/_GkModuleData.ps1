@@ -278,6 +278,36 @@ $script:GkScopeMap = @{
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator', 'Security Reader')
     }
+
+    'Get-GkExternalCollaborationSetting' = @{
+        Groups = @(@{ For = 'read the authorization policy'; Any = @('Policy.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Security Reader')
+    }
+
+    'Get-GkRoleAssignableGroup' = @{
+        Groups = @(@{ For = 'read groups and owners'; Any = @('Group.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Directory Readers')
+    }
+
+    'Get-GkLegacyAuthSignIn' = @{
+        Groups = @(@{ For = 'read sign-in logs'; Any = @('AuditLog.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
+    }
+
+    'Get-GkAuthStrengthPolicy' = @{
+        Groups = @(@{ For = 'read authentication strength policies'; Any = @('Policy.Read.AuthenticationMethod', 'Policy.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Conditional Access Administrator', 'Security Reader')
+    }
+
+    'Get-GkConditionalAccessTemplate' = @{
+        Groups = @(@{ For = 'read Conditional Access templates'; Any = @('Policy.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Conditional Access Administrator', 'Security Reader')
+    }
 }
 
 # Session cache for the signed-in admin's active directory roles (populated on first need).

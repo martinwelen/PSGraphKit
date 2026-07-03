@@ -13,20 +13,25 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkAdminRoleAssignment](Get-GkAdminRoleAssignment.md) | Report Entra directory role assignments — active, PIM-eligible, and PIM active/time-bound — with the assigned principal and role resolved. |
 | [Get-GkAppRegistrationReport](Get-GkAppRegistrationReport.md) | Report app registrations with credential (secret/certificate) expiry and high-privilege API permissions. |
 | [Get-GkAuthMethodPolicy](Get-GkAuthMethodPolicy.md) | Report the tenant authentication-methods policy: which methods are enabled or disabled. |
+| [Get-GkAuthStrengthPolicy](Get-GkAuthStrengthPolicy.md) | Report authentication strength policies (built-in and custom) and their allowed method combinations. |
 | [Get-GkCaPolicyReport](Get-GkCaPolicyReport.md) | Report Conditional Access policies with their state and human-readable summaries of the targeted users/apps and the grant/session controls. |
+| [Get-GkConditionalAccessTemplate](Get-GkConditionalAccessTemplate.md) | Report Microsoft's built-in Conditional Access policy templates. |
 | [Get-GkConnectionInfo](Get-GkConnectionInfo.md) | Show the current Microsoft Graph session: identity, auth type, granted scopes, and (for delegated sessions) the signed-in admin's active directory roles. |
 | [Get-GkCrossTenantAccess](Get-GkCrossTenantAccess.md) | Report cross-tenant access (B2B) settings: the default policy and any partner overrides. |
 | [Get-GkCustomRole](Get-GkCustomRole.md) | Report custom (non-built-in) directory role definitions and their permissions. |
 | [Get-GkDeviceInventory](Get-GkDeviceInventory.md) | Inventory Entra-registered/joined devices with OS, join type, last activity, and a stale flag. |
 | [Get-GkDirectoryAudit](Get-GkDirectoryAudit.md) | Report directory audit events (who changed what) over a recent window. |
+| [Get-GkExternalCollaborationSetting](Get-GkExternalCollaborationSetting.md) | Report the tenant's external-collaboration and default-user-permission settings. |
 | [Get-GkGroupReport](Get-GkGroupReport.md) | Report groups with their type (Microsoft 365 / security / distribution / dynamic), membership count, owners, and an ownerless flag. |
 | [Get-GkGuestInventory](Get-GkGuestInventory.md) | Inventory guest (external) accounts with their sponsor, invitation state, last sign-in, and inactivity/age in days. |
+| [Get-GkLegacyAuthSignIn](Get-GkLegacyAuthSignIn.md) | Report sign-ins that used legacy authentication clients — a prime attack vector. |
 | [Get-GkLicenseAssignmentError](Get-GkLicenseAssignmentError.md) | Report users whose license assignments are in an error state. |
 | [Get-GkLicenseOverview](Get-GkLicenseOverview.md) | Report subscribed license SKUs with enabled/assigned/available counts, and optionally the number of disabled-but-licensed users per SKU. |
 | [Get-GkNamedLocation](Get-GkNamedLocation.md) | Report Conditional Access named locations (IP ranges and countries). |
 | [Get-GkPrivilegedRoleMember](Get-GkPrivilegedRoleMember.md) | Report members of highly privileged directory roles, flagging permanent (non-PIM) assignments. |
 | [Get-GkRiskDetection](Get-GkRiskDetection.md) | Report Microsoft Entra ID Protection risk detections (e.g. impossible travel, leaked credentials, anonymous IP). |
 | [Get-GkRiskyUser](Get-GkRiskyUser.md) | Report users flagged by Microsoft Entra ID Protection with their risk level and state. |
+| [Get-GkRoleAssignableGroup](Get-GkRoleAssignableGroup.md) | Report role-assignable ("privileged") groups and their owners, flagging ownerless ones. |
 | [Get-GkSecureScore](Get-GkSecureScore.md) | Report the tenant's latest Microsoft Secure Score, or the per-control breakdown. |
 | [Get-GkServicePrincipalReport](Get-GkServicePrincipalReport.md) | Report service principals (enterprise apps) with type, state, and optionally their tenant-wide OAuth2 consent grants. |
 | [Get-GkSignInReport](Get-GkSignInReport.md) | Report Entra sign-ins over a recent window, with risk and Conditional Access status. |

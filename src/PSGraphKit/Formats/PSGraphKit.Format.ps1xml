@@ -690,5 +690,73 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.ExternalCollaborationSetting</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.ExternalCollaborationSetting</TypeName></ViewSelectedBy>
+      <ListControl>
+        <ListEntries><ListEntry><ListItems>
+          <ListItem><PropertyName>AllowInvitesFrom</PropertyName></ListItem>
+          <ListItem><PropertyName>GuestUserRole</PropertyName></ListItem>
+          <ListItem><PropertyName>AllowEmailVerifiedUsersToJoin</PropertyName></ListItem>
+          <ListItem><PropertyName>DefaultUserCanCreateApps</PropertyName></ListItem>
+          <ListItem><PropertyName>DefaultUserCanCreateSecurityGroups</PropertyName></ListItem>
+          <ListItem><PropertyName>DefaultUserCanReadOtherUsers</PropertyName></ListItem>
+        </ListItems></ListEntry></ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.RoleAssignableGroup</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.RoleAssignableGroup</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Owners</Label><Width>7</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Ownerless</Label><Width>9</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Visibility</Label><Width>12</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>OwnerCount</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsOwnerless</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Visibility</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.AuthStrengthPolicy</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.AuthStrengthPolicy</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>PolicyType</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Combos</Label><Width>7</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>AllowedCombinations</Label><Width>34</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>PolicyType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>CombinationCount</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.AllowedCombinations -is [array]) { $_.AllowedCombinations -join '; ' } else { $_.AllowedCombinations }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.CaTemplate</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.CaTemplate</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label><Width>40</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Scenarios</Label><Width>40</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.Scenarios -is [array]) { $_.Scenarios -join '; ' } else { $_.Scenarios }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security posture & risk reports: `Get-GkSecureScore` (latest score + per-control breakdown),
   `Get-GkRiskyUser` (P2), `Get-GkRiskDetection` (P1+), `Get-GkDirectoryAudit` (who-changed-what),
   `Get-GkPrivilegedRoleMember` (privileged role holders, flags permanent/non-PIM).
+- Access & CA hardening reports: `Get-GkExternalCollaborationSetting` (guest-invite + default-user
+  permissions), `Get-GkRoleAssignableGroup` (privileged groups + ownerless flag), `Get-GkLegacyAuthSignIn`
+  (sign-ins using legacy protocols), `Get-GkAuthStrengthPolicy`, `Get-GkConditionalAccessTemplate`.
 
 ## [0.2.0] - 2026-07-03
 
