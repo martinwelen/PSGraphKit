@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Remove-GkConsentGrant` (revoke a delegated consent grant).
 - Tenant, domains & licensing lifecycle: `Get-GkTenantInfo` (/organization), `Get-GkDomain` (verified +
   federation), `Get-GkSubscription` (renewal/expiry via nextLifecycleDateTime), `Get-GkGroupExpirationPolicy`.
+- Membership & invitation write cmdlets: `New-GkGuestInvitation` (POST /invitations, returns redeem URL),
+  `Add-GkGroupMember` / `Remove-GkGroupMember` (/groups/{id}/members/$ref).
 
 ## [0.2.0] - 2026-07-03
 

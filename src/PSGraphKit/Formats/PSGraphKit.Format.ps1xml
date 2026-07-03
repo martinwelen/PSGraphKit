@@ -902,5 +902,41 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.GuestInvitationResult</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.GuestInvitationResult</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>EmailAddress</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>InvitedUserId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>EmailAddress</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>InvitedUserId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.GroupMemberResult</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.GroupMemberResult</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>GroupId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MemberId</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Action</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>GroupId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MemberId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Action</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
   </ViewDefinitions>
 </Configuration>

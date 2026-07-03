@@ -362,6 +362,24 @@ $script:GkScopeMap = @{
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Groups Administrator')
     }
+
+    'New-GkGuestInvitation' = @{
+        Groups = @(@{ For = 'invite guests'; Any = @('User.Invite.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Guest Inviter', 'User Administrator')
+    }
+
+    'Add-GkGroupMember' = @{
+        Groups = @(@{ For = 'manage group membership'; Any = @('GroupMember.ReadWrite.All', 'Group.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Groups Administrator', 'User Administrator')
+    }
+
+    'Remove-GkGroupMember' = @{
+        Groups = @(@{ For = 'manage group membership'; Any = @('GroupMember.ReadWrite.All', 'Group.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Groups Administrator', 'User Administrator')
+    }
 }
 
 # Session cache for the signed-in admin's active directory roles (populated on first need).

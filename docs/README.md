@@ -5,6 +5,7 @@ Do not edit these files by hand — edit the function help and regenerate.
 
 | Cmdlet | Synopsis |
 |--------|----------|
+| [Add-GkGroupMember](Add-GkGroupMember.md) | Add a member (user, group, or service principal) to one or more groups. |
 | [Connect-GkGraph](Connect-GkGraph.md) | Connect to Microsoft Graph for PSGraphKit — a thin wrapper over Connect-MgGraph that can derive the required scopes from the cmdlets you intend to run. |
 | [Disable-GkStaleDevice](Disable-GkStaleDevice.md) | Disable (default) or delete stale Entra devices. |
 | [Disable-GkStaleUser](Disable-GkStaleUser.md) | Block sign-in for one or more users by setting accountEnabled = false. |
@@ -45,8 +46,10 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkTenantInfo](Get-GkTenantInfo.md) | Report high-level tenant information: name, type, directory size, sync status, contacts. |
 | [Get-GkUserAccessReport](Get-GkUserAccessReport.md) | Report a single user's full access footprint: group memberships, directory roles, licenses, and application role assignments. |
 | [Get-GkUserMfaStatus](Get-GkUserMfaStatus.md) | Report per-user authentication-method registration and MFA capability from the authentication methods registration report. |
+| [New-GkGuestInvitation](New-GkGuestInvitation.md) | Invite one or more external users as B2B guests. |
 | [Remove-GkAdminRoleAssignment](Remove-GkAdminRoleAssignment.md) | Remove a directory role assignment — direct active, PIM-eligible, or PIM active. |
 | [Remove-GkConsentGrant](Remove-GkConsentGrant.md) | Revoke a delegated OAuth2 permission grant (consent). |
+| [Remove-GkGroupMember](Remove-GkGroupMember.md) | Remove a member from one or more groups. |
 | [Remove-GkStaleGuest](Remove-GkStaleGuest.md) | Disable (default) or delete stale guest accounts, with a guest-type safety check. |
 | [Remove-GkUserLicense](Remove-GkUserLicense.md) | Remove one or more license SKUs from users, reclaiming the seats. |
 | [Reset-GkAppCredential](Reset-GkAppCredential.md) | Add or remove an app registration's client secret. |

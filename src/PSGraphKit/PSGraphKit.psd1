@@ -65,6 +65,9 @@
         'Get-GkDomain',
         'Get-GkSubscription',
         'Get-GkGroupExpirationPolicy',
+        'New-GkGuestInvitation',
+        'Add-GkGroupMember',
+        'Remove-GkGroupMember',
         'Export-GkTenantAssessment'
     )
     CmdletsToExport   = @()
