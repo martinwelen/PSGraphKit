@@ -46,8 +46,12 @@ function Get-GkSecureScore {
     }
 
     process {
-        $latest = @(Invoke-GkGraphRequest -Uri '/security/secureScores?$top=1' -CallerFunction 'Get-GkSecureScore') | Select-Object -First 1
-        if (-not $latest) { Write-Warning 'No Secure Score data was returned for this tenant.'; return }
+        # Invoke-GkGraphRequest returns the page array as a single (non-unrolled) object, so take the
+        # first item by indexing an assigned variable — NOT via @(...) | Select-Object -First 1, which
+        # would hand back the whole array and silently null every field.
+        $scores = Invoke-GkGraphRequest -Uri '/security/secureScores?$top=1' -CallerFunction 'Get-GkSecureScore'
+        if (-not $scores) { Write-Warning 'No Secure Score data was returned for this tenant.'; return }
+        $latest = @($scores)[0]
 
         if ($IncludeControls) {
             foreach ($c in @(Get-GkDictValue $latest 'controlScores')) {

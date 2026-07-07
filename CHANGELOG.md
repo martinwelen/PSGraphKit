@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-07-07
+
+Patch release: fixes two report cmdlets that returned empty rows. No API surface or scope changes.
+
+### Fixed
+- `Get-GkSecureScore` and `Get-GkTenantInfo` returned a row of zeros/blank fields instead of the
+  tenant's actual data. Both selected the first item of a Graph collection with
+  `@(...) | Select-Object -First 1`; because the internal request helper returns a page as a single
+  non-unrolled array object, that expression yielded the whole array rather than its first element,
+  so every field resolved to null. Both now index the assigned result directly.
+- The unit tests for both cmdlets now drive the real request/pagination path (mocking only the
+  low-level HTTP seam), so this class of consumption bug is caught rather than masked.
+
 ## [0.3.1] - 2026-07-03
 
 First PowerShell Gallery release. Adds the professional release kit and brand package; no cmdlet

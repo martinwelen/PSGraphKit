@@ -37,8 +37,12 @@ function Get-GkTenantInfo {
     }
 
     process {
-        $org = @(Invoke-GkGraphRequest -Uri '/organization' -CallerFunction 'Get-GkTenantInfo') | Select-Object -First 1
-        if (-not $org) { Write-Warning 'No organization data was returned.'; return }
+        # Invoke-GkGraphRequest returns the collection as a single (non-unrolled) object; index an
+        # assigned variable rather than @(...) | Select-Object -First 1, which would return the whole
+        # array and null every field below.
+        $orgs = Invoke-GkGraphRequest -Uri '/organization' -CallerFunction 'Get-GkTenantInfo'
+        if (-not $orgs) { Write-Warning 'No organization data was returned.'; return }
+        $org = @($orgs)[0]
 
         $quota = Get-GkDictValue $org 'directorySizeQuota'
         $domains = @(Get-GkDictValue $org 'verifiedDomains')
