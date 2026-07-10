@@ -6,19 +6,24 @@ InModuleScope PSGraphKit {
 
         BeforeEach {
             Mock Test-GkConnection { [pscustomobject]@{ AuthType = 'Delegated'; Scopes = @('ConsentRequest.Read.All') } }
+            # Real appConsentRequest shape: pending permissions live in the pendingScopes collection
+            # (there is no pendingScopeCount/consentType property on the resource).
             Mock Invoke-GkGraphRequest {
                 @(
-                    @{ id = 'r1'; appDisplayName = 'Cool App'; appId = 'app-1'; pendingScopeCount = 3; consentType = 'Static' }
-                    @{ id = 'r2'; appDisplayName = 'Other App'; appId = 'app-2'; pendingScopeCount = 1; consentType = 'Static' }
+                    @{ id = 'r1'; appDisplayName = 'Cool App'; appId = 'app-1'; pendingScopes = @(
+                            @{ displayName = 'Read all users' }, @{ displayName = 'Read directory data' }, @{ displayName = 'Send mail' }) }
+                    @{ id = 'r2'; appDisplayName = 'Other App'; appId = 'app-2'; pendingScopes = @(@{ displayName = 'Read calendars' }) }
                 )
             }
         }
 
-        It 'emits typed rows with pending scope counts' {
+        It 'derives the pending scope count and names from pendingScopes' {
             $r = Get-GkConsentRequest
             $r.Count | Should -Be 2
             $r[0].PSTypeNames[0] | Should -Be 'PSGraphKit.ConsentRequest'
             ($r | Where-Object Id -eq 'r1').PendingScopeCount | Should -Be 3
+            ($r | Where-Object Id -eq 'r1').PendingScopes     | Should -Contain 'Read all users'
+            ($r | Where-Object Id -eq 'r2').PendingScopeCount | Should -Be 1
         }
 
         It 'warns and returns nothing when unavailable' {

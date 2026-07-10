@@ -49,7 +49,9 @@ function Get-GkConditionalAccessTemplate {
         $templates = Invoke-GkGraphRequest -Uri '/identity/conditionalAccess/templates' -CallerFunction 'Get-GkConditionalAccessTemplate'
 
         foreach ($t in $templates) {
-            $scenarios = @(Get-GkDictValue $t 'scenarios')
+            # 'scenarios' is a comma-separated flags string (e.g. 'zeroTrust,protectAdmins'), not an
+            # array — split it so -Scenario matches templates tagged with more than one scenario.
+            $scenarios = @([string](Get-GkDictValue $t 'scenarios') -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
             if ($Scenario -and $Scenario -notin $scenarios) { continue }
 
             $obj = [ordered]@{

@@ -698,6 +698,8 @@
           <ListItem><PropertyName>AllowInvitesFrom</PropertyName></ListItem>
           <ListItem><PropertyName>GuestUserRole</PropertyName></ListItem>
           <ListItem><PropertyName>AllowEmailVerifiedUsersToJoin</PropertyName></ListItem>
+          <ListItem><PropertyName>AllowUserConsentForApps</PropertyName></ListItem>
+          <ListItem><PropertyName>AllowUserConsentForRiskyApps</PropertyName></ListItem>
           <ListItem><PropertyName>DefaultUserCanCreateApps</PropertyName></ListItem>
           <ListItem><PropertyName>DefaultUserCanCreateSecurityGroups</PropertyName></ListItem>
           <ListItem><PropertyName>DefaultUserCanReadOtherUsers</PropertyName></ListItem>
@@ -804,13 +806,13 @@
       <TableControl>
         <TableHeaders>
           <TableColumnHeader><Label>AppDisplayName</Label><Width>36</Width></TableColumnHeader>
-          <TableColumnHeader><Label>PendingScopes</Label><Width>14</Width><Alignment>Right</Alignment></TableColumnHeader>
-          <TableColumnHeader><Label>ConsentType</Label><Width>14</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Pending</Label><Width>8</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>PendingScopes</Label><Width>50</Width></TableColumnHeader>
         </TableHeaders>
         <TableRowEntries><TableRowEntry><TableColumnItems>
           <TableColumnItem><PropertyName>AppDisplayName</PropertyName></TableColumnItem>
           <TableColumnItem><PropertyName>PendingScopeCount</PropertyName></TableColumnItem>
-          <TableColumnItem><PropertyName>ConsentType</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.PendingScopes -is [array]) { $_.PendingScopes -join '; ' } else { $_.PendingScopes }</ScriptBlock></TableColumnItem>
         </TableColumnItems></TableRowEntry></TableRowEntries>
       </TableControl>
     </View>

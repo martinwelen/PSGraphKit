@@ -48,12 +48,16 @@ function Get-GkConsentRequest {
         }
 
         foreach ($r in $requests) {
+            # appConsentRequest has no pendingScopeCount/consentType properties — the pending permissions
+            # live in the pendingScopes collection. Count and name them from there.
+            $pending    = @(Get-GkDictValue $r 'pendingScopes')
+            $scopeNames = @($pending | ForEach-Object { [string](Get-GkDictValue $_ 'displayName') } | Where-Object { $_ })
             $obj = [ordered]@{
                 PSTypeName        = 'PSGraphKit.ConsentRequest'
                 AppDisplayName    = [string](Get-GkDictValue $r 'appDisplayName')
                 AppId             = [string](Get-GkDictValue $r 'appId')
-                PendingScopeCount = [int](Get-GkDictValue $r 'pendingScopeCount')
-                ConsentType       = [string](Get-GkDictValue $r 'consentType')
+                PendingScopeCount = $pending.Count
+                PendingScopes     = if ($AsReport) { $scopeNames -join '; ' } else { $scopeNames }
                 Id                = [string](Get-GkDictValue $r 'id')
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }

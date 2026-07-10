@@ -34,11 +34,18 @@ InModuleScope PSGraphKit {
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly
         }
 
-        It 'binds the Id property from the pipeline (Get-GkDeviceInventory shape)' {
-            $devs = @([pscustomobject]@{ Id = 'd1' }, [pscustomobject]@{ Id = 'd2' })
+        It 'binds the object Id, not the deviceId GUID, from the Get-GkDeviceInventory pipeline shape' {
+            # Get-GkDeviceInventory emits BOTH Id (object id) and DeviceId (deviceId GUID). /devices/{id}
+            # needs the object id; binding the deviceId GUID would 404. PowerShell binds the formal name
+            # (Id) over the alias (DeviceId), so the object id must be the parameter's formal name.
+            $devs = @(
+                [pscustomobject]@{ Id = 'obj-1'; DeviceId = 'dev-guid-1' }
+                [pscustomobject]@{ Id = 'obj-2'; DeviceId = 'dev-guid-2' }
+            )
             $r = $devs | Disable-GkStaleDevice -Confirm:$false
             $r.Count | Should -Be 2
-            Should -Invoke Invoke-GkGraphRequest -Times 2 -Exactly
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter { $Uri -like '*/devices/obj-1' }
+            Should -Not -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like '*dev-guid*' }
         }
 
         It 'warns and returns Failed on error' {

@@ -17,7 +17,7 @@ function Get-GkTenantInfo {
         The tenant overview.
 
     .EXAMPLE
-        Get-GkTenantInfo | Select-Object DisplayName, TenantId, OnPremisesSyncEnabled, DirectoryUsers
+        Get-GkTenantInfo | Select-Object DisplayName, TenantId, OnPremisesSyncEnabled, DirectoryUsersUsed
 
     .EXAMPLE
         Get-GkTenantInfo -AsReport | Export-Csv .\tenant-info.csv -NoTypeInformation

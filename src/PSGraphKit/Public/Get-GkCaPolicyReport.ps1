@@ -112,8 +112,12 @@ function Get-GkCaPolicyReport {
             $sessionNames = @()
             if ($sessionCtrls -is [System.Collections.IDictionary]) {
                 foreach ($key in $sessionCtrls.Keys) {
+                    if ([string]$key -like '@*') { continue }   # skip @odata.* metadata keys
                     $val = $sessionCtrls[$key]
                     if ($null -eq $val) { continue }
+                    # Scalar-boolean session settings (e.g. disableResilienceDefaults, secureSignInSession)
+                    # are only "on" when true — a plain $false must not be listed as enabled.
+                    if ($val -is [bool]) { if ($val) { $sessionNames += [string]$key }; continue }
                     if ($val -is [System.Collections.IDictionary] -and $val.Contains('isEnabled') -and -not [bool]$val['isEnabled']) { continue }
                     $sessionNames += [string]$key
                 }

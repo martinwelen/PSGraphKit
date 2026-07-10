@@ -65,7 +65,9 @@
       "sessionControls": {
         "signInFrequency": { "value": 1, "type": "days", "isEnabled": true },
         "persistentBrowser": null,
-        "applicationEnforcedRestrictions": { "isEnabled": false }
+        "applicationEnforcedRestrictions": { "isEnabled": false },
+        "disableResilienceDefaults": false,
+        "secureSignInSession": true
       }
     }
   ]

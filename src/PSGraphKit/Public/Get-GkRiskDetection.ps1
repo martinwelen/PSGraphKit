@@ -60,7 +60,7 @@ function Get-GkRiskDetection {
 
             $obj = [ordered]@{
                 PSTypeName        = 'PSGraphKit.RiskDetection'
-                DetectedDateTime  = ConvertTo-GkDateTime (Get-GkDictValue $d 'activityDateTime')
+                DetectedDateTime  = ConvertTo-GkDateTime (Get-GkDictValue $d 'detectedDateTime')
                 UserPrincipalName = [string](Get-GkDictValue $d 'userPrincipalName')
                 RiskEventType     = [string](Get-GkDictValue $d 'riskEventType')
                 RiskLevel         = $level

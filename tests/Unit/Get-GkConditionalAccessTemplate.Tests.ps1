@@ -6,10 +6,11 @@ InModuleScope PSGraphKit {
 
         BeforeEach {
             Mock Test-GkConnection { [pscustomobject]@{ AuthType = 'Delegated'; Scopes = @('Policy.Read.All') } }
+            # Graph returns templateScenarios as a comma-separated flags STRING, not an array.
             Mock Invoke-GkGraphRequest {
                 @(
-                    @{ id = 't1'; name = 'Require MFA for admins'; description = 'protect admins'; scenarios = @('secureFoundation', 'protectAdmins') }
-                    @{ id = 't2'; name = 'Block legacy authentication'; description = 'block legacy'; scenarios = @('secureFoundation') }
+                    @{ id = 't1'; name = 'Require MFA for admins'; description = 'protect admins'; scenarios = 'secureFoundation,protectAdmins' }
+                    @{ id = 't2'; name = 'Block legacy authentication'; description = 'block legacy'; scenarios = 'secureFoundation' }
                 )
             }
         }

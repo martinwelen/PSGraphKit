@@ -40,9 +40,11 @@ InModuleScope PSGraphKit {
         It 'lists only enabled session controls' {
             $ca3 = Get-GkCaPolicyReport | Where-Object Id -eq 'ca3'
             $ca3.SessionControls | Should -Contain 'signInFrequency'
-            # applicationEnforcedRestrictions isEnabled=false must be excluded; persistentBrowser null excluded
+            $ca3.SessionControls | Should -Contain 'secureSignInSession'          # scalar bool $true -> included
+            # excluded: dict isEnabled=false, null, and a scalar bool $false
             $ca3.SessionControls | Should -Not -Contain 'applicationEnforcedRestrictions'
             $ca3.SessionControls | Should -Not -Contain 'persistentBrowser'
+            $ca3.SessionControls | Should -Not -Contain 'disableResilienceDefaults'
         }
 
         It 'filters by state' {

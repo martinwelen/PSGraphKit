@@ -16,9 +16,11 @@ function Disable-GkStaleDevice {
         Device.ReadWrite.All) and require a supporting Entra role — Cloud Device Administrator to
         enable/disable, Intune Administrator to delete.
 
-    .PARAMETER DeviceId
+    .PARAMETER Id
         One or more device OBJECT IDs (the Id from Get-GkDeviceInventory, not the deviceId GUID).
-        Accepts pipeline input incl. by the Id property.
+        Accepts pipeline input by the Id property; -DeviceId remains a back-compat alias. Binding to
+        Id — not DeviceId — is deliberate: Get-GkDeviceInventory emits BOTH properties, /devices/{id}
+        needs the object id, and PowerShell binds a parameter's formal name over its alias.
 
     .PARAMETER Delete
         Delete the device (soft-delete) instead of only disabling it.
@@ -45,8 +47,8 @@ function Disable-GkStaleDevice {
     [OutputType('PSGraphKit.DeviceDisableResult')]
     param(
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-        [Alias('Id')]
-        [string[]] $DeviceId,
+        [Alias('DeviceId')]
+        [string[]] $Id,
 
         [switch] $Delete
     )
@@ -56,7 +58,7 @@ function Disable-GkStaleDevice {
     }
 
     process {
-        foreach ($did in $DeviceId) {
+        foreach ($did in $Id) {
             if ([string]::IsNullOrWhiteSpace($did)) { continue }
 
             $action = if ($Delete) { 'Delete device (soft-delete)' } else { 'Disable device (accountEnabled = false)' }

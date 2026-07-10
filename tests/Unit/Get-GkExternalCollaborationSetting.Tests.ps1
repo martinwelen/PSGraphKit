@@ -11,7 +11,8 @@ InModuleScope PSGraphKit {
                     allowInvitesFrom = 'everyone'
                     guestUserRoleId  = '10dae51f-b6af-4016-8d66-8c2a99b929b3'
                     allowEmailVerifiedUsersToJoinOrganization = $false
-                    defaultUserRolePermissions = @{ allowedToCreateApps = $true; allowedToCreateSecurityGroups = $false; allowedToReadOtherUsers = $true }
+                    allowUserConsentForRiskyApps = $false
+                    defaultUserRolePermissions = @{ allowedToCreateApps = $true; allowedToCreateSecurityGroups = $false; allowedToReadOtherUsers = $true; permissionGrantPoliciesAssigned = @('ManagePermissionGrantsForSelf.microsoft-user-default-low') }
                 }
             }
         }
@@ -23,6 +24,12 @@ InModuleScope PSGraphKit {
             $r.GuestUserRole            | Should -Be 'Guest User (default)'
             $r.DefaultUserCanCreateApps | Should -BeTrue
             $r.DefaultUserCanCreateSecurityGroups | Should -BeFalse
+        }
+
+        It 'reports user app-consent (from permissionGrantPoliciesAssigned) separately from the risky-apps toggle' {
+            $r = Get-GkExternalCollaborationSetting
+            $r.AllowUserConsentForApps      | Should -BeTrue    # a grant policy is assigned
+            $r.AllowUserConsentForRiskyApps | Should -BeFalse   # the separate risky-apps toggle
         }
     }
 }

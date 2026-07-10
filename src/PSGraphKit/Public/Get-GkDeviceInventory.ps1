@@ -79,11 +79,22 @@ function Get-GkDeviceInventory {
             if ($JoinType -ne 'All' -and $deviceJoin -ne $JoinType) { continue }
 
             $lastActivity  = ConvertTo-GkDateTime (Get-GkDictValue $d 'approximateLastSignInDateTime')
+            $registered    = ConvertTo-GkDateTime (Get-GkDictValue $d 'registrationDateTime')
             $neverActive   = ($null -eq $lastActivity)
             $inactiveDays  = if ($neverActive) { $null } else { [int][math]::Floor(($now - $lastActivity).TotalDays) }
-            $isStale       = $neverActive -or ($inactiveDays -ge $StaleDays)
+            # A device with no sign-in activity is stale only if it also was not registered within
+            # StaleDays — otherwise a freshly-registered device whose (approximate, periodically-updated)
+            # sign-in hasn't populated yet is a false positive in the very stale list this cmdlet produces.
+            $isStale = if ($neverActive) {
+                ($null -eq $registered) -or ((($now - $registered).TotalDays) -ge $StaleDays)
+            }
+            else { $inactiveDays -ge $StaleDays }
 
             if ($StaleOnly -and -not $isStale) { continue }
+
+            # Preserve tri-state: an absent isCompliant/isManaged means "not evaluated", not $false.
+            $compliantRaw = Get-GkDictValue $d 'isCompliant'
+            $managedRaw   = Get-GkDictValue $d 'isManaged'
 
             $obj = [ordered]@{
                 PSTypeName      = 'PSGraphKit.Device'
@@ -96,11 +107,11 @@ function Get-GkDeviceInventory {
                 InactiveDays    = $inactiveDays
                 NeverActive     = $neverActive
                 IsStale         = $isStale
-                IsCompliant     = [bool](Get-GkDictValue $d 'isCompliant')
-                IsManaged       = [bool](Get-GkDictValue $d 'isManaged')
+                IsCompliant     = if ($null -eq $compliantRaw) { $null } else { [bool]$compliantRaw }
+                IsManaged       = if ($null -eq $managedRaw) { $null } else { [bool]$managedRaw }
                 AccountEnabled  = [bool](Get-GkDictValue $d 'accountEnabled')
                 Ownership       = [string](Get-GkDictValue $d 'deviceOwnership')
-                Registered      = ConvertTo-GkDateTime (Get-GkDictValue $d 'registrationDateTime')
+                Registered      = $registered
                 DeviceId        = [string](Get-GkDictValue $d 'deviceId')
                 Id              = [string](Get-GkDictValue $d 'id')
             }

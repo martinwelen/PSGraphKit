@@ -52,12 +52,18 @@ function Get-GkExternalCollaborationSetting {
         $defaults = Get-GkDictValue $p 'defaultUserRolePermissions'
         $guestRoleId = [string](Get-GkDictValue $p 'guestUserRoleId')
 
+        # General user app-consent is governed by defaultUserRolePermissions.permissionGrantPoliciesAssigned
+        # (empty list = users cannot consent to any app). allowUserConsentForRiskyApps is a SEPARATE toggle
+        # for publisher-unverified/risky apps — report both, each correctly labelled.
+        $grantPolicies = @(Get-GkDictValue $defaults 'permissionGrantPoliciesAssigned')
+
         $obj = [ordered]@{
             PSTypeName                       = 'PSGraphKit.ExternalCollaborationSetting'
             AllowInvitesFrom                 = [string](Get-GkDictValue $p 'allowInvitesFrom')
             GuestUserRole                    = if ($guestRoleNames.ContainsKey($guestRoleId)) { $guestRoleNames[$guestRoleId] } else { $guestRoleId }
             AllowEmailVerifiedUsersToJoin    = [bool](Get-GkDictValue $p 'allowEmailVerifiedUsersToJoinOrganization')
-            AllowUserConsentForApps          = [bool](Get-GkDictValue $p 'allowUserConsentForRiskyApps')
+            AllowUserConsentForApps          = ($grantPolicies.Count -gt 0)
+            AllowUserConsentForRiskyApps     = [bool](Get-GkDictValue $p 'allowUserConsentForRiskyApps')
             DefaultUserCanCreateApps         = [bool](Get-GkDictValue $defaults 'allowedToCreateApps')
             DefaultUserCanCreateSecurityGroups = [bool](Get-GkDictValue $defaults 'allowedToCreateSecurityGroups')
             DefaultUserCanReadOtherUsers     = [bool](Get-GkDictValue $defaults 'allowedToReadOtherUsers')

@@ -52,6 +52,24 @@ InModuleScope PSGraphKit {
             $stale[0].DisplayName | Should -Be 'StaleOne'
         }
 
+        It 'does not flag a freshly-registered device with no sign-in as stale' {
+            Mock Invoke-GkGraphRequest {
+                @(@{ id = 'new1'; displayName = 'BrandNew'; operatingSystem = 'Windows'; trustType = 'AzureAd'
+                     registrationDateTime = ([datetime]::UtcNow.AddDays(-3).ToString('o')) })   # registered, no sign-in yet
+            }
+            $d = Get-GkDeviceInventory -StaleDays 90
+            $d.NeverActive | Should -BeTrue
+            $d.IsStale     | Should -BeFalse
+        }
+
+        It 'preserves unknown compliance as $null rather than $false' {
+            Mock Invoke-GkGraphRequest {
+                @(@{ id = 'unk1'; displayName = 'Unknown'; operatingSystem = 'Windows'; trustType = 'AzureAd'
+                     approximateLastSignInDateTime = ([datetime]::UtcNow.AddDays(-1).ToString('o')) })   # no isCompliant key
+            }
+            (Get-GkDeviceInventory)[0].IsCompliant | Should -BeNullOrEmpty
+        }
+
         It 'carries compliance/management/ownership flags' {
             $bob = Get-GkDeviceInventory | Where-Object Id -eq 'dev2'
             $bob.IsCompliant | Should -BeFalse
