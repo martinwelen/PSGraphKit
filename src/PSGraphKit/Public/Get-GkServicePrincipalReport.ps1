@@ -65,7 +65,10 @@ function Get-GkServicePrincipalReport {
         }
 
         $select = 'id,appId,displayName,accountEnabled,servicePrincipalType,appRoleAssignmentRequired,tags,signInAudience'
-        $sps = Invoke-GkGraphRequest -Uri "/servicePrincipals?`$select=$select&`$top=999" -CallerFunction 'Get-GkServicePrincipalReport'
+        # servicePrincipalType filters server-side, so -Type doesn't page the whole servicePrincipals
+        # collection just to discard the non-matching ones.
+        $spFilter = if ($Type) { "&`$filter=servicePrincipalType eq '$Type'" } else { '' }
+        $sps = Invoke-GkGraphRequest -Uri "/servicePrincipals?`$select=$select$spFilter&`$top=999" -CallerFunction 'Get-GkServicePrincipalReport'
 
         foreach ($sp in $sps) {
             $spType = [string](Get-GkDictValue $sp 'servicePrincipalType')
@@ -82,7 +85,7 @@ function Get-GkServicePrincipalReport {
                 AccountEnabled            = [bool](Get-GkDictValue $sp 'accountEnabled')
                 AppRoleAssignmentRequired = [bool](Get-GkDictValue $sp 'appRoleAssignmentRequired')
                 SignInAudience            = [string](Get-GkDictValue $sp 'signInAudience')
-                Tags                      = if ($AsReport) { $tags -join '; ' } else { $tags }
+                Tags                      = if ($AsReport) { $tags -join '; ' } else { , $tags }
                 Id                        = $id
             }
 

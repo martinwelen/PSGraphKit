@@ -63,8 +63,8 @@ function Get-GkNamedLocation {
                 DisplayName = [string](Get-GkDictValue $l 'displayName')
                 Type        = if ($isIp) { 'IP' } else { 'Country' }
                 IsTrusted   = $isTrusted
-                IpRanges    = if ($AsReport) { $ipRanges -join '; ' } else { $ipRanges }
-                Countries   = if ($AsReport) { $countries -join '; ' } else { $countries }
+                IpRanges    = if ($AsReport) { $ipRanges -join '; ' } else { , $ipRanges }
+                Countries   = if ($AsReport) { $countries -join '; ' } else { , $countries }
                 Created     = ConvertTo-GkDateTime (Get-GkDictValue $l 'createdDateTime')
                 Modified    = ConvertTo-GkDateTime (Get-GkDictValue $l 'modifiedDateTime')
                 Id          = [string](Get-GkDictValue $l 'id')

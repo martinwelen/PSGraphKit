@@ -51,7 +51,7 @@ function Get-GkCustomRole {
                 IsEnabled       = [bool](Get-GkDictValue $r 'isEnabled')
                 Description     = [string](Get-GkDictValue $r 'description')
                 PermissionCount = $actions.Count
-                Permissions     = if ($AsReport) { $actions -join '; ' } else { $actions }
+                Permissions     = if ($AsReport) { $actions -join '; ' } else { , $actions }
                 TemplateId      = [string](Get-GkDictValue $r 'templateId')
                 Id              = [string](Get-GkDictValue $r 'id')
             }

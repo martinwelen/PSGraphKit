@@ -131,9 +131,9 @@ function Get-GkCaPolicyReport {
                 ExcludedUsers    = $excludedUsers
                 TargetApps       = $targetApps
                 GrantControls    = $grantSummary
-                BuiltInControls  = if ($AsReport) { $builtIn -join '; ' } else { $builtIn }
-                SessionControls  = if ($AsReport) { $sessionNames -join '; ' } else { $sessionNames }
-                ClientAppTypes   = if ($AsReport) { $clientAppTypes -join '; ' } else { $clientAppTypes }
+                BuiltInControls  = if ($AsReport) { $builtIn -join '; ' } else { , $builtIn }
+                SessionControls  = if ($AsReport) { $sessionNames -join '; ' } else { , $sessionNames }
+                ClientAppTypes   = if ($AsReport) { $clientAppTypes -join '; ' } else { , $clientAppTypes }
                 CreatedDateTime  = ConvertTo-GkDateTime (Get-GkDictValue $p 'createdDateTime')
                 ModifiedDateTime = ConvertTo-GkDateTime (Get-GkDictValue $p 'modifiedDateTime')
                 Id               = [string](Get-GkDictValue $p 'id')

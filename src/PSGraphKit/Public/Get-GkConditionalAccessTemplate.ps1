@@ -58,7 +58,7 @@ function Get-GkConditionalAccessTemplate {
                 PSTypeName  = 'PSGraphKit.CaTemplate'
                 Name        = [string](Get-GkDictValue $t 'name')
                 Description = [string](Get-GkDictValue $t 'description')
-                Scenarios   = if ($AsReport) { $scenarios -join '; ' } else { $scenarios }
+                Scenarios   = if ($AsReport) { $scenarios -join '; ' } else { , $scenarios }
                 Id          = [string](Get-GkDictValue $t 'id')
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }

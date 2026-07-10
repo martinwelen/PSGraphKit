@@ -88,7 +88,7 @@ function Get-GkDirectoryAudit {
                 Category            = [string](Get-GkDictValue $e 'category')
                 Result              = [string](Get-GkDictValue $e 'result')
                 InitiatedBy         = $actor
-                Targets             = if ($AsReport) { $targets -join '; ' } else { $targets }
+                Targets             = if ($AsReport) { $targets -join '; ' } else { , $targets }
                 Id                  = [string](Get-GkDictValue $e 'id')
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }

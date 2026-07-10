@@ -124,7 +124,7 @@ function Get-GkGuestInventory {
                 InactiveDays           = $inactive
                 NeverSignedIn          = $neverSignedIn
                 IsStale                = $isStale
-                Sponsors               = if ($AsReport) { $sponsorNames -join '; ' } else { $sponsorNames }
+                Sponsors               = if ($AsReport) { $sponsorNames -join '; ' } else { , $sponsorNames }
                 SponsorCount           = $sponsorNames.Count
                 Id                     = $id
             }

@@ -118,7 +118,7 @@ function Get-GkGroupReport {
                 GroupType      = $type
                 IsDynamic      = $isDynamic
                 MemberCount    = $memberCount
-                Owners         = if ($AsReport) { $ownerNames -join '; ' } else { $ownerNames }
+                Owners         = if ($AsReport) { $ownerNames -join '; ' } else { , $ownerNames }
                 OwnerCount     = $ownerNames.Count
                 IsOwnerless    = ($ownerNames.Count -eq 0)
                 Mail           = [string](Get-GkDictValue $g 'mail')

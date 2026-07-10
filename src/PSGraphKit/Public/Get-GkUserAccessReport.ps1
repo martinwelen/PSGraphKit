@@ -117,13 +117,13 @@ function Get-GkUserAccessReport {
                 DisplayName        = [string](Get-GkDictValue $user 'displayName')
                 AccountEnabled     = [bool](Get-GkDictValue $user 'accountEnabled')
                 UserType           = [string](Get-GkDictValue $user 'userType')
-                Groups             = if ($AsReport) { $groups -join '; ' } else { $groups }
+                Groups             = if ($AsReport) { $groups -join '; ' } else { , $groups }
                 GroupCount         = $groups.Count
-                DirectoryRoles     = if ($AsReport) { $roles -join '; ' } else { $roles }
+                DirectoryRoles     = if ($AsReport) { $roles -join '; ' } else { , $roles }
                 RoleCount          = $roles.Count
-                Licenses           = if ($AsReport) { $skus -join '; ' } else { $skus }
+                Licenses           = if ($AsReport) { $skus -join '; ' } else { , $skus }
                 LicenseCount       = $skus.Count
-                AppRoleAssignments = if ($AsReport) { $apps -join '; ' } else { $apps }
+                AppRoleAssignments = if ($AsReport) { $apps -join '; ' } else { , $apps }
                 AppCount           = $apps.Count
                 Id                 = [string](Get-GkDictValue $user 'id')
             }

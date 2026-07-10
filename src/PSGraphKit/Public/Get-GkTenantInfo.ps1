@@ -60,7 +60,7 @@ function Get-GkTenantInfo {
             DefaultDomain              = if ($defaultDomain) { [string](Get-GkDictValue $defaultDomain 'name') } else { $null }
             DirectoryUsersUsed         = [int](Get-GkDictValue $quota 'used')
             DirectoryQuotaTotal        = [int](Get-GkDictValue $quota 'total')
-            TechnicalNotificationMails = if ($AsReport) { $mails -join '; ' } else { $mails }
+            TechnicalNotificationMails = if ($AsReport) { $mails -join '; ' } else { , $mails }
         }
         if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }
         [pscustomobject]$obj

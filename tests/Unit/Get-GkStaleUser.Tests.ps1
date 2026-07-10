@@ -56,6 +56,11 @@ InModuleScope PSGraphKit {
             $r[0].DisplayName | Should -Be 'Bob Bianchi'
         }
 
+        It 'applies -UserType server-side (userType filter in the query)' {
+            Get-GkStaleUser -UserType Guest | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like "*userType eq 'Guest'*" }
+        }
+
         It 'excludes non-stale users unless -IncludeAll (recent sign-in)' {
             Mock Invoke-GkGraphRequest {
                 @(

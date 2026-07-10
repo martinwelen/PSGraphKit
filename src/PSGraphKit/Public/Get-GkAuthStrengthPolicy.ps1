@@ -58,7 +58,7 @@ function Get-GkAuthStrengthPolicy {
                 PSTypeName          = 'PSGraphKit.AuthStrengthPolicy'
                 DisplayName         = [string](Get-GkDictValue $p 'displayName')
                 PolicyType          = $type
-                AllowedCombinations = if ($AsReport) { $combos -join '; ' } else { $combos }
+                AllowedCombinations = if ($AsReport) { $combos -join '; ' } else { , $combos }
                 CombinationCount    = $combos.Count
                 Modified            = ConvertTo-GkDateTime (Get-GkDictValue $p 'modifiedDateTime')
                 Id                  = [string](Get-GkDictValue $p 'id')

@@ -30,6 +30,17 @@ InModuleScope PSGraphKit {
             (Get-GkServicePrincipalReport -Type ManagedIdentity).Count | Should -Be 1
         }
 
+        It 'applies -Type server-side (servicePrincipalType filter in the query)' {
+            Get-GkServicePrincipalReport -Type ManagedIdentity | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like "*servicePrincipalType eq 'ManagedIdentity'*" }
+        }
+
+        It 'keeps a single-element array field as an array (not unrolled to a scalar)' {
+            $sp1 = Get-GkServicePrincipalReport | Where-Object Id -eq 'sp1'
+            ($sp1.Tags -is [array]) | Should -BeTrue   # one tag -> still an array
+            $sp1.Tags.Count | Should -Be 1
+        }
+
         It 'does not query consent grants unless -IncludeConsentGrants' {
             Get-GkServicePrincipalReport | Out-Null
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Uri -like '*oauth2PermissionGrants*' }

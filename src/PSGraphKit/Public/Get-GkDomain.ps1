@@ -57,7 +57,7 @@ function Get-GkDomain {
                 IsDefault          = [bool](Get-GkDictValue $d 'isDefault')
                 AuthenticationType = $authType
                 IsAdminManaged     = [bool](Get-GkDictValue $d 'isAdminManaged')
-                SupportedServices  = if ($AsReport) { $services -join '; ' } else { $services }
+                SupportedServices  = if ($AsReport) { $services -join '; ' } else { , $services }
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }
             [pscustomobject]$obj

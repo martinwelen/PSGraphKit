@@ -57,7 +57,7 @@ function Get-GkConsentRequest {
                 AppDisplayName    = [string](Get-GkDictValue $r 'appDisplayName')
                 AppId             = [string](Get-GkDictValue $r 'appId')
                 PendingScopeCount = $pending.Count
-                PendingScopes     = if ($AsReport) { $scopeNames -join '; ' } else { $scopeNames }
+                PendingScopes     = if ($AsReport) { $scopeNames -join '; ' } else { , $scopeNames }
                 Id                = [string](Get-GkDictValue $r 'id')
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }

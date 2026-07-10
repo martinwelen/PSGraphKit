@@ -79,7 +79,7 @@ function Get-GkUserMfaStatus {
                 IsPasswordlessCapable = [bool](Get-GkDictValue $d 'isPasswordlessCapable')
                 IsSsprCapable         = [bool](Get-GkDictValue $d 'isSsprCapable')
                 IsSsprRegistered      = [bool](Get-GkDictValue $d 'isSsprRegistered')
-                MethodsRegistered     = if ($AsReport) { $methods -join '; ' } else { $methods }
+                MethodsRegistered     = if ($AsReport) { $methods -join '; ' } else { , $methods }
                 MethodCount           = $methods.Count
                 UserType              = [string](Get-GkDictValue $d 'userType')
                 LastUpdated           = ConvertTo-GkDateTime (Get-GkDictValue $d 'lastUpdatedDateTime')

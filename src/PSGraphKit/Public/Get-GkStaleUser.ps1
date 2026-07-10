@@ -26,8 +26,8 @@ function Get-GkStaleUser {
         least this many days ago, or when they have never signed in.
 
     .PARAMETER UserType
-        Limit to 'Member', 'Guest', or 'All' (default). Filtered client-side because signInActivity
-        cannot be combined with other server-side filters.
+        Limit to 'Member', 'Guest', or 'All' (default). A non-All value is applied server-side via a
+        userType filter (which combines fine with the signInActivity select).
 
     .PARAMETER IncludeAll
         Return every user with the computed staleness fields, not just the stale ones.
@@ -78,7 +78,10 @@ function Get-GkStaleUser {
 
     process {
         $select = 'id,displayName,userPrincipalName,userType,accountEnabled,signInActivity'
-        $uri = "/users?`$select=$select&`$top=500"
+        # userType filters server-side (Get-GkGuestInventory proves it combines with the signInActivity
+        # select), so a targeted -UserType doesn't download the whole user population to discard most of it.
+        $filter = if ($UserType -ne 'All') { "&`$filter=userType eq '$UserType'" } else { '' }
+        $uri = "/users?`$select=$select$filter&`$top=500"
 
         $users = Invoke-GkGraphRequest -Uri $uri -CallerFunction 'Get-GkStaleUser'
 

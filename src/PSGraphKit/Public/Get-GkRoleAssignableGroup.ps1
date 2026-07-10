@@ -66,7 +66,7 @@ function Get-GkRoleAssignableGroup {
             $obj = [ordered]@{
                 PSTypeName  = 'PSGraphKit.RoleAssignableGroup'
                 DisplayName = [string](Get-GkDictValue $g 'displayName')
-                Owners      = if ($AsReport) { $ownerNames -join '; ' } else { $ownerNames }
+                Owners      = if ($AsReport) { $ownerNames -join '; ' } else { , $ownerNames }
                 OwnerCount  = $ownerNames.Count
                 IsOwnerless = ($ownerNames.Count -eq 0)
                 Visibility  = [string](Get-GkDictValue $g 'visibility')

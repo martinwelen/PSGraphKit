@@ -48,7 +48,7 @@ function Get-GkGroupExpirationPolicy {
                 PSTypeName                  = 'PSGraphKit.GroupExpirationPolicy'
                 GroupLifetimeInDays         = [int](Get-GkDictValue $p 'groupLifetimeInDays')
                 ManagedGroupTypes           = [string](Get-GkDictValue $p 'managedGroupTypes')
-                AlternateNotificationEmails = if ($AsReport) { $emails -join '; ' } else { $emails }
+                AlternateNotificationEmails = if ($AsReport) { $emails -join '; ' } else { , $emails }
                 Id                          = [string](Get-GkDictValue $p 'id')
             }
             if ($AsReport) { $obj['ReportGeneratedUtc'] = $now }

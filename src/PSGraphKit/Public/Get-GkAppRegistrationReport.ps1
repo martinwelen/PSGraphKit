@@ -161,7 +161,7 @@ function Get-GkAppRegistrationReport {
                 ExpiringSoonCount        = $expiringSoon
                 AppPermissionCount       = $appPerms.Count
                 DelegatedPermissionCount = $delegatedPerms.Count
-                HighPrivilegePermissions = if ($AsReport) { $highPriv -join '; ' } else { $highPriv }
+                HighPrivilegePermissions = if ($AsReport) { $highPriv -join '; ' } else { , $highPriv }
                 HasHighPrivilege         = ($highPriv.Count -gt 0)
                 Id                       = [string](Get-GkDictValue $app 'id')
             }
