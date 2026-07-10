@@ -114,6 +114,7 @@ function Get-GkGuestInventory {
                 PSTypeName             = 'PSGraphKit.GuestInventory'
                 DisplayName            = [string](Get-GkDictValue $g 'displayName')
                 UserPrincipalName      = [string](Get-GkDictValue $g 'userPrincipalName')
+                UserType               = [string](Get-GkDictValue $g 'userType')
                 Mail                   = [string](Get-GkDictValue $g 'mail')
                 AccountEnabled         = [bool](Get-GkDictValue $g 'accountEnabled')
                 InvitationState        = [string](Get-GkDictValue $g 'externalUserState')

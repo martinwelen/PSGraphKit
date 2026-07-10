@@ -45,6 +45,12 @@ InModuleScope PSGraphKit {
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Method -in 'PATCH', 'DELETE' }
         }
 
+        It 'skips the per-user userType re-read when UserType comes from the pipeline' {
+            [pscustomobject]@{ UserId = 'g@contoso.com'; UserType = 'Guest' } | Remove-GkStaleGuest -Confirm:$false | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Uri -like '*$select=id,userType*' }
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter { $Method -eq 'PATCH' }
+        }
+
         It '-Force bypasses the guest-type check' {
             Mock Invoke-GkGraphRequest { $null }   # no safety GET expected
             Remove-GkStaleGuest -UserId 'member@contoso.com' -Force -Confirm:$false | Out-Null

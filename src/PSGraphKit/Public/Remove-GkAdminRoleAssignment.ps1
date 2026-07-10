@@ -86,7 +86,9 @@ function Remove-GkAdminRoleAssignment {
     }
 
     process {
-        $target = if ($RoleName) { "$RoleName [$AssignmentKind]" } else { "$AssignmentKind assignment" }
+        # Include a unique identifier so a bulk -Confirm run distinguishes each assignment being removed.
+        $who = if ($PrincipalId) { "principal $PrincipalId" } elseif ($AssignmentId) { "assignment $AssignmentId" } else { 'assignment' }
+        $target = if ($RoleName) { "$RoleName [$AssignmentKind] — $who" } else { "$AssignmentKind — $who" }
         if (-not $PSCmdlet.ShouldProcess($target, 'Remove role assignment')) { return }
 
         $dirScope = if ($Scope) { $Scope } else { '/' }
@@ -124,6 +126,8 @@ function Remove-GkAdminRoleAssignment {
             RoleName       = $RoleName
             AssignmentKind = $AssignmentKind
             PrincipalId    = $PrincipalId
+            AssignmentId   = $AssignmentId
+            Scope          = $dirScope
             Outcome        = $outcome
             Error          = $errMsg
         }

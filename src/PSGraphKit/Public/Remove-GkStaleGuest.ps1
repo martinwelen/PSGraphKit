@@ -52,6 +52,10 @@ function Remove-GkStaleGuest {
         [Alias('UserPrincipalName', 'Id')]
         [string[]] $UserId,
 
+        # Bound from the pipeline (e.g. Get-GkGuestInventory) to skip a per-user userType re-read.
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [string] $UserType,
+
         [switch] $Delete,
 
         [switch] $Force
@@ -67,20 +71,24 @@ function Remove-GkStaleGuest {
             $enc = [uri]::EscapeDataString($uid)
             $action = if ($Delete) { 'Delete guest (soft-delete)' } else { 'Disable guest (accountEnabled = false)' }
 
-            # Guest-type safety check (unless -Force).
+            # Guest-type safety check (unless -Force). Use the pipeline-supplied UserType when present
+            # (e.g. from Get-GkGuestInventory) and only re-read it per user when it wasn't provided.
             if (-not $Force) {
-                try {
-                    $u = Invoke-GkGraphRequest -Raw -Uri "/users/$enc`?`$select=id,userType" -CallerFunction 'Remove-GkStaleGuest'
-                    $utype = [string](Get-GkDictValue $u 'userType')
-                    if ($utype -ne 'Guest') {
-                        Write-Warning "Skipping '$uid': not a guest (userType=$utype). Use -Force to override."
-                        [pscustomobject]@{ PSTypeName = 'PSGraphKit.GuestRemovalResult'; UserId = $uid; Action = 'Skipped'; Outcome = 'Skipped'; Error = "Not a guest (userType=$utype)" }
+                $utype = $UserType
+                if (-not $utype) {
+                    try {
+                        $u = Invoke-GkGraphRequest -Raw -Uri "/users/$enc`?`$select=id,userType" -CallerFunction 'Remove-GkStaleGuest'
+                        $utype = [string](Get-GkDictValue $u 'userType')
+                    }
+                    catch {
+                        Write-Warning "Skipping '$uid': could not verify guest status. $($_.Exception.Message)"
+                        [pscustomobject]@{ PSTypeName = 'PSGraphKit.GuestRemovalResult'; UserId = $uid; Action = 'Skipped'; Outcome = 'Failed'; Error = $_.Exception.Message }
                         continue
                     }
                 }
-                catch {
-                    Write-Warning "Skipping '$uid': could not verify guest status. $($_.Exception.Message)"
-                    [pscustomobject]@{ PSTypeName = 'PSGraphKit.GuestRemovalResult'; UserId = $uid; Action = 'Skipped'; Outcome = 'Failed'; Error = $_.Exception.Message }
+                if ($utype -ne 'Guest') {
+                    Write-Warning "Skipping '$uid': not a guest (userType=$utype). Use -Force to override."
+                    [pscustomobject]@{ PSTypeName = 'PSGraphKit.GuestRemovalResult'; UserId = $uid; Action = 'Skipped'; Outcome = 'Skipped'; Error = "Not a guest (userType=$utype)" }
                     continue
                 }
             }
