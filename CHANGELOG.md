@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-07-10
+
+Correctness and efficiency fixes from a full audit of the cmdlet surface. Each fix ships with a
+regression test built from the real Graph shape.
+
+### Fixed
+- `Disable-GkStaleDevice` bound the deviceId GUID instead of the object Id from the
+  `Get-GkDeviceInventory` pipeline (both are emitted; a parameter's formal name binds over its alias),
+  so `/devices/{id}` 404'd on every device. The parameter is now `Id` with a `DeviceId` alias.
+- `Get-GkConsentRequest` read `pendingScopeCount`/`consentType`, which don't exist on
+  `appConsentRequest`; `PendingScopeCount` was always 0. Count and name the pending permissions from
+  the `pendingScopes` collection (the `ConsentType` column is replaced by `PendingScopes`).
+- `Get-GkConditionalAccessTemplate` treated `scenarios` (a comma-separated string) as an array, so
+  `-Scenario` never matched a template tagged with more than one scenario. It is now split.
+- `Get-GkExternalCollaborationSetting` mislabelled `allowUserConsentForRiskyApps` as
+  `AllowUserConsentForApps`. Both are now reported, correctly named, with the real user-consent
+  setting derived from `permissionGrantPoliciesAssigned`.
+- `Get-GkRiskDetection` sourced `DetectedDateTime` from `activityDateTime`; it now uses `detectedDateTime`.
+- `Get-GkCaPolicyReport` listed scalar-boolean session controls set to `false` as enabled.
+- `Get-GkDeviceInventory` flagged freshly-registered devices (no sign-in yet) as stale, and collapsed
+  an unknown `isCompliant`/`isManaged` (null) to `$false`. Fixed to fall back to registration date and
+  to preserve tri-state.
+- **Module-wide:** the `if ($AsReport) { … } else { $array }` pattern unrolled a single-element array
+  to a scalar (breaking `.Count`/indexing for any row with exactly one value) across 23 fields in 17
+  cmdlets; all fixed.
+- `Get-GkTenantInfo` doc example referenced `DirectoryUsers` (field is `DirectoryUsersUsed`).
+
+### Changed
+- `Get-GkLicenseOverview -IncludeDisabledLicensed` counts disabled licensed users per SKU server-side
+  (`$count=true`) instead of paging the whole assigned-user set per SKU.
+- `Get-GkStaleUser -UserType` and `Get-GkServicePrincipalReport -Type` filter server-side
+  (`userType` / `servicePrincipalType`) instead of downloading the whole collection.
+
+### Added
+- `-First <N>` on `Get-GkRiskyUser` and `Get-GkRiskDetection` to bound the pull.
+- `Get-GkGuestInventory` now emits `UserType`; `Remove-GkStaleGuest` accepts it from the pipeline to
+  skip the per-user guest-type re-read. `Remove-GkAdminRoleAssignment` adds `AssignmentId`/`Scope` to
+  its result and a unique identifier to the confirmation prompt.
+
 ## [0.3.4] - 2026-07-10
 
 ### Added
