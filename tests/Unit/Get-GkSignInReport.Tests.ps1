@@ -36,6 +36,16 @@ InModuleScope PSGraphKit {
             (Get-GkSignInReport -RiskyOnly).Count | Should -Be 1
         }
 
+        It '-First is forwarded to the pagination cap (MaxResult)' {
+            Get-GkSignInReport -First 50 | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $MaxResult -eq 50 }
+        }
+
+        It 'does not cap the fetch when -First is omitted' {
+            Get-GkSignInReport | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $MaxResult -eq 0 }
+        }
+
         It 'warns and returns nothing when the log is unavailable' {
             Mock Invoke-GkGraphRequest { throw 'P1/P2 required' }
             $warnings = @()

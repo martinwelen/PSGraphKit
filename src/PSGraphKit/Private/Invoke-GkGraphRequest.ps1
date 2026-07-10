@@ -41,6 +41,12 @@ function Invoke-GkGraphRequest {
         [ValidateRange(0, 10)]
         [int] $MaxRetry = 5,
 
+        # Cap the number of collection items returned (0 = unlimited): stop following @odata.nextLink
+        # once this many have accumulated, then trim to exactly this count. For "N most-recent" reads
+        # over time-ordered logs (Graph returns them newest-first).
+        [ValidateRange(0, 500000)]
+        [int] $MaxResult = 0,
+
         # Name of the public function on whose behalf this runs; drives role hints in 403 messages.
         [string] $CallerFunction,
 
@@ -90,6 +96,9 @@ function Invoke-GkGraphRequest {
 
             if ($response -is [System.Collections.IDictionary] -and $response.Contains('value')) {
                 foreach ($v in @($response['value'])) { $items.Add($v) }
+                if ($MaxResult -gt 0 -and $items.Count -ge $MaxResult) {
+                    return , @($items.ToArray() | Select-Object -First $MaxResult)   # cap reached; stop paging
+                }
                 $next = if ($response.Contains('@odata.nextLink')) { $response['@odata.nextLink'] } else { $null }
                 if ($doPaging -and $next) {
                     $current = [string]$next

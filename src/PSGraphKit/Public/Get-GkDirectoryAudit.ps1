@@ -12,6 +12,11 @@ function Get-GkDirectoryAudit {
     .PARAMETER Days
         Look-back window in days (default 7).
 
+    .PARAMETER First
+        Return only the N most-recent audit events in the window (Graph returns them newest-first),
+        stopping pagination early. Applied before the -InitiatedBy refinement. Use for a fast, bounded
+        look at a high-volume tenant.
+
     .PARAMETER InitiatedBy
         Filter to events initiated by a user (userPrincipalName).
 
@@ -43,6 +48,9 @@ function Get-GkDirectoryAudit {
         [ValidateRange(1, 30)]
         [int] $Days = 7,
 
+        [ValidateRange(1, 500000)]
+        [int] $First,
+
         [string] $InitiatedBy,
 
         [string] $Category,
@@ -61,7 +69,7 @@ function Get-GkDirectoryAudit {
         if ($Category) { $filters += "category eq '$Category'" }
         $uri = '/auditLogs/directoryAudits?$filter=' + ($filters -join ' and ') + '&$top=1000'
 
-        $events = Invoke-GkGraphRequest -Uri $uri -CallerFunction 'Get-GkDirectoryAudit'
+        $events = Invoke-GkGraphRequest -Uri $uri -MaxResult $First -CallerFunction 'Get-GkDirectoryAudit'
 
         foreach ($e in $events) {
             $initiator = Get-GkDictValue $e 'initiatedBy'

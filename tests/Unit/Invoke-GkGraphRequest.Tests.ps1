@@ -26,6 +26,23 @@ InModuleScope PSGraphKit {
                 Should -Invoke Invoke-GkRawGraphCall -Times 2 -Exactly
             }
 
+            It 'caps at -MaxResult and stops paging once reached' {
+                $script:call = 0
+                Mock Invoke-GkRawGraphCall {
+                    $script:call++
+                    [pscustomobject]@{ StatusCode = 200; Headers = @{}; Body = @{
+                        value             = @(@{ id = "p$script:call-a" }, @{ id = "p$script:call-b" })
+                        '@odata.nextLink' = 'https://graph.microsoft.com/v1.0/users?$skiptoken=x'
+                    } }
+                }
+
+                $result = Invoke-GkGraphRequest -Uri '/users' -MaxResult 3
+
+                # page 1 -> 2 items (< 3, keep paging); page 2 -> 4 items (>= 3, stop) -> trimmed to 3.
+                @($result).Count | Should -Be 3
+                Should -Invoke Invoke-GkRawGraphCall -Times 2 -Exactly
+            }
+
             It 're-injects custom headers (ConsistencyLevel) on every page request' {
                 $script:call = 0
                 Mock Invoke-GkRawGraphCall {

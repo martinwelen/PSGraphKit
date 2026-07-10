@@ -141,9 +141,9 @@ $specs = @(
     @{ Name = 'Get-GkSecureScore';                 Type = 'PSGraphKit.SecureScore';                 Key = @('ScoreDate');               Invoke = { Get-GkSecureScore } }
     @{ Name = 'Get-GkRiskyUser';                   Type = 'PSGraphKit.RiskyUser';                   Key = @();                          Invoke = { Get-GkRiskyUser } }
     @{ Name = 'Get-GkRiskDetection';               Type = 'PSGraphKit.RiskDetection';               Key = @();                          Invoke = { Get-GkRiskDetection } }
-    @{ Name = 'Get-GkSignInReport';                Type = 'PSGraphKit.SignIn';                      Key = @();                          Invoke = { Get-GkSignInReport } }
+    @{ Name = 'Get-GkSignInReport';                Type = 'PSGraphKit.SignIn';                      Key = @();                          Invoke = { Get-GkSignInReport -First 500 } }
     @{ Name = 'Get-GkLegacyAuthSignIn';            Type = 'PSGraphKit.SignIn';                      Key = @();                          Invoke = { Get-GkLegacyAuthSignIn } }
-    @{ Name = 'Get-GkDirectoryAudit';              Type = 'PSGraphKit.DirectoryAudit';              Key = @();                          Invoke = { Get-GkDirectoryAudit } }
+    @{ Name = 'Get-GkDirectoryAudit';              Type = 'PSGraphKit.DirectoryAudit';              Key = @();                          Invoke = { Get-GkDirectoryAudit -First 500 } }
 )
 
 if ($IncludeAssessment) {

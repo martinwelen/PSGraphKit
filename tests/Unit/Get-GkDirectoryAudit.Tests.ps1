@@ -36,5 +36,10 @@ InModuleScope PSGraphKit {
             $r.Count | Should -Be 1
             $r[0].Id | Should -Be 'a1'
         }
+
+        It '-First is forwarded to the pagination cap (MaxResult)' {
+            Get-GkDirectoryAudit -First 25 | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $MaxResult -eq 25 }
+        }
     }
 }

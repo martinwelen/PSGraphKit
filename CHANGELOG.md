@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-07-10
+
+### Added
+- `-First <N>` on `Get-GkSignInReport` and `Get-GkDirectoryAudit`: return only the N most-recent
+  events (Graph returns these logs newest-first), stopping pagination early for a fast, bounded look
+  at a high-volume tenant. Applied before the client-side refinements (`-FailedOnly`/`-RiskyOnly`,
+  `-InitiatedBy`). Backed by a new optional `-MaxResult` cap in the internal request helper; the
+  `-Days` window and default behavior (no cap) are unchanged.
+
 ## [0.3.3] - 2026-07-10
 
 Performance patch: three read cmdlets did far more Graph work than needed. No output shape or scope

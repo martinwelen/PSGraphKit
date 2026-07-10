@@ -16,6 +16,11 @@ function Get-GkSignInReport {
     .PARAMETER Days
         Look-back window in days (default 7).
 
+    .PARAMETER First
+        Return only the N most-recent sign-ins in the window (Graph returns them newest-first),
+        stopping pagination early. Applied before -FailedOnly/-RiskyOnly, so those refine within the
+        N fetched. Use for a fast, bounded look at a high-volume tenant.
+
     .PARAMETER UserPrincipalName
         Filter to a single user's sign-ins.
 
@@ -52,6 +57,9 @@ function Get-GkSignInReport {
         [ValidateRange(1, 30)]
         [int] $Days = 7,
 
+        [ValidateRange(1, 500000)]
+        [int] $First,
+
         [string] $UserPrincipalName,
 
         [switch] $FailedOnly,
@@ -73,7 +81,7 @@ function Get-GkSignInReport {
         $uri = '/auditLogs/signIns?$filter=' + ($filters -join ' and ') + '&$top=1000'
 
         try {
-            $signIns = Invoke-GkGraphRequest -Uri $uri -CallerFunction 'Get-GkSignInReport'
+            $signIns = Invoke-GkGraphRequest -Uri $uri -MaxResult $First -CallerFunction 'Get-GkSignInReport'
         }
         catch {
             Write-Warning "Could not read sign-in logs. This report requires a Microsoft Entra ID P1/P2 license and AuditLog.Read.All. $($_.Exception.Message)"
