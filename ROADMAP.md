@@ -117,12 +117,6 @@ points the user at and how it renders.
   `$GkAutoConnect` preference or explicit switch) — never surprise unattended/scripted runs with an
   interactive prompt.
 
-- **`Get-GkSecureScore` pages the full history to use one day.** `secureScores?$top=1` returns a
-  `@odata.nextLink`, so `Invoke-GkGraphRequest`'s auto-pagination walks all ~90 days of daily scores
-  when only the latest is needed. Output is correct (fixed in 0.3.2) but wasteful — short-circuit to
-  the first page (e.g. read with `-Raw` and take `value[0]`, or add a first-page-only option to
-  `Invoke-GkGraphRequest`).
-
 ---
 
 ## Honorable mentions (idea)
