@@ -13,11 +13,7 @@ InModuleScope PSGraphKit {
             Mock Test-GkConnection { [pscustomobject]@{ AuthType = 'Delegated'; Scopes = @('Group.Read.All', 'GroupMember.Read.All') } }
             Mock Invoke-GkGraphRequest {
                 if ($Uri -like '*/members*') { return @{ '@odata.count' = 7; value = @() } }   # $count=true query
-                if ($Uri -like '*/owners*') {
-                    if ($Uri -like '*m365-1*') { return @() }                    # ownerless
-                    return @(@{ id = 'o1'; displayName = 'Olga Owner' })
-                }
-                return $script:GroupValue                                        # /groups list
+                return $script:GroupValue                                        # /groups list (owners expanded)
             }
         }
 
@@ -58,6 +54,13 @@ InModuleScope PSGraphKit {
             $sec = $r | Where-Object Id -eq 'sec-1'
             $sec.IsOwnerless | Should -BeFalse
             $sec.Owners      | Should -Contain 'Olga Owner'
+        }
+
+        It 'reads owners from an expanded list query, not a per-group call' {
+            Get-GkGroupReport | Out-Null
+            # Owners must come from $expand=owners on the /groups list — never a per-group GET.
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like '*expand=owners*' }
+            Should -Not -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like '*/owners*' }
         }
 
         It '-SkipMemberCount avoids the members/$count call' {

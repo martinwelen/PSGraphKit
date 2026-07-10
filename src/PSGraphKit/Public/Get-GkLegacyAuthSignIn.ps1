@@ -59,7 +59,11 @@ function Get-GkLegacyAuthSignIn {
 
     process {
         $since = $now.AddDays(-$Days).ToString('yyyy-MM-ddTHH:mm:ssZ')
-        $uri = "/auditLogs/signIns?`$filter=createdDateTime ge $since&`$top=1000"
+        # Filter to legacy client apps server-side so Graph does not return the entire sign-in log for
+        # the window and force us to discard most of it. The client-side check below is retained as a
+        # safety net in case a returned clientAppUsed value is outside this set.
+        $clientFilter = ($legacyClients | ForEach-Object { "clientAppUsed eq '$_'" }) -join ' or '
+        $uri = "/auditLogs/signIns?`$filter=createdDateTime ge $since and ($clientFilter)&`$top=1000"
 
         try {
             $signIns = Invoke-GkGraphRequest -Uri $uri -CallerFunction 'Get-GkLegacyAuthSignIn'

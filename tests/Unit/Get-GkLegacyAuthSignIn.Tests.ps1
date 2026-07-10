@@ -22,6 +22,12 @@ InModuleScope PSGraphKit {
             $r[0].PSTypeNames[0] | Should -Be 'PSGraphKit.SignIn'
         }
 
+        It 'filters to legacy client apps server-side' {
+            Get-GkLegacyAuthSignIn | Out-Null
+            # The clientAppUsed filter must be in the query so Graph does not return the whole log.
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $Uri -like '*clientAppUsed eq*' }
+        }
+
         It '-SuccessfulOnly excludes failed sign-ins' {
             $r = Get-GkLegacyAuthSignIn -SuccessfulOnly
             $r.Count | Should -Be 1

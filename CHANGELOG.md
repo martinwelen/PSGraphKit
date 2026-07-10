@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-07-10
+
+Performance patch: three read cmdlets did far more Graph work than needed. No output shape or scope
+changes. Surfaced by the new live test protocol (below) reporting their per-cmdlet run time.
+
+### Changed
+- `Get-GkSecureScore` reads only the first page of `/security/secureScores` instead of following the
+  nextLink through ~90 days of history to use a single day (~113s → ~1s on a live tenant).
+- `Get-GkGroupReport` expands owners on the group-list query (`$expand=owners`) instead of a per-group
+  `GET /groups/{id}/owners`, removing an N+1 that dominated runtime on large tenants. Owners for a group
+  with more than ~20 owners may be truncated by Graph's expand cap; `IsOwnerless` is unaffected.
+- `Get-GkLegacyAuthSignIn` filters to legacy client apps server-side (a `clientAppUsed` `$filter`)
+  instead of downloading the whole sign-in window and discarding most of it.
+
+### Added
+- `build/Invoke-GkTestProtocol.ps1` + `docs/TEST-PROTOCOL.md`: a read-only live validation protocol
+  that checks every read cmdlet's returned rows for type, content (no all-null "hollow" rows), and key
+  fields, and documents the unit + live test layers and the release gate.
+
 ## [0.3.2] - 2026-07-07
 
 Patch release: fixes two report cmdlets that returned empty rows. No API surface or scope changes.

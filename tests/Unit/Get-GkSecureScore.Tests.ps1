@@ -42,6 +42,8 @@ InModuleScope PSGraphKit {
             $r.Percentage    | Should -Be 70
             $r.ControlCount  | Should -Be 2
             $r.ScoreDate     | Should -Not -BeNullOrEmpty
+            # First page only: the nextLink must NOT be followed (it would walk ~90 days of history).
+            Should -Invoke Invoke-GkRawGraphCall -Times 1 -Exactly
         }
 
         It '-IncludeControls returns per-control rows' {

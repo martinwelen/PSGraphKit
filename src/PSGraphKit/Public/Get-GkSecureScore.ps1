@@ -46,12 +46,17 @@ function Get-GkSecureScore {
     }
 
     process {
-        # Invoke-GkGraphRequest returns the page array as a single (non-unrolled) object, so take the
-        # first item by indexing an assigned variable — NOT via @(...) | Select-Object -First 1, which
-        # would hand back the whole array and silently null every field.
-        $scores = Invoke-GkGraphRequest -Uri '/security/secureScores?$top=1' -CallerFunction 'Get-GkSecureScore'
-        if (-not $scores) { Write-Warning 'No Secure Score data was returned for this tenant.'; return }
-        $latest = @($scores)[0]
+        # secureScores is returned newest-first and carries a nextLink, so letting Invoke-GkGraphRequest
+        # auto-paginate would walk ~90 days of history just to use the latest day. Read only the first
+        # page (-Raw returns the untouched first-page body) and take the latest item from it.
+        # NB: build $values with a plain if-STATEMENT, not an if-EXPRESSION: an if-expression unrolls a
+        # single-element 'value' array back to a scalar, so $values[0] would then index a hashtable and
+        # return $null. A direct @() assignment keeps it a real array.
+        $body = Invoke-GkGraphRequest -Uri '/security/secureScores?$top=1' -Raw -CallerFunction 'Get-GkSecureScore'
+        $values = @()
+        if ($body -is [System.Collections.IDictionary]) { $values = @($body['value']) }
+        if ($values.Count -eq 0) { Write-Warning 'No Secure Score data was returned for this tenant.'; return }
+        $latest = $values[0]
 
         if ($IncludeControls) {
             foreach ($c in @(Get-GkDictValue $latest 'controlScores')) {

@@ -10,7 +10,8 @@
       "mailEnabled": true,
       "visibility": "Private",
       "membershipRule": null,
-      "membershipRuleProcessingState": null
+      "membershipRuleProcessingState": null,
+      "owners": []
     },
     {
       "id": "sec-1",
@@ -21,7 +22,8 @@
       "mailEnabled": false,
       "visibility": null,
       "membershipRule": null,
-      "membershipRuleProcessingState": null
+      "membershipRuleProcessingState": null,
+      "owners": [{ "id": "o1", "displayName": "Olga Owner" }]
     },
     {
       "id": "dyn-1",
@@ -32,7 +34,8 @@
       "mailEnabled": false,
       "visibility": null,
       "membershipRule": "(user.department -eq \"Sales\")",
-      "membershipRuleProcessingState": "On"
+      "membershipRuleProcessingState": "On",
+      "owners": [{ "id": "o2", "displayName": "Dan Dynamic" }]
     },
     {
       "id": "dist-1",
@@ -43,7 +46,8 @@
       "mailEnabled": true,
       "visibility": null,
       "membershipRule": null,
-      "membershipRuleProcessingState": null
+      "membershipRuleProcessingState": null,
+      "owners": [{ "id": "o3", "displayName": "Dave Dist" }]
     }
   ]
 }

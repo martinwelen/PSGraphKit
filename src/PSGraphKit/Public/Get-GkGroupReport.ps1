@@ -7,8 +7,8 @@ function Get-GkGroupReport {
     .DESCRIPTION
         Reads GET /groups and classifies each group from groupTypes/securityEnabled/mailEnabled.
         For each group it also fetches the membership count (GET /groups/{id}/members/$count, which
-        requires the ConsistencyLevel: eventual header) and the owners (GET /groups/{id}/owners),
-        flagging ownerless groups.
+        requires the ConsistencyLevel: eventual header) and reads the owners (expanded on the group
+        list via $expand=owners, one round-trip rather than a call per group), flagging ownerless groups.
 
         Caveat on ownerless detection: owners are not returned by Graph for groups created in
         Exchange, distribution groups, or on-premises-synced groups, so IsOwnerless can be a false
@@ -64,9 +64,12 @@ function Get-GkGroupReport {
 
     process {
         $select = 'id,displayName,mail,groupTypes,securityEnabled,mailEnabled,membershipRule,membershipRuleProcessingState,visibility'
-        $groups = Invoke-GkGraphRequest -Uri "/groups?`$select=$select&`$top=999" -CallerFunction 'Get-GkGroupReport'
+        # Expand owners on the list query — one round-trip for every group's owners instead of a
+        # per-group GET /groups/{id}/owners (an N+1 that dominated runtime on large tenants). Graph
+        # caps an expanded collection at ~20 items, so OwnerCount can under-report for groups with
+        # >20 owners; IsOwnerless (zero owners) is unaffected.
+        $groups = Invoke-GkGraphRequest -Uri "/groups?`$select=$select&`$expand=owners(`$select=id,displayName)&`$top=999" -CallerFunction 'Get-GkGroupReport'
         $memberCountFailures = 0
-        $ownerFailures = 0
 
         foreach ($g in $groups) {
             $id         = [string](Get-GkDictValue $g 'id')
@@ -101,18 +104,11 @@ function Get-GkGroupReport {
                 }
             }
 
-            # Owners.
-            $ownerNames = @()
-            if ($id) {
-                try {
-                    $owners = Invoke-GkGraphRequest -CallerFunction 'Get-GkGroupReport' -Uri "/groups/$id/owners?`$select=id,displayName"
-                    $ownerNames = @($owners | ForEach-Object { [string](Get-GkDictValue $_ 'displayName') } | Where-Object { $_ })
-                }
-                catch {
-                    $ownerFailures++
-                    Write-Verbose "PSGraphKit: owners unavailable for group $id : $($_.Exception.Message)"
-                }
-            }
+            # Owners (expanded on the list query above). Empty for group types Graph does not return
+            # owners for — Exchange/distribution/on-prem-synced — which is the ownerless caveat noted
+            # in the help, not a lookup failure.
+            $owners = @(Get-GkDictValue $g 'owners')
+            $ownerNames = @($owners | ForEach-Object { [string](Get-GkDictValue $_ 'displayName') } | Where-Object { $_ })
 
             if ($OwnerlessOnly -and $ownerNames.Count -gt 0) { continue }
 
@@ -136,9 +132,6 @@ function Get-GkGroupReport {
 
         if ($memberCountFailures -gt 0) {
             Write-Warning "Membership count could not be read for $memberCountFailures group(s) — MemberCount is null for those. Needs GroupMember.Read.All (or Group.Read.All) and the ConsistencyLevel: eventual header."
-        }
-        if ($ownerFailures -gt 0) {
-            Write-Warning "Owner lookup failed for $ownerFailures group(s) — IsOwnerless may be inaccurate for those (as opposed to genuinely having no owners)."
         }
     }
 }
