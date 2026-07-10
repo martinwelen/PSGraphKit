@@ -12,6 +12,10 @@ function Get-GkRiskDetection {
     .PARAMETER RiskLevel
         Filter to a single risk level: low, medium, or high.
 
+    .PARAMETER First
+        Return at most N risk detections, stopping pagination early. Use to bound the pull on a large
+        tenant instead of paging the entire riskDetections collection.
+
     .PARAMETER AsReport
         Add a ReportGeneratedUtc column.
 
@@ -37,6 +41,9 @@ function Get-GkRiskDetection {
         [ValidateSet('low', 'medium', 'high')]
         [string] $RiskLevel,
 
+        [ValidateRange(1, 500000)]
+        [int] $First,
+
         [switch] $AsReport
     )
 
@@ -47,7 +54,7 @@ function Get-GkRiskDetection {
 
     process {
         try {
-            $detections = Invoke-GkGraphRequest -Uri '/identityProtection/riskDetections' -CallerFunction 'Get-GkRiskDetection'
+            $detections = Invoke-GkGraphRequest -Uri '/identityProtection/riskDetections' -MaxResult $First -CallerFunction 'Get-GkRiskDetection'
         }
         catch {
             Write-Warning "Could not read risk detections. This report requires a Microsoft Entra ID P1/P2 license and IdentityRiskEvent.Read.All. $($_.Exception.Message)"

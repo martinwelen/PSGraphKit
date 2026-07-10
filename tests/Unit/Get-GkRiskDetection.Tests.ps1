@@ -26,6 +26,11 @@ InModuleScope PSGraphKit {
             (Get-GkRiskDetection -RiskLevel high).Count | Should -Be 1
         }
 
+        It '-First is forwarded to the pagination cap (MaxResult)' {
+            Get-GkRiskDetection -First 100 | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $MaxResult -eq 100 }
+        }
+
         It 'warns and returns nothing when unavailable' {
             Mock Invoke-GkGraphRequest { throw 'P1/P2 required' }
             $warnings = @()

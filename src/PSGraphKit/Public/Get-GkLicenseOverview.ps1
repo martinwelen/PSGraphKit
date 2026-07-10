@@ -88,9 +88,11 @@ function Get-GkLicenseOverview {
             if ($IncludeDisabledLicensed) {
                 $disabledCount = 0
                 if ($skuId) {
-                    $uri = "/users?`$filter=assignedLicenses/any(l:l/skuId eq $skuId)&`$select=id,accountEnabled&`$top=999"
-                    $licUsers = Invoke-GkGraphRequest -Uri $uri -Headers @{ ConsistencyLevel = 'eventual' } -CallerFunction 'Get-GkLicenseOverview'
-                    $disabledCount = @($licUsers | Where-Object { -not [bool](Get-GkDictValue $_ 'accountEnabled') }).Count
+                    # Count disabled users holding this SKU server-side ($count=true) instead of paging
+                    # the entire assigned-user set per SKU just to count a subset.
+                    $uri = "/users?`$filter=assignedLicenses/any(l:l/skuId eq $skuId) and accountEnabled eq false&`$count=true&`$top=1"
+                    $countResp = Invoke-GkGraphRequest -Raw -Uri $uri -Headers @{ ConsistencyLevel = 'eventual' } -CallerFunction 'Get-GkLicenseOverview'
+                    $disabledCount = [int](Get-GkDictValue $countResp '@odata.count')
                 }
                 $obj['DisabledLicensedCount'] = $disabledCount
             }

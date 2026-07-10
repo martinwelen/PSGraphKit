@@ -30,6 +30,11 @@ InModuleScope PSGraphKit {
             $r[0].UserPrincipalName | Should -Be 'ada@contoso.com'
         }
 
+        It '-First is forwarded to the pagination cap (MaxResult)' {
+            Get-GkRiskyUser -First 100 | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -ParameterFilter { $MaxResult -eq 100 }
+        }
+
         It 'warns and returns nothing when unavailable (no P2)' {
             Mock Invoke-GkGraphRequest { throw 'requires P2' }
             $warnings = @()

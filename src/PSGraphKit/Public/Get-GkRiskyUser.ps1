@@ -10,6 +10,10 @@ function Get-GkRiskyUser {
     .PARAMETER RiskLevel
         Filter to a single aggregated risk level: low, medium, or high.
 
+    .PARAMETER First
+        Return at most N risky users, stopping pagination early. Use to bound the pull on a large
+        tenant instead of paging the entire riskyUsers collection.
+
     .PARAMETER AtRiskOnly
         Return only users whose riskState is atRisk or confirmedCompromised (excludes remediated /
         dismissed).
@@ -39,6 +43,9 @@ function Get-GkRiskyUser {
         [ValidateSet('low', 'medium', 'high')]
         [string] $RiskLevel,
 
+        [ValidateRange(1, 500000)]
+        [int] $First,
+
         [switch] $AtRiskOnly,
 
         [switch] $AsReport
@@ -51,7 +58,7 @@ function Get-GkRiskyUser {
 
     process {
         try {
-            $users = Invoke-GkGraphRequest -Uri '/identityProtection/riskyUsers' -CallerFunction 'Get-GkRiskyUser'
+            $users = Invoke-GkGraphRequest -Uri '/identityProtection/riskyUsers' -MaxResult $First -CallerFunction 'Get-GkRiskyUser'
         }
         catch {
             Write-Warning "Could not read risky users. This report requires a Microsoft Entra ID P2 license and IdentityRiskyUser.Read.All. $($_.Exception.Message)"

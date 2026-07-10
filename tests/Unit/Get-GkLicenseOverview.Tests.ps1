@@ -47,23 +47,18 @@ InModuleScope PSGraphKit {
             Should -Invoke Invoke-GkGraphRequest -Times 0 -Exactly -ParameterFilter { $Uri -like '*/users*' }
         }
 
-        It 'counts disabled-but-licensed users per SKU with -IncludeDisabledLicensed' {
+        It 'counts disabled-but-licensed users per SKU server-side with -IncludeDisabledLicensed' {
             Mock Invoke-GkGraphRequest {
                 if ($Uri -like '*subscribedSkus*') { return $script:SkuValue }
-                if ($Uri -like '*/users*') {
-                    return @(
-                        @{ id = 'u1'; accountEnabled = $false }
-                        @{ id = 'u2'; accountEnabled = $true }
-                        @{ id = 'u3'; accountEnabled = $false }
-                    )
-                }
+                if ($Uri -like '*/users*') { return @{ '@odata.count' = 2; value = @() } }   # $count=true body
                 @()
             }
             $e3 = Get-GkLicenseOverview -IncludeDisabledLicensed | Where-Object SkuPartNumber -eq 'ENTERPRISEPACK'
             $e3.DisabledLicensedCount | Should -Be 2
-            # one users query per SKU (2 SKUs), each with ConsistencyLevel: eventual
-            Should -Invoke Invoke-GkGraphRequest -Times 2 -Exactly `
-                -ParameterFilter { $Uri -like '*/users*' -and $Headers.ConsistencyLevel -eq 'eventual' }
+            # one $count=true users query per SKU, filtered to accountEnabled eq false, advanced-query headers
+            Should -Invoke Invoke-GkGraphRequest -Times 2 -Exactly -ParameterFilter {
+                $Uri -like '*/users*' -and $Uri -like '*accountEnabled eq false*' -and $Uri -like '*$count=true*' -and $Headers.ConsistencyLevel -eq 'eventual'
+            }
         }
 
         It 'adds a timestamp with -AsReport' {
