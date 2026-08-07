@@ -5,7 +5,7 @@ Disable (default) or delete stale Entra devices.
 
 ## SYNTAX
 ```
-Disable-GkStaleDevice [-DeviceId] <string[]> [-Delete] [-WhatIf] [-Confirm] [<CommonParameters>]
+Disable-GkStaleDevice [-Id] <string[]> [-Delete] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -43,9 +43,11 @@ Delete one device by object id (prompts for confirmation).
 
 ## PARAMETERS
 
-### -DeviceId
+### -Id
 One or more device OBJECT IDs (the Id from Get-GkDeviceInventory, not the deviceId GUID).
-Accepts pipeline input incl. by the Id property.
+Accepts pipeline input by the Id property; -DeviceId remains a back-compat alias. Binding to
+Id — not DeviceId — is deliberate: Get-GkDeviceInventory emits BOTH properties, /devices/{id}
+needs the object id, and PowerShell binds a parameter's formal name over its alias.
 
 ```yaml
 Type: String[]

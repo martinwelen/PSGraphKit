@@ -318,6 +318,95 @@ $script:GkScopeMap = @{
         RoleHints     = @('Global Reader', 'Directory Readers')
     }
 
+    'Get-GkGroupMember' = @{
+        Groups = @(
+            @{ For = 'read group members'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Directory Readers', 'Groups Administrator')
+    }
+
+    'Get-GkRoleDefinition' = @{
+        Groups = @(
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Privileged Role Administrator')
+    }
+
+    # UserAuthenticationMethod.Read is deliberately absent: it grants only the signed-in user's own
+    # methods, and this cmdlet reads arbitrary users.
+    'Get-GkUserAuthMethod' = @{
+        Groups = @(
+            @{ For = "read a user's authentication methods"; Any = @('UserAuthenticationMethod.Read.All', 'UserAuthenticationMethod.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Authentication Administrator', 'Privileged Authentication Administrator')
+    }
+
+    # /directory/deletedItems is a per-type cast segment and each type is a different permission,
+    # so every -Type gets its own entry and only the one in use is validated.
+    'Get-GkDeletedItem' = @{
+        Groups = @(
+            @{ For = 'read deleted directory objects'; Any = @('User.Read.All', 'Group.Read.All', 'Application.Read.All', 'AdministrativeUnit.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Directory Readers')
+    }
+    'Get-GkDeletedItem:User' = @{
+        Groups = @(@{ For = 'read deleted users'; Any = @('User.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'User Administrator')
+    }
+    'Get-GkDeletedItem:Group' = @{
+        Groups = @(@{ For = 'read deleted groups'; Any = @('Group.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Groups Administrator')
+    }
+    'Get-GkDeletedItem:Application' = @{
+        Groups = @(@{ For = 'read deleted applications'; Any = @('Application.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Application Administrator')
+    }
+    'Get-GkDeletedItem:ServicePrincipal' = @{
+        Groups = @(@{ For = 'read deleted service principals'; Any = @('Application.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Application Administrator')
+    }
+    'Get-GkDeletedItem:AdministrativeUnit' = @{
+        Groups = @(@{ For = 'read deleted administrative units'; Any = @('AdministrativeUnit.Read.All', 'Directory.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Directory Readers')
+    }
+
+    # ServiceHealth.Read.All / ServiceMessage.Read.All are the only permissions Graph accepts for
+    # the service announcement APIs — the docs list no higher-privileged alternative.
+    'Get-GkServiceHealth' = @{
+        Groups = @(@{ For = 'read service health'; Any = @('ServiceHealth.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Service Support Administrator')
+    }
+
+    'Get-GkServiceMessage' = @{
+        Groups = @(@{ For = 'read message center posts'; Any = @('ServiceMessage.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'Service Support Administrator')
+    }
+
+    'Get-GkGroupBasedLicense' = @{
+        Groups = @(@{ For = 'read groups and their assigned licenses'; Any = @('Group.Read.All', 'Directory.Read.All', 'GroupMember.Read.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'License Administrator', 'Groups Administrator')
+    }
+    'Get-GkGroupBasedLicense:ResolveSkuName' = @{
+        Groups = @(
+            @{ For = 'read groups and their assigned licenses'; Any = @('Group.Read.All', 'Directory.Read.All', 'GroupMember.Read.All') }
+            @{ For = 'resolve SKU names from subscribedSkus';   Any = @('LicenseAssignment.Read.All', 'Organization.Read.All', 'Directory.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Global Reader', 'License Administrator')
+    }
+
     'Get-GkLegacyAuthSignIn' = @{
         Groups = @(@{ For = 'read sign-in logs'; Any = @('AuditLog.Read.All') })
         DelegatedOnly = $false

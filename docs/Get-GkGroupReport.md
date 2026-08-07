@@ -12,8 +12,8 @@ Get-GkGroupReport [[-GroupType] <string>] [-OwnerlessOnly] [-SkipMemberCount] [-
 ## DESCRIPTION
 Reads GET /groups and classifies each group from groupTypes/securityEnabled/mailEnabled.
 For each group it also fetches the membership count (GET /groups/{id}/members/$count, which
-requires the ConsistencyLevel: eventual header) and the owners (GET /groups/{id}/owners),
-flagging ownerless groups.
+requires the ConsistencyLevel: eventual header) and reads the owners (expanded on the group
+list via $expand=owners, one round-trip rather than a call per group), flagging ownerless groups.
 
 Caveat on ownerless detection: owners are not returned by Graph for groups created in
 Exchange, distribution groups, or on-premises-synced groups, so IsOwnerless can be a false

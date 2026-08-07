@@ -130,6 +130,13 @@ you — no need to look up which scope goes with which cmdlet.
 | `Get-GkCustomRole` | Custom directory role definitions and their permissions. |
 | `Get-GkAdministrativeUnit` | Administrative units with membership type and member count. |
 | `Get-GkLicenseAssignmentError` | Users with failing license assignments (incl. group-based). |
+| `Get-GkGroupMember` | Members of a group, classified by directory object type. |
+| `Get-GkRoleDefinition` | Directory role definitions — built-in and custom — with permission counts. |
+| `Get-GkUserAuthMethod` | Authentication methods registered on a user's account. |
+| `Get-GkDeletedItem` | Soft-deleted directory objects still inside the 30-day restore window. |
+| `Get-GkServiceHealth` | Microsoft 365 service health, with the open incidents behind it. |
+| `Get-GkServiceMessage` | Message center posts, filterable by action deadline. |
+| `Get-GkGroupBasedLicense` | Groups that assign licences, and whether assignment has finished. |
 
 **Remediation (write — `-WhatIf`/`-Confirm`)**
 

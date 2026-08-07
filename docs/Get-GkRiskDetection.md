@@ -6,7 +6,7 @@ credentials, anonymous IP).
 
 ## SYNTAX
 ```
-Get-GkRiskDetection [[-RiskLevel] <string>] [-AsReport] [<CommonParameters>]
+Get-GkRiskDetection [[-RiskLevel] <string>] [[-First] <int>] [-AsReport] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -43,6 +43,18 @@ Type: String
 Required: false
 Position: 1
 Default value: None
+Accept pipeline input: false
+```
+
+### -First
+Return at most N risk detections, stopping pagination early. Use to bound the pull on a large
+tenant instead of paging the entire riskDetections collection.
+
+```yaml
+Type: Int32
+Required: false
+Position: 2
+Default value: 0
 Accept pipeline input: false
 ```
 

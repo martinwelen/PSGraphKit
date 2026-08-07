@@ -940,5 +940,131 @@
       </TableControl>
     </View>
 
+    <View>
+      <Name>PSGraphKit.GroupMember</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.GroupMember</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MemberType</Label><Width>16</Width></TableColumnHeader>
+          <TableColumnHeader><Label>UserPrincipalName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Enabled</Label><Width>7</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MemberType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>UserPrincipalName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AccountEnabled</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.RoleDefinition</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.RoleDefinition</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>38</Width></TableColumnHeader>
+          <TableColumnHeader><Label>BuiltIn</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Enabled</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Perms</Label><Width>6</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsBuiltIn</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsEnabled</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>PermissionCount</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.UserAuthMethod</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.UserAuthMethod</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserId</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MethodType</Label><Width>26</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Detail</Label><Width>30</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>UserId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MethodType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Detail</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.DeletedItem</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.DeletedItem</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Type</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Deleted</Label><Width>12</Width></TableColumnHeader>
+          <TableColumnHeader><Label>DaysLeft</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ObjectType</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.DeletedDateTime) { $_.DeletedDateTime.ToString('yyyy-MM-dd') }</ScriptBlock></TableColumnItem>
+          <TableColumnItem><PropertyName>DaysUntilPurge</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.ServiceHealth</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.ServiceHealth</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Service</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Status</Label><Width>26</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Healthy</Label><Width>8</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Service</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Status</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsHealthy</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.ServiceMessage</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.ServiceMessage</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Id</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Title</Label><Width>44</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Category</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>ActionBy</Label><Width>12</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Id</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Title</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Category</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.ActionRequiredBy) { $_.ActionRequiredBy.ToString('yyyy-MM-dd') }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.GroupBasedLicense</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.GroupBasedLicense</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>34</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Licenses</Label><Width>9</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>ProcessingState</Label><Width>22</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>LicenseCount</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ProcessingState</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>

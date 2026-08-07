@@ -29,17 +29,36 @@ $rows = foreach ($file in Get-ChildItem "$Repo\src\PSGraphKit\Public" -Filter *.
     $t = $null; $e = $null
     $ast = [System.Management.Automation.Language.Parser]::ParseInput($text, [ref]$t, [ref]$e)
 
-    # Index every string-literal assignment in the file: $name -> list of literal texts.
+    # Index assignments in the file so a URI built before the call can still be resolved:
+    #   $assign  : $name -> literal URI strings assigned to it
+    #   $splat   : $name -> literal URI strings held in the hashtable's Uri key (for @splatting)
     $assign = @{}
+    $splat = @{}
     foreach ($a in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] }, $true)) {
-        if ($a.Left -is [System.Management.Automation.Language.VariableExpressionAst]) {
-            $name = $a.Left.VariablePath.UserPath
-            $rhs = $a.Right
-            if ($rhs -is [System.Management.Automation.Language.CommandExpressionAst]) { $rhs = $rhs.Expression }
-            if ($rhs -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-                $rhs -is [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
+        if ($a.Left -isnot [System.Management.Automation.Language.VariableExpressionAst]) { continue }
+        $name = $a.Left.VariablePath.UserPath
+        $rhs = $a.Right
+        if ($rhs -is [System.Management.Automation.Language.CommandExpressionAst]) { $rhs = $rhs.Expression }
+
+        if ($rhs -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+            $rhs -is [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
+            # '+=' appends a query fragment ('?$filter=...'); only a real path segment is a URI.
+            if ($rhs.Value -like '/*') {
                 if (-not $assign.ContainsKey($name)) { $assign[$name] = @() }
                 $assign[$name] += $rhs.Value
+            }
+        }
+        elseif ($rhs -is [System.Management.Automation.Language.HashtableAst]) {
+            foreach ($pair in $rhs.KeyValuePairs) {
+                if ($pair.Item1.Extent.Text.Trim("'", '"') -ne 'Uri') { continue }
+                $v = $pair.Item2
+                if ($v -is [System.Management.Automation.Language.PipelineAst]) { $v = $v.PipelineElements[0] }
+                if ($v -is [System.Management.Automation.Language.CommandExpressionAst]) { $v = $v.Expression }
+                if ($v -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+                    $v -is [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
+                    if (-not $splat.ContainsKey($name)) { $splat[$name] = @() }
+                    $splat[$name] += $v.Value
+                }
             }
         }
     }
@@ -51,7 +70,7 @@ $rows = foreach ($file in Get-ChildItem "$Repo\src\PSGraphKit\Public" -Filter *.
     }, $true)
 
     foreach ($c in $cmds) {
-        $method = 'GET'; $uriAst = $null
+        $method = 'GET'; $uriAst = $null; $splatName = $null
         $elems = $c.CommandElements
         for ($i = 0; $i -lt $elems.Count; $i++) {
             $el = $elems[$i]
@@ -60,24 +79,33 @@ $rows = foreach ($file in Get-ChildItem "$Repo\src\PSGraphKit\Public" -Filter *.
                 if ($el.ParameterName -eq 'Method' -and $val) { $method = $val.Extent.Text.Trim("'", '"') }
                 if ($el.ParameterName -eq 'Uri' -and $val) { $uriAst = $val }
             }
+            elseif ($el -is [System.Management.Automation.Language.VariableExpressionAst] -and $el.Splatted) {
+                $splatName = $el.VariablePath.UserPath
+            }
         }
-        if (-not $uriAst) { continue }
 
-        # Literal URI, or a variable we can resolve to one (or more) literal assignments.
+        # Literal URI, a variable resolving to one, or the Uri key of a splatted hashtable.
         $literals = @()
+        $sourceText = ''
         if ($uriAst -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
             $uriAst -is [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
-            $literals = @($uriAst.Value)
+            $literals = @($uriAst.Value); $sourceText = $uriAst.Extent.Text
         }
         elseif ($uriAst -is [System.Management.Automation.Language.VariableExpressionAst]) {
             $n = $uriAst.VariablePath.UserPath
+            $sourceText = $uriAst.Extent.Text
             if ($assign.ContainsKey($n)) { $literals = @($assign[$n]) }
         }
+        elseif ($splatName) {
+            $sourceText = "@$splatName"
+            if ($splat.ContainsKey($splatName)) { $literals = @($splat[$splatName]) }
+        }
+        else { continue }   # not a Graph call we can attribute a URI to
 
         if ($literals.Count -eq 0) {
             [pscustomobject]@{
                 Cmdlet = $file.BaseName; Method = $method.ToUpper()
-                Path = '<UNRESOLVED>'; Source = $uriAst.Extent.Text
+                Path = '<UNRESOLVED>'; Source = $sourceText
             }
             continue
         }

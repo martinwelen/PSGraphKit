@@ -2,8 +2,16 @@ Cmdlet,Method,Path,Source
 Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleAssignments,manual
 Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleEligibilityScheduleInstances,manual
 Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleAssignmentScheduleInstances,manual
+Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleDefinitions,manual
 Get-GkDirectoryAudit,GET,/auditLogs/directoryAudits,manual
 Get-GkSignInReport,GET,/auditLogs/signIns,manual
+Get-GkUserAccessReport,GET,/users/{id},manual
 Get-GkUserAccessReport,GET,/users/{id}/transitiveMemberOf,manual
 Get-GkUserAccessReport,GET,/users/{id}/appRoleAssignments,manual
 Get-GkUserAccessReport,GET,/users/{id}/licenseDetails,manual
+Get-GkServiceMessage,GET,/admin/serviceAnnouncement/messages,manual
+Get-GkDeletedItem,GET,/directory/deletedItems/microsoft.graph.user,manual
+Get-GkDeletedItem,GET,/directory/deletedItems/microsoft.graph.group,manual
+Get-GkDeletedItem,GET,/directory/deletedItems/microsoft.graph.application,manual
+Get-GkDeletedItem,GET,/directory/deletedItems/microsoft.graph.servicePrincipal,manual
+Get-GkDeletedItem,GET,/directory/deletedItems/microsoft.graph.administrativeUnit,manual

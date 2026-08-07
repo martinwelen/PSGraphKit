@@ -5,7 +5,7 @@ Report directory audit events (who changed what) over a recent window.
 
 ## SYNTAX
 ```
-Get-GkDirectoryAudit [[-Days] <int>] [[-InitiatedBy] <string>] [[-Category] <string>] [-AsReport] [<CommonParameters>]
+Get-GkDirectoryAudit [[-Days] <int>] [[-First] <int>] [[-InitiatedBy] <string>] [[-Category] <string>] [-AsReport] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -46,13 +46,26 @@ Default value: 7
 Accept pipeline input: false
 ```
 
+### -First
+Return only the N most-recent audit events in the window (Graph returns them newest-first),
+stopping pagination early. Applied before the -InitiatedBy refinement. Use for a fast, bounded
+look at a high-volume tenant.
+
+```yaml
+Type: Int32
+Required: false
+Position: 2
+Default value: 0
+Accept pipeline input: false
+```
+
 ### -InitiatedBy
 Filter to events initiated by a user (userPrincipalName).
 
 ```yaml
 Type: String
 Required: false
-Position: 2
+Position: 3
 Default value: None
 Accept pipeline input: false
 ```
@@ -63,7 +76,7 @@ Filter to an audit category (e.g. UserManagement, RoleManagement, ApplicationMan
 ```yaml
 Type: String
 Required: false
-Position: 3
+Position: 4
 Default value: None
 Accept pipeline input: false
 ```

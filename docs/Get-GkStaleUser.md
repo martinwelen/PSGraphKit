@@ -64,8 +64,8 @@ Accept pipeline input: false
 ```
 
 ### -UserType
-Limit to 'Member', 'Guest', or 'All' (default). Filtered client-side because signInActivity
-cannot be combined with other server-side filters.
+Limit to 'Member', 'Guest', or 'All' (default). A non-All value is applied server-side via a
+userType filter (which combines fine with the signInActivity select).
 
 ```yaml
 Type: String

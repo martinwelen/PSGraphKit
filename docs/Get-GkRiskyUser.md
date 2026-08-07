@@ -5,7 +5,7 @@ Report users flagged by Microsoft Entra ID Protection with their risk level and 
 
 ## SYNTAX
 ```
-Get-GkRiskyUser [[-RiskLevel] <string>] [-AtRiskOnly] [-AsReport] [<CommonParameters>]
+Get-GkRiskyUser [[-RiskLevel] <string>] [[-First] <int>] [-AtRiskOnly] [-AsReport] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -41,6 +41,18 @@ Type: String
 Required: false
 Position: 1
 Default value: None
+Accept pipeline input: false
+```
+
+### -First
+Return at most N risky users, stopping pagination early. Use to bound the pull on a large
+tenant instead of paging the entire riskyUsers collection.
+
+```yaml
+Type: Int32
+Required: false
+Position: 2
+Default value: 0
 Accept pipeline input: false
 ```
 

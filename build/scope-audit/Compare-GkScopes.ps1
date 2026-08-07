@@ -31,6 +31,24 @@ foreach ($r in Import-Csv $LearnPerms) {
     }
 }
 
+# /directory/deletedItems documents one least-privileged permission per resource type in a matrix,
+# not a least/higher table, so the generated include is empty. Read manually from
+# directory-deleteditems-list.md; Directory.Read.All serves all of them as the broad directory read.
+$deletedItemPerms = @{
+    'user'               = @('User.Read.All', 'Directory.Read.All')
+    'group'              = @('Group.Read.All', 'Directory.Read.All')
+    'application'        = @('Application.Read.All', 'Directory.Read.All')
+    'servicePrincipal'   = @('Application.Read.All', 'Directory.Read.All')
+    'administrativeUnit' = @('AdministrativeUnit.Read.All', 'Directory.Read.All')
+}
+foreach ($t in $deletedItemPerms.Keys) {
+    $perms["GET /directory/deletedItems/microsoft.graph.$t"] = [pscustomobject]@{
+        All   = $deletedItemPerms[$t]
+        Least = @($deletedItemPerms[$t][0])
+        Doc   = 'directory-deleteditems-list.md (resource-type matrix, read manually)'
+    }
+}
+
 # POST /groups/{id}/members/$ref uses a per-resource-type matrix rather than a least/higher table.
 # For adding a user (what Add-GkGroupMember does) the documented least privileged permission is
 # GroupMember.ReadWrite.All; the broader group/directory write scopes also serve it.

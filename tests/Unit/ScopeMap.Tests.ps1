@@ -82,6 +82,15 @@ InModuleScope PSGraphKit {
             @{ Cmdlet = 'Get-GkGroupReport';            Group = 'read groups';                         Expected = 'Group.Read.All,Directory.Read.All,GroupMember.Read.All' }
             @{ Cmdlet = 'Get-GkUserMfaStatus';          Group = 'read authentication method registration report'; Expected = 'AuditLog.Read.All' }
             @{ Cmdlet = 'Remove-GkAdminRoleAssignment'; Group = 'remove role assignments (active and PIM)'; Expected = 'RoleManagement.ReadWrite.Directory' }
+            @{ Cmdlet = 'Get-GkGroupMember';            Group = 'read group members';                   Expected = 'GroupMember.Read.All,Group.Read.All,Directory.Read.All' }
+            @{ Cmdlet = 'Get-GkRoleDefinition';         Group = 'read role definitions';                Expected = 'RoleManagement.Read.Directory,Directory.Read.All' }
+            @{ Cmdlet = 'Get-GkUserAuthMethod';         Group = "read a user's authentication methods"; Expected = 'UserAuthenticationMethod.Read.All,UserAuthenticationMethod.ReadWrite.All' }
+            @{ Cmdlet = 'Get-GkDeletedItem:User';       Group = 'read deleted users';                   Expected = 'User.Read.All,Directory.Read.All' }
+            @{ Cmdlet = 'Get-GkDeletedItem:Group';      Group = 'read deleted groups';                  Expected = 'Group.Read.All,Directory.Read.All' }
+            @{ Cmdlet = 'Get-GkDeletedItem:Application'; Group = 'read deleted applications';           Expected = 'Application.Read.All,Directory.Read.All' }
+            @{ Cmdlet = 'Get-GkServiceHealth';          Group = 'read service health';                  Expected = 'ServiceHealth.Read.All' }
+            @{ Cmdlet = 'Get-GkServiceMessage';         Group = 'read message center posts';            Expected = 'ServiceMessage.Read.All' }
+            @{ Cmdlet = 'Get-GkGroupBasedLicense:ResolveSkuName'; Group = 'resolve SKU names from subscribedSkus'; Expected = 'LicenseAssignment.Read.All,Organization.Read.All,Directory.Read.All' }
         )
 
         It '<Cmdlet> / <Group>' -TestCases $cases {
@@ -113,6 +122,11 @@ InModuleScope PSGraphKit {
         It 'does not accept User.Read for Get-GkUserAccessReport' {
             # User.Read grants the signed-in user's own profile; the cmdlet reads arbitrary users.
             @($script:GkScopeMap['Get-GkUserAccessReport'].Groups.Any) | Should -Not -Contain 'User.Read'
+        }
+
+        It 'does not accept UserAuthenticationMethod.Read for Get-GkUserAuthMethod' {
+            # Same trap: the non-.All scope grants only the signed-in user's own methods.
+            @($script:GkScopeMap['Get-GkUserAuthMethod'].Groups.Any) | Should -Not -Contain 'UserAuthenticationMethod.Read'
         }
     }
 }

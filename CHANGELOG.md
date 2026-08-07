@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Seven read-only cmdlets, taking the module to 57. Every endpoint was verified against Microsoft
+Learn before implementation and reconciled by `build/scope-audit` afterwards; the whole surface —
+all 53 cmdlets that call Graph — now declares only scopes Graph accepts.
+
+### Added
+- `Get-GkGroupMember` — members of a group with the directory object type resolved from
+  `@odata.type`. The read companion to `Add-GkGroupMember` / `Remove-GkGroupMember`, and the names
+  behind `Get-GkGroupReport`'s member counts.
+- `Get-GkRoleDefinition` — every assignable directory role, built-in and custom, with its
+  permission count. `-IncludePermission` adds the allowed resource actions. Widens
+  `Get-GkCustomRole`, which covers custom roles only.
+- `Get-GkUserAuthMethod` — the methods registered on a user's account, with each `@odata.type`
+  mapped to a readable name. The per-user detail behind `Get-GkUserMfaStatus`.
+- `Get-GkDeletedItem` — soft-deleted directory objects still inside the 30-day restore window,
+  reporting how long is left. The safety net behind the module's delete paths.
+- `Get-GkServiceHealth` — per-service health, with `-IncludeIssue` attaching the open incidents.
+  Issues are read once per run, not once per service.
+- `Get-GkServiceMessage` — message center posts. `-ActionRequiredOnly -ByDays` surfaces the ones
+  with a deadline, which are the ones that turn into an incident when missed.
+- `Get-GkGroupBasedLicense` — groups that assign licences and whether assignment has finished
+  applying. `-ResolveSkuName` maps SKU GUIDs to names and validates the extra scope it needs.
+
+### Fixed
+- `Get-GkGroupBasedLicense -ResolveSkuName` did not accept `LicenseAssignment.Read.All`, the
+  documented least-privileged scope for `/subscribedSkus`. Found by the scope audit against the new
+  code before release.
+
+### Changed
+- `build/scope-audit` resolves URIs passed by hashtable splatting, and no longer mistakes a `+=`
+  query fragment for a path — both patterns appear in the new cmdlets and previously produced a
+  silently empty endpoint instead of an explicit unresolved marker.
+- `Merge-GkCallInventory.ps1` replaces the ad-hoc merge step: the hand-verified supplement now wins
+  per cmdlet, and anything unresolved without a supplement entry is reported as a gap.
+
 ## [0.3.7] - 2026-08-07
 
 Full scope audit: every cmdlet's declared scopes reconciled against Microsoft's permission tables

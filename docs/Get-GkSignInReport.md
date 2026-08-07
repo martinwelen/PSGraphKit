@@ -5,7 +5,7 @@ Report Entra sign-ins over a recent window, with risk and Conditional Access sta
 
 ## SYNTAX
 ```
-Get-GkSignInReport [[-Days] <int>] [[-UserPrincipalName] <string>] [-FailedOnly] [-RiskyOnly] [-AsReport] [<CommonParameters>]
+Get-GkSignInReport [[-Days] <int>] [[-First] <int>] [[-UserPrincipalName] <string>] [-FailedOnly] [-RiskyOnly] [-AsReport] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -51,13 +51,26 @@ Default value: 7
 Accept pipeline input: false
 ```
 
+### -First
+Return only the N most-recent sign-ins in the window (Graph returns them newest-first),
+stopping pagination early. Applied before -FailedOnly/-RiskyOnly, so those refine within the
+N fetched. Use for a fast, bounded look at a high-volume tenant.
+
+```yaml
+Type: Int32
+Required: false
+Position: 2
+Default value: 0
+Accept pipeline input: false
+```
+
 ### -UserPrincipalName
 Filter to a single user's sign-ins.
 
 ```yaml
 Type: String
 Required: false
-Position: 2
+Position: 3
 Default value: None
 Accept pipeline input: false
 ```

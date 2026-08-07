@@ -23,7 +23,7 @@ The tenant overview.
 
 ### Example 2
 ```powershell
-Get-GkTenantInfo | Select-Object DisplayName, TenantId, OnPremisesSyncEnabled, DirectoryUsers
+Get-GkTenantInfo | Select-Object DisplayName, TenantId, OnPremisesSyncEnabled, DirectoryUsersUsed
 ```
 
 ### Example 3

@@ -75,26 +75,38 @@ Lower-risk reports that widen the assessment surface.
 
 ---
 
-## v0.4 — candidates (idea)
+## Phase 6 — broader read coverage (shipped, v0.4.0)
 
-Endpoint- and scope-verified against Microsoft Learn; not yet committed.
+Seven read-only cmdlets, each endpoint- and scope-verified against Microsoft Learn before
+implementation and reconciled by `build/scope-audit` afterwards.
+
+| Cmdlet | Endpoint | Least-privileged scope |
+|--------|----------|------------------------|
+| `Get-GkGroupMember` | `GET /groups/{id}/members` | GroupMember.Read.All |
+| `Get-GkRoleDefinition` | `GET /roleManagement/directory/roleDefinitions` | RoleManagement.Read.Directory |
+| `Get-GkUserAuthMethod` | `GET /users/{id}/authentication/methods` | UserAuthenticationMethod.Read.All |
+| `Get-GkDeletedItem` | `GET /directory/deletedItems/microsoft.graph.{type}` | per type — validated by `-Variant` |
+| `Get-GkServiceHealth` | `GET /admin/serviceAnnouncement/healthOverviews` (+ `/issues`) | ServiceHealth.Read.All |
+| `Get-GkServiceMessage` | `GET /admin/serviceAnnouncement/messages` | ServiceMessage.Read.All |
+| `Get-GkGroupBasedLicense` | `GET /groups?$select=assignedLicenses,licenseProcessingState` | Group.Read.All |
+
+## v0.4.1 — write / sensitive reads (idea)
+
+Deliberately held back from v0.4.0: all four touch authentication or return secrets, and want
+design attention rather than a place in a batch.
 
 | Cmdlet | Endpoint | Scope | Channel |
 |--------|----------|-------|---------|
-| `Get-GkGroupMember` | `GET /groups/{id}/members` | GroupMember.Read.All | v1.0 |
-| `Get-GkDeletedItem` | `GET /directory/deletedItems/microsoft.graph.{user\|group\|application}` | User/Group/Application.Read.All | v1.0 |
-| `Get-GkRoleDefinition` | `GET /roleManagement/directory/roleDefinitions` | RoleManagement.Read.Directory | v1.0 |
 | `New-GkTemporaryAccessPass` (write) | `POST /users/{id}/authentication/temporaryAccessPassMethods` | UserAuthenticationMethod.ReadWrite.All | v1.0 |
-| `Reset-GkUserPassword` (write) | `PATCH /users/{id}` (passwordProfile) | User.ReadWrite.All | v1.0 |
+| `Reset-GkUserPassword` (write) | `PATCH /users/{id}` (passwordProfile) | User-PasswordProfile.ReadWrite.All | v1.0 |
 | `Get-GkLapsPassword` | `GET /directory/deviceLocalCredentials/{deviceId}` | DeviceLocalCredential.Read.All (+ Device.Read.All) | v1.0 |
-| `Get-GkUserAuthMethod` | `GET /users/{id}/authentication/methods` | UserAuthenticationMethod.Read.All | v1.0 |
-| `Get-GkServiceHealth` | `GET /admin/serviceAnnouncement/healthOverviews` (+ `/issues`) | ServiceHealth.Read.All | v1.0 |
-| `Get-GkServiceMessage` | `GET /admin/serviceAnnouncement/messages` | ServiceMessage.Read.All | v1.0 |
-| `Get-GkGroupBasedLicense` | `GET /groups?$select=assignedLicenses,licenseProcessingState` | Group.Read.All | v1.0 |
+| `Restore-GkDeletedObject` (write) | `POST /directory/deletedItems/{id}/restore` | per type, as `Get-GkDeletedItem` | v1.0 |
 
-Notes: `Get-GkGroupMember` is the read companion to the shipped `Add`/`Remove-GkGroupMember`.
-`Get-GkDeletedItem` pairs with the honorable-mention `Restore-GkDeletedObject`. `Get-GkLapsPassword`
-returns a clear-text secret — treat as sensitive (mask by default).
+Notes: `Get-GkLapsPassword` and `New-GkTemporaryAccessPass` return clear-text secrets and need a
+masking decision before implementation (a `-AsPlainText` switch, or `SecureString` by default).
+`Reset-GkUserPassword` should use the narrow `User-PasswordProfile.ReadWrite.All` documented for the
+`passwordProfile` property, not the blanket `User.ReadWrite.All`. `Restore-GkDeletedObject` is the
+write counterpart to the shipped `Get-GkDeletedItem`.
 
 ## Connection UX / error DX (shipped, except auto-connect)
 

@@ -5,7 +5,7 @@ Disable (default) or delete stale guest accounts, with a guest-type safety check
 
 ## SYNTAX
 ```
-Remove-GkStaleGuest [-UserId] <string[]> [-Delete] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-GkStaleGuest [-UserId] <string[]> [[-UserType] <string>] [-Delete] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -59,6 +59,17 @@ Required: true
 Position: 1
 Default value: None
 Accept pipeline input: true (ByValue, ByPropertyName)
+```
+
+### -UserType
+Bound from the pipeline (e.g. Get-GkGuestInventory) to skip a per-user userType re-read.
+
+```yaml
+Type: String
+Required: false
+Position: 2
+Default value: None
+Accept pipeline input: true (ByPropertyName)
 ```
 
 ### -Delete
