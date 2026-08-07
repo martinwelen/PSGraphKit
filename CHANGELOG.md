@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-08-07
+
 Full scope audit: every cmdlet's declared scopes reconciled against Microsoft's permission tables
 for every Graph call it makes — 70 calls across 59 endpoints. No cmdlet behavior changes.
 
@@ -284,7 +286,8 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.6...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.7...HEAD
+[0.3.7]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.7
 [0.3.6]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.6
 [0.3.5]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.5
 [0.3.4]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.4
