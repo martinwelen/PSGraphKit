@@ -15,7 +15,12 @@ function Remove-GkStaleGuest {
 
         State-changing: supports -WhatIf / -Confirm and prompts by default. Accepts users from the
         pipeline and yields a PSGraphKit.GuestRemovalResult per user; failures warn and continue.
-        Requires User.ReadWrite.All (or Directory.ReadWrite.All) plus a supporting Entra role.
+
+        Scopes differ by path, and only the one in use is validated. Disabling needs a scope that
+        can update accountEnabled (User.EnableDisableAccount.All, User.ReadUpdate.All,
+        User.ReadWrite.All or Directory.ReadWrite.All) plus one that can read the user for the
+        guest-type check. Deleting needs User.ReadWrite.All (or Directory.ReadWrite.All). Both
+        paths also need a supporting Entra role, e.g. User Administrator.
 
     .PARAMETER UserId
         One or more user object IDs or userPrincipalNames (accepts pipeline input, incl. by the
@@ -62,7 +67,11 @@ function Remove-GkStaleGuest {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Remove-GkStaleGuest' | Out-Null
+        # The two paths need different scopes: DELETE /users/{id} is not served by the narrow
+        # update scopes that suffice for PATCH accountEnabled, so validate the one being used.
+        $scopeVariant = ''
+        if ($Delete) { $scopeVariant = 'Delete' }
+        Test-GkConnection -FunctionName 'Remove-GkStaleGuest' -Variant $scopeVariant -Caller $PSCmdlet | Out-Null
     }
 
     process {

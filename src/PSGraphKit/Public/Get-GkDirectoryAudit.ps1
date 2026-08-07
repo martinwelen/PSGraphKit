@@ -59,7 +59,7 @@ function Get-GkDirectoryAudit {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkDirectoryAudit' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkDirectoryAudit' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

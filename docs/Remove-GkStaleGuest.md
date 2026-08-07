@@ -20,7 +20,12 @@ cannot accidentally disable/delete a member.
 
 State-changing: supports -WhatIf / -Confirm and prompts by default. Accepts users from the
 pipeline and yields a PSGraphKit.GuestRemovalResult per user; failures warn and continue.
-Requires User.ReadWrite.All (or Directory.ReadWrite.All) plus a supporting Entra role.
+
+Scopes differ by path, and only the one in use is validated. Disabling needs a scope that
+can update accountEnabled (User.EnableDisableAccount.All, User.ReadUpdate.All,
+User.ReadWrite.All or Directory.ReadWrite.All) plus one that can read the user for the
+guest-type check. Deleting needs User.ReadWrite.All (or Directory.ReadWrite.All). Both
+paths also need a supporting Entra role, e.g. User Administrator.
 
 ## EXAMPLES
 

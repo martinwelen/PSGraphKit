@@ -38,7 +38,7 @@ function Get-GkDomain {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkDomain' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkDomain' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

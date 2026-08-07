@@ -48,7 +48,7 @@ function Get-GkRiskDetection {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkRiskDetection' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkRiskDetection' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

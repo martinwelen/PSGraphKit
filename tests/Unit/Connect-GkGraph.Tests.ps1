@@ -58,6 +58,15 @@ InModuleScope PSGraphKit {
             { Connect-GkGraph } | Should -Throw -ExpectedMessage '*-Scopes*'
         }
 
+        It 'covers every path of a cmdlet with action-specific scopes' {
+            # Remove-GkStaleGuest disables by default and deletes with -Delete; naming the cmdlet
+            # must grant both, not just the default path.
+            Connect-GkGraph -ForCommand Remove-GkStaleGuest | Out-Null
+            Should -Invoke Connect-MgGraph -Times 1 -Exactly -ParameterFilter {
+                ($Scopes -contains 'User.EnableDisableAccount.All') -and ($Scopes -contains 'User.ReadWrite.All')
+            }
+        }
+
         It 'warns for an unknown cmdlet name in -ForCommand' {
             $warnings = @()
             Connect-GkGraph -ForCommand 'Get-GkStaleUser', 'Get-GkNotReal' -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null

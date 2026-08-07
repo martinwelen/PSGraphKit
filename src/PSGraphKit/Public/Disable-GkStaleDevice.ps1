@@ -54,7 +54,7 @@ function Disable-GkStaleDevice {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Disable-GkStaleDevice' | Out-Null
+        Test-GkConnection -FunctionName 'Disable-GkStaleDevice' -Caller $PSCmdlet | Out-Null
     }
 
     process {

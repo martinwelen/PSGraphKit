@@ -41,7 +41,7 @@ function Get-GkSecureScore {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkSecureScore' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkSecureScore' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

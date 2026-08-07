@@ -49,7 +49,7 @@ function Get-GkLicenseOverview {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkLicenseOverview' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkLicenseOverview' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

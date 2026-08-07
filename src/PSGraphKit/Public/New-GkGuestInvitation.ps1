@@ -56,7 +56,7 @@ function New-GkGuestInvitation {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'New-GkGuestInvitation' | Out-Null
+        Test-GkConnection -FunctionName 'New-GkGuestInvitation' -Caller $PSCmdlet | Out-Null
     }
 
     process {

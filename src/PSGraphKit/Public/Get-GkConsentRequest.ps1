@@ -34,7 +34,7 @@ function Get-GkConsentRequest {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkConsentRequest' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkConsentRequest' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

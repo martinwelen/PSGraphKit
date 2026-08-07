@@ -57,7 +57,7 @@ function Get-GkUserAccessReport {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkUserAccessReport' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkUserAccessReport' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

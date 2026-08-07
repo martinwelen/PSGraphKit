@@ -48,7 +48,7 @@ function Get-GkLegacyAuthSignIn {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkLegacyAuthSignIn' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkLegacyAuthSignIn' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
         $legacyClients = @(
             'Exchange ActiveSync', 'IMAP4', 'IMAP', 'POP3', 'POP', 'SMTP', 'Authenticated SMTP', 'MAPI',

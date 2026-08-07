@@ -41,7 +41,7 @@ function Get-GkRoleAssignableGroup {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkRoleAssignableGroup' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkRoleAssignableGroup' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

@@ -58,7 +58,7 @@ function Export-GkTenantAssessment {
     )
 
     begin {
-        $ctx = Test-GkConnection -FunctionName 'Export-GkTenantAssessment'
+        $ctx = Test-GkConnection -FunctionName 'Export-GkTenantAssessment' -Caller $PSCmdlet
         $now = [datetime]::UtcNow
         Add-Type -AssemblyName System.Web -ErrorAction SilentlyContinue
     }

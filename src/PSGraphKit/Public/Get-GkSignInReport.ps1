@@ -70,7 +70,7 @@ function Get-GkSignInReport {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkSignInReport' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkSignInReport' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

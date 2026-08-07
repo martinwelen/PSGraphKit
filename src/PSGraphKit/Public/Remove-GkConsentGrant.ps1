@@ -45,7 +45,7 @@ function Remove-GkConsentGrant {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Remove-GkConsentGrant' | Out-Null
+        Test-GkConnection -FunctionName 'Remove-GkConsentGrant' -Caller $PSCmdlet | Out-Null
     }
 
     process {

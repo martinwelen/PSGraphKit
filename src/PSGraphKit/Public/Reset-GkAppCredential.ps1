@@ -69,7 +69,7 @@ function Reset-GkAppCredential {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Reset-GkAppCredential' | Out-Null
+        Test-GkConnection -FunctionName 'Reset-GkAppCredential' -Caller $PSCmdlet | Out-Null
         $isRemove = $PSCmdlet.ParameterSetName -eq 'RemoveSecret'
     }
 

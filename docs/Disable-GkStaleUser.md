@@ -18,8 +18,11 @@ pipeline and yields a PSGraphKit.UserDisableResult per user; a failure warns and
 Disabling is reversible (set accountEnabled back to true). Blocking a privileged/admin
 account requires a higher Entra role than blocking a regular user.
 
-Requires User.EnableDisableAccount.All (or User.ReadWrite.All / Directory.ReadWrite.All) plus
-a supporting Entra role (e.g. User Administrator).
+Requires a scope that can update accountEnabled (User.EnableDisableAccount.All,
+User.ReadUpdate.All, User.ReadWrite.All or Directory.ReadWrite.All) and one that can read
+the user — Graph documents User.EnableDisableAccount.All + User.Read.All as the
+least-privileged combination, while User.ReadWrite.All / Directory.ReadWrite.All carry both
+on their own. Also requires a supporting Entra role (e.g. User Administrator).
 
 ## EXAMPLES
 

@@ -37,7 +37,7 @@ function Get-GkExternalCollaborationSetting {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkExternalCollaborationSetting' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkExternalCollaborationSetting' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
         # Well-known guest user role template IDs.
         $guestRoleNames = @{

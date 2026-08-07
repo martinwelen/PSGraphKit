@@ -66,7 +66,7 @@ function Get-GkAppRegistrationReport {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkAppRegistrationReport' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkAppRegistrationReport' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
 
         $highRiskExact = @(

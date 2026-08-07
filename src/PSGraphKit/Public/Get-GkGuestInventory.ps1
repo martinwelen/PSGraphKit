@@ -64,7 +64,7 @@ function Get-GkGuestInventory {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkGuestInventory' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkGuestInventory' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

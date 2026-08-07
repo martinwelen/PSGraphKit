@@ -52,7 +52,7 @@ function Get-GkUserMfaStatus {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkUserMfaStatus' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkUserMfaStatus' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

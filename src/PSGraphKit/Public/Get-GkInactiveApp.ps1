@@ -50,7 +50,7 @@ function Get-GkInactiveApp {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkInactiveApp' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkInactiveApp' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

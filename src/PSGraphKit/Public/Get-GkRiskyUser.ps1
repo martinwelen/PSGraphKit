@@ -52,7 +52,7 @@ function Get-GkRiskyUser {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkRiskyUser' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkRiskyUser' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

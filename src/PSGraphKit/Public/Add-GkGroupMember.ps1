@@ -47,7 +47,7 @@ function Add-GkGroupMember {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Add-GkGroupMember' | Out-Null
+        Test-GkConnection -FunctionName 'Add-GkGroupMember' -Caller $PSCmdlet | Out-Null
         $encMember = [uri]::EscapeDataString($MemberId)
         $memberRef = "$script:GkGraphBaseUri/v1.0/directoryObjects/$encMember"
     }

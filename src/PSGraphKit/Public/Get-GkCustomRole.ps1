@@ -35,7 +35,7 @@ function Get-GkCustomRole {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkCustomRole' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkCustomRole' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

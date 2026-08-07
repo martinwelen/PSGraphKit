@@ -48,7 +48,7 @@ function Get-GkServicePrincipalReport {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkServicePrincipalReport' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkServicePrincipalReport' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

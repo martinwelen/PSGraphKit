@@ -52,7 +52,15 @@ See [DESIGN.md](DESIGN.md) / [DESIGN-phase2.md](DESIGN-phase2.md) for the endpoi
 
 ## Authentication
 
-PSGraphKit is auth-agnostic — it runs against whatever `Connect-MgGraph` session exists.
+Let PSGraphKit derive the scopes for the cmdlets you plan to run — no hand-assembled scope lists:
+
+```powershell
+Connect-GkGraph -ForCommand Get-GkStaleUser, Get-GkGuestInventory   # only what those need
+Connect-GkGraph -AllCommands                                         # full read-only footprint
+Connect-GkGraph -ClientId <appId> -TenantId <tid> -CertificateThumbprint <thumb>   # app-only
+```
+
+PSGraphKit is auth-agnostic, so connecting your own way works just as well:
 
 ```powershell
 # Delegated (interactive) — recommended for ad-hoc, cross-tenant assessments
@@ -60,14 +68,6 @@ Connect-MgGraph -Scopes User.Read.All, AuditLog.Read.All
 
 # App-only (enterprise app) — for automated/recurring reporting
 Connect-MgGraph -ClientId <appId> -TenantId <tenantId> -CertificateThumbprint <thumb>
-```
-
-Or let PSGraphKit derive the scopes for the cmdlets you plan to run:
-
-```powershell
-Connect-GkGraph -ForCommand Get-GkStaleUser, Get-GkGuestInventory   # only what those need
-Connect-GkGraph -AllCommands                                         # full read-only footprint
-Connect-GkGraph -ClientId <appId> -TenantId <tid> -CertificateThumbprint <thumb>   # app-only
 ```
 
 One caveat: `Get-GkUserAccessReport` reads `licenseDetails`, a Graph API with no application
@@ -91,9 +91,13 @@ Get-GkConnectionInfo
 If a cmdlet is missing a scope, it tells you the exact command to run:
 
 ```
-Missing Graph scope(s) for Get-GkStaleUser: to read signInActivity: one of [AuditLog.Read.All].
-Run: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All
+Get-GkStaleUser: Missing Graph scope(s) for Get-GkStaleUser: to read signInActivity: one of
+[AuditLog.Read.All]. Run: Connect-GkGraph -ForCommand Get-GkStaleUser  (or connect your own way
+with: Connect-MgGraph -Scopes User.Read.All,AuditLog.Read.All)
 ```
+
+The failure is reported against the cmdlet you typed, and the fix it names derives the scopes for
+you — no need to look up which scope goes with which cmdlet.
 
 ## Available cmdlets
 

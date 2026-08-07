@@ -87,13 +87,19 @@ function Connect-GkGraph {
     if ($AllCommands)     { $commands = @($script:GkScopeMap.Keys) }
     elseif ($ForCommand)  { $commands = $ForCommand }
     foreach ($c in $commands) {
-        if (-not $script:GkScopeMap.ContainsKey($c)) {
+        # A cmdlet whose scopes depend on the action it performs also has '<name>:<variant>' entries
+        # (e.g. Remove-GkStaleGuest:Delete). Naming the cmdlet grants what every one of its paths
+        # needs, so -ForCommand never leaves the caller short on one of them.
+        $keys = @($script:GkScopeMap.Keys | Where-Object { $_ -eq $c -or $_ -like "${c}:*" })
+        if ($keys.Count -eq 0) {
             Write-Warning "Unknown PSGraphKit cmdlet '$c' — no scopes derived for it."
             continue
         }
-        foreach ($s in ((Get-GkConnectScopeHint -FunctionName $c) -split ',')) {
-            $s = $s.Trim()
-            if ($s -and $resolved -notcontains $s) { $resolved.Add($s) }
+        foreach ($k in $keys) {
+            foreach ($s in ((Get-GkConnectScopeHint -FunctionName $k) -split ',')) {
+                $s = $s.Trim()
+                if ($s -and $resolved -notcontains $s) { $resolved.Add($s) }
+            }
         }
     }
 

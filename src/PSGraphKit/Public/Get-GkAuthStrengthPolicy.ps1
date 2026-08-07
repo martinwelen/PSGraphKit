@@ -42,7 +42,7 @@ function Get-GkAuthStrengthPolicy {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkAuthStrengthPolicy' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkAuthStrengthPolicy' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

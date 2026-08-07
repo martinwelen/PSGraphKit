@@ -32,7 +32,7 @@ function Get-GkTenantInfo {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkTenantInfo' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkTenantInfo' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

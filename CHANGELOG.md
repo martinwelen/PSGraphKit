@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-08-07
+
+Scope-map corrections from a review of the module's Graph surface against Microsoft's API changes,
+and the connection/error experience that surfaces them. No endpoint or output shape changes.
+
+### Fixed
+- `Disable-GkStaleUser` and `Remove-GkStaleGuest` rejected a session holding only
+  `User.ReadUpdate.All`, which Graph made the least-privileged permission for `PATCH /users/{id}`
+  in July 2026. Both now accept it.
+- `Remove-GkStaleGuest` validated one scope set for both of its paths, so a session that could
+  disable but not delete passed the pre-flight check and then failed with a 403 from Graph.
+  `DELETE /users/{id}` is not served by the narrow update scopes, so the two paths are now
+  validated separately and `-Delete` reports the missing scope up front.
+- `Disable-GkStaleUser` accepted `User.EnableDisableAccount.All` on its own. Graph documents
+  `User.EnableDisableAccount.All` **+** `User.Read.All` as the least-privileged combination for
+  updating `accountEnabled`; the read is now modelled as its own capability group, which the
+  broader `User.ReadWrite.All` / `Directory.ReadWrite.All` still satisfy alone.
+
+### Added
+- `Test-GkConnection -Variant` and a `'<FunctionName>:<Variant>'` scope-map key, for cmdlets whose
+  required scopes depend on the action requested rather than on the cmdlet alone.
+
+### Changed
+- Connection and scope failures now lead with `Run: Connect-GkGraph -ForCommand <cmdlet>`, which
+  derives the scope set from the scope map, instead of `Connect-MgGraph -Scopes <scope...>`, which
+  pushed the caller to hand-assemble scopes. The raw scope list is kept as a secondary note for
+  anyone who connects their own way.
+- Pre-flight failures are attributed to the cmdlet the caller typed rather than to the private
+  `Test-GkConnection` helper. PowerShell's ConciseView was rendering a code frame pointing into
+  `Test-GkConnection.ps1`, which read like a leaked stack trace; it now reads
+  `Get-GkStaleUser: Not connected to Microsoft Graph. Run: …`. Public cmdlets pass
+  `-Caller $PSCmdlet` to opt in; the helper still raises the error itself when called without one.
+- `Connect-GkGraph -ForCommand` unions the scopes of every action a cmdlet can perform, so naming
+  `Remove-GkStaleGuest` now grants both its disable and its delete path.
+
 ## [0.3.5] - 2026-07-10
 
 Correctness and efficiency fixes from a full audit of the cmdlet surface. Each fix ships with a
@@ -226,7 +261,12 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.6...HEAD
+[0.3.6]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.6
+[0.3.5]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.5
+[0.3.4]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.4
+[0.3.3]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.3
+[0.3.2]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.2
 [0.3.1]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.1
 [0.3.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.2.0

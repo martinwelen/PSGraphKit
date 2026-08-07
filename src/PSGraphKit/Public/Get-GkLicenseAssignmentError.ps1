@@ -37,7 +37,7 @@ function Get-GkLicenseAssignmentError {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkLicenseAssignmentError' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkLicenseAssignmentError' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

@@ -47,7 +47,7 @@ function Get-GkCaPolicyReport {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkCaPolicyReport' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkCaPolicyReport' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
 
         $stateFilter = switch ($State) {

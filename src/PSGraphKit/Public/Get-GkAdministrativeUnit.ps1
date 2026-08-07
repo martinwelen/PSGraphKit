@@ -41,7 +41,7 @@ function Get-GkAdministrativeUnit {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkAdministrativeUnit' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkAdministrativeUnit' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

@@ -58,7 +58,7 @@ function Get-GkGroupReport {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkGroupReport' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkGroupReport' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

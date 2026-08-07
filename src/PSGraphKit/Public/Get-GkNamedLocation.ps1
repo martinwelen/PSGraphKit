@@ -40,7 +40,7 @@ function Get-GkNamedLocation {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkNamedLocation' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkNamedLocation' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

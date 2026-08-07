@@ -41,7 +41,7 @@ function Get-GkConditionalAccessTemplate {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkConditionalAccessTemplate' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkConditionalAccessTemplate' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

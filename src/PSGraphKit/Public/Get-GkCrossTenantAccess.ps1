@@ -37,7 +37,7 @@ function Get-GkCrossTenantAccess {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkCrossTenantAccess' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkCrossTenantAccess' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

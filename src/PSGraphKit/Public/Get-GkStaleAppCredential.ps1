@@ -48,7 +48,7 @@ function Get-GkStaleAppCredential {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkStaleAppCredential' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkStaleAppCredential' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

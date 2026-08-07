@@ -57,7 +57,7 @@ function Remove-GkUserLicense {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Remove-GkUserLicense' | Out-Null
+        Test-GkConnection -FunctionName 'Remove-GkUserLicense' -Caller $PSCmdlet | Out-Null
     }
 
     process {

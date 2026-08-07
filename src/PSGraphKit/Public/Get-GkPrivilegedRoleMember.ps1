@@ -44,7 +44,7 @@ function Get-GkPrivilegedRoleMember {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkPrivilegedRoleMember' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkPrivilegedRoleMember' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

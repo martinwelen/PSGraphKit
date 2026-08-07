@@ -50,7 +50,7 @@ function Revoke-GkUserSession {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Revoke-GkUserSession' | Out-Null
+        Test-GkConnection -FunctionName 'Revoke-GkUserSession' -Caller $PSCmdlet | Out-Null
     }
 
     process {

@@ -13,8 +13,11 @@ function Disable-GkStaleUser {
         Disabling is reversible (set accountEnabled back to true). Blocking a privileged/admin
         account requires a higher Entra role than blocking a regular user.
 
-        Requires User.EnableDisableAccount.All (or User.ReadWrite.All / Directory.ReadWrite.All) plus
-        a supporting Entra role (e.g. User Administrator).
+        Requires a scope that can update accountEnabled (User.EnableDisableAccount.All,
+        User.ReadUpdate.All, User.ReadWrite.All or Directory.ReadWrite.All) and one that can read
+        the user — Graph documents User.EnableDisableAccount.All + User.Read.All as the
+        least-privileged combination, while User.ReadWrite.All / Directory.ReadWrite.All carry both
+        on their own. Also requires a supporting Entra role (e.g. User Administrator).
 
     .PARAMETER UserId
         One or more user object IDs or userPrincipalNames. Accepts pipeline input, including by the
@@ -48,7 +51,7 @@ function Disable-GkStaleUser {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Disable-GkStaleUser' | Out-Null
+        Test-GkConnection -FunctionName 'Disable-GkStaleUser' -Caller $PSCmdlet | Out-Null
     }
 
     process {

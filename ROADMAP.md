@@ -96,22 +96,16 @@ Notes: `Get-GkGroupMember` is the read companion to the shipped `Add`/`Remove-Gk
 `Get-GkDeletedItem` pairs with the honorable-mention `Restore-GkDeletedObject`. `Get-GkLapsPassword`
 returns a clear-text secret — treat as sensitive (mask by default).
 
-## v0.4 — connection UX / error DX (idea)
+## Connection UX / error DX (shipped, except auto-connect)
 
-Improvements to how `Test-GkConnection` reports a not-connected / missing-scope failure. The
-pre-flight check itself works (throws an actionable terminating error); these refine what it
-points the user at and how it renders.
+Improvements to how `Test-GkConnection` reports a not-connected / missing-scope failure.
 
-- **Recommend `Connect-GkGraph`, not raw `Connect-MgGraph`.** The not-connected and missing-scope
-  hints currently say `Run: Connect-MgGraph -Scopes <scope...>`, which pushes the user to
-  hand-assemble scopes. Change the hint to `Run: Connect-GkGraph -ForCommand <FunctionName>` (our
-  helper already derives the scope set from `$script:GkScopeMap`), so the user never has to
-  remember scopes per cmdlet. Keep the raw `-Scopes` value as a secondary/manual note.
-  Touches `Get-GkConnectScopeHint` / the two `ThrowTerminatingError` messages in
-  `Test-GkConnection.ps1`; update `Test-GkConnection.Tests.ps1` assertions in the same pass.
-- **Clean error rendering.** PS7 ConciseView wraps the message in an internal code-frame pointing
-  at `Test-GkConnection:<file>:61` (the helper call site), which reads like a leaked stack trace.
-  Surface the failure as a clean one-liner attributed to the public cmdlet the user actually typed.
+- **Recommend `Connect-GkGraph`, not raw `Connect-MgGraph`** (shipped). All three pre-flight
+  failures now lead with `Run: Connect-GkGraph -ForCommand <FunctionName>`, which derives the scope
+  set from `$script:GkScopeMap`, and keep the raw `-Scopes` value as a secondary note.
+- **Clean error rendering** (shipped). Public cmdlets pass `-Caller $PSCmdlet`, so the terminating
+  error is raised from the cmdlet the user typed instead of the private helper. ConciseView renders
+  it as `Get-GkStaleUser: <message>` rather than exposing `Test-GkConnection:<file>:<line>`.
 - **Optional opt-in auto-connect (idea).** On not-connected, offer to run
   `Connect-GkGraph -ForCommand <name>` interactively instead of erroring. Must stay opt-in (a
   `$GkAutoConnect` preference or explicit switch) — never surprise unattended/scripted runs with an

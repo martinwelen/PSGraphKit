@@ -41,7 +41,7 @@ function Get-GkAuthMethodPolicy {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkAuthMethodPolicy' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkAuthMethodPolicy' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

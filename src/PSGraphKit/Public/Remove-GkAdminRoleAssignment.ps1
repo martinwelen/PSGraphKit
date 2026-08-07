@@ -82,7 +82,7 @@ function Remove-GkAdminRoleAssignment {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Remove-GkAdminRoleAssignment' | Out-Null
+        Test-GkConnection -FunctionName 'Remove-GkAdminRoleAssignment' -Caller $PSCmdlet | Out-Null
     }
 
     process {

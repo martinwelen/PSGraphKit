@@ -38,7 +38,7 @@ function Get-GkSubscription {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkSubscription' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkSubscription' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

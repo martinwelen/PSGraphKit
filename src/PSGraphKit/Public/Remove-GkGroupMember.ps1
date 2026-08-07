@@ -47,7 +47,7 @@ function Remove-GkGroupMember {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Remove-GkGroupMember' | Out-Null
+        Test-GkConnection -FunctionName 'Remove-GkGroupMember' -Caller $PSCmdlet | Out-Null
         $encMember = [uri]::EscapeDataString($MemberId)
     }
 

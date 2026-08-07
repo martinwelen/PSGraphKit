@@ -9,6 +9,10 @@ $script:GkGraphBaseUri = 'https://graph.microsoft.com'
 # "missing scope" failure, while still requiring genuinely distinct capabilities
 # (e.g. reading users AND reading signInActivity) separately.
 #
+# Keys are function names. A function whose requirement depends on the action it was asked to
+# perform also gets a '<FunctionName>:<Variant>' key, which Test-GkConnection -Variant selects
+# in preference to the plain key (see Remove-GkStaleGuest / :Delete).
+#
 # DelegatedOnly: the underlying Graph API has no application permission — app-only sessions
 # cannot serve it (currently only licenseDetails, used by Get-GkUserAccessReport).
 #
@@ -43,9 +47,13 @@ $script:GkScopeMap = @{
         RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
     }
 
+    # Graph documents User.EnableDisableAccount.All + User.Read.All as the least-privileged
+    # COMBINATION for updating accountEnabled, so the read is modelled as its own group: the narrow
+    # write scope alone does not carry it, while User.ReadWrite.All / Directory.ReadWrite.All do.
     'Disable-GkStaleUser' = @{
         Groups = @(
-            @{ For = 'block user sign-in (accountEnabled)'; Any = @('User.EnableDisableAccount.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+            @{ For = 'block user sign-in (accountEnabled)'; Any = @('User.EnableDisableAccount.All', 'User.ReadUpdate.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read the target user'; Any = @('User.Read.All', 'User.ReadUpdate.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
@@ -67,9 +75,23 @@ $script:GkScopeMap = @{
         RoleHints     = @('Groups Administrator', 'User Administrator')
     }
 
+    # Default (disable) path: PATCH accountEnabled, same combination rule as Disable-GkStaleUser,
+    # plus the guest-type read. The -Delete path is a separate entry because DELETE /users/{id}
+    # is NOT served by the narrow update scopes.
     'Remove-GkStaleGuest' = @{
         Groups = @(
-            @{ For = 'disable or delete a user'; Any = @('User.ReadWrite.All', 'Directory.ReadWrite.All') }
+            @{ For = 'disable a guest (accountEnabled)'; Any = @('User.EnableDisableAccount.All', 'User.ReadUpdate.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read the target user (guest-type check)'; Any = @('User.Read.All', 'User.ReadUpdate.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
+    }
+    # Graph documents User.ReadWrite.All as the only permission for DELETE /users/{id}
+    # ("Higher privileged: Not available"); Directory.ReadWrite.All is kept as the broad
+    # directory-write scope so an existing tenant-admin session is not falsely rejected.
+    'Remove-GkStaleGuest:Delete' = @{
+        Groups = @(
+            @{ For = 'delete a user (30-day soft-delete)'; Any = @('User.ReadWrite.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')

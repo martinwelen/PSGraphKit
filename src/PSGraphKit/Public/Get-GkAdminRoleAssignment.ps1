@@ -58,7 +58,7 @@ function Get-GkAdminRoleAssignment {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkAdminRoleAssignment' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkAdminRoleAssignment' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

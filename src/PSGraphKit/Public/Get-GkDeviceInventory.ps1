@@ -60,7 +60,7 @@ function Get-GkDeviceInventory {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkDeviceInventory' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkDeviceInventory' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

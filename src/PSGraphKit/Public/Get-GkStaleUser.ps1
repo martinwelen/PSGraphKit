@@ -72,7 +72,7 @@ function Get-GkStaleUser {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkStaleUser' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkStaleUser' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

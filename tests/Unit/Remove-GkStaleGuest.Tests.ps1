@@ -17,6 +17,21 @@ InModuleScope PSGraphKit {
             Should -Invoke Test-GkConnection -Times 1 -Exactly -ParameterFilter { $FunctionName -eq 'Remove-GkStaleGuest' }
         }
 
+        It 'validates the disable scopes by default (no variant)' {
+            Remove-GkStaleGuest -UserId 'g@contoso.com' -Confirm:$false | Out-Null
+            Should -Invoke Test-GkConnection -Times 1 -Exactly -ParameterFilter { -not $Variant }
+        }
+
+        It 'validates the delete scopes under -Delete' {
+            Remove-GkStaleGuest -UserId 'g@contoso.com' -Delete -Confirm:$false | Out-Null
+            Should -Invoke Test-GkConnection -Times 1 -Exactly -ParameterFilter { $Variant -eq 'Delete' }
+        }
+
+        It 'validates the delete scopes even when -WhatIf suppresses the call' {
+            Remove-GkStaleGuest -UserId 'g@contoso.com' -Delete -WhatIf | Out-Null
+            Should -Invoke Test-GkConnection -Times 1 -Exactly -ParameterFilter { $Variant -eq 'Delete' }
+        }
+
         It 'disables a guest by default (PATCH accountEnabled=false)' {
             $r = Remove-GkStaleGuest -UserId 'g@contoso.com' -Confirm:$false
             $r.Action  | Should -Be 'DisableAccount'

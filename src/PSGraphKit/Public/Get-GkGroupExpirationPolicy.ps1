@@ -32,7 +32,7 @@ function Get-GkGroupExpirationPolicy {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Get-GkGroupExpirationPolicy' | Out-Null
+        Test-GkConnection -FunctionName 'Get-GkGroupExpirationPolicy' -Caller $PSCmdlet | Out-Null
         $now = [datetime]::UtcNow
     }
 

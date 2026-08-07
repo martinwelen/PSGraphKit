@@ -55,7 +55,7 @@ function Set-GkGroupOwner {
     )
 
     begin {
-        Test-GkConnection -FunctionName 'Set-GkGroupOwner' | Out-Null
+        Test-GkConnection -FunctionName 'Set-GkGroupOwner' -Caller $PSCmdlet | Out-Null
         $encOwner = [uri]::EscapeDataString($OwnerId)
         $ownerRef = "$script:GkGraphBaseUri/v1.0/directoryObjects/$encOwner"
     }
