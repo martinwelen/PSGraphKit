@@ -149,7 +149,7 @@ $script:GkScopeMap = @{
 
     'Get-GkAdminRoleAssignment' = @{
         Groups = @(
-            @{ For = 'read role assignments and PIM schedules'; Any = @('RoleManagement.Read.All', 'RoleManagement.Read.Directory') }
+            @{ For = 'read role assignments and PIM schedules'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.Read.All', 'Directory.Read.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator', 'Security Reader')
@@ -183,7 +183,7 @@ $script:GkScopeMap = @{
 
     'Get-GkGroupReport' = @{
         Groups = @(
-            @{ For = 'read groups';                  Any = @('Group.Read.All', 'Directory.Read.All') }
+            @{ For = 'read groups';                  Any = @('Group.Read.All', 'Directory.Read.All', 'GroupMember.Read.All') }
             @{ For = 'read group members and owners'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') }
         )
         DelegatedOnly = $false
@@ -246,9 +246,12 @@ $script:GkScopeMap = @{
         RoleHints     = @('Global Reader', 'Security Reader')
     }
 
+    # RoleManagement.Read.All is deliberately absent: the directory provider's table for
+    # GET /roleManagement/directory/roleDefinitions does not list it, so accepting it here would
+    # pass the pre-flight check and then take a 403 from Graph.
     'Get-GkCustomRole' = @{
         Groups = @(
-            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.Read.All', 'Directory.Read.All') }
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator')
@@ -307,8 +310,10 @@ $script:GkScopeMap = @{
         RoleHints     = @('Global Reader', 'Security Reader')
     }
 
+    # GroupMember.Read.All is the documented least-privileged scope for GET /groups/{id}/owners and
+    # is also valid for GET /groups, so it serves both of this cmdlet's calls on its own.
     'Get-GkRoleAssignableGroup' = @{
-        Groups = @(@{ For = 'read groups and owners'; Any = @('Group.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read groups and owners'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers')
     }

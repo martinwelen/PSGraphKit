@@ -1,0 +1,9 @@
+Cmdlet,Method,Path,Source
+Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleAssignments,manual
+Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleEligibilityScheduleInstances,manual
+Get-GkAdminRoleAssignment,GET,/roleManagement/directory/roleAssignmentScheduleInstances,manual
+Get-GkDirectoryAudit,GET,/auditLogs/directoryAudits,manual
+Get-GkSignInReport,GET,/auditLogs/signIns,manual
+Get-GkUserAccessReport,GET,/users/{id}/transitiveMemberOf,manual
+Get-GkUserAccessReport,GET,/users/{id}/appRoleAssignments,manual
+Get-GkUserAccessReport,GET,/users/{id}/licenseDetails,manual

@@ -373,3 +373,112 @@ first (with their own tests/fixtures), then functions 1→10, one commit each wi
 5. **Guest sponsor N+1** — sponsors are resolved per guest by default (one `/sponsors` call
    each) since sponsor is a headline column; `-SkipSponsor` opts out for large-tenant runs.
 6. **`-OutputType`** — Hashtable internally, for clean `@odata.*` access.
+
+---
+
+## 7. Verified scope model (whole surface)
+
+Section 4 above is the original Phase 1 plan for the first ten cmdlets. This section supersedes it
+and covers every cmdlet the module ships.
+
+### How it was verified
+
+Each cmdlet's declared capability groups were reconciled against Microsoft's own documentation for
+**every Graph call it makes** — 70 calls across 59 distinct endpoints:
+
+1. Graph calls were extracted from the source by AST, resolving URIs assigned to a local variable
+   and normalising OData segments (`$ref`, `$count`) and id placeholders.
+2. Permission tables were read from the docs source (`microsoftgraph/microsoft-graph-docs-contrib`),
+   following the per-channel `includes/permissions/*.md` file that each API page embeds.
+3. Each declared scope was checked in both directions: does Graph accept it for at least one of the
+   cmdlet's calls (otherwise the pre-flight check passes and Graph returns 403), and is the
+   documented least-privileged option offered (otherwise a legitimate caller is falsely rejected).
+
+Two sources were compared, and **Learn is the authority**. The machine-readable
+`permissions.json` used by Graph Explorer lags it — `User.ReadUpdate.All` went GA for
+`PATCH /users/{id}` in July 2026 and is still absent from that snapshot.
+
+Two things the generated permission tables do **not** capture, which were supplied by hand from the
+prose on the same page:
+
+- **Property-level requirements.** `accountEnabled` needs
+  `User.EnableDisableAccount.All` **+** `User.Read.All`, and `signInActivity` on `user` needs
+  `AuditLog.Read.All`. Neither appears in the resource's permission table.
+- **Provider-scoped tables.** `/roleManagement/*` pages carry one table per RBAC provider. Only the
+  *directory (Microsoft Entra ID)* provider applies here; the entitlement-management table is a
+  different API surface that happens to share the page.
+
+### Deliberate deviations
+
+These are documented least-privileged options that the module intentionally does **not** accept.
+Each is a judgment call, not an oversight:
+
+| Endpoint | Documented least privileged | Why it is not offered |
+|---|---|---|
+| `GET /groups` | `Group-NestingSupport.ReadWrite.All` | A **write** scope classified as least privileged for a read. Offering it in a read-only cmdlet would contradict the module's least-privilege story; `Group.Read.All` and `GroupMember.Read.All` are accepted instead. |
+| `GET /users/{id}/transitiveMemberOf` | `User.Read` | Grants the signed-in user's *own* profile only. `Get-GkUserAccessReport` reads arbitrary users, so `User.Read` cannot serve it. |
+| `GET /roleManagement/directory/role{Assignment,Eligibility}ScheduleInstances` | `Role{Assignment,Eligibility}Schedule.Read.Directory` | These PIM reads are **optional** in `Get-GkAdminRoleAssignment` — it warns and continues when they fail. A caller holding only these scopes could not perform the cmdlet's required calls, so accepting them alone would trade a clear pre-flight error for a confusing partial result. |
+| `POST /roleManagement/directory/role{Assignment,Eligibility}ScheduleRequests` | `Role{Assignment,Eligibility}Schedule.ReadWrite.Directory` | Same reasoning for `Remove-GkAdminRoleAssignment`: `RoleManagement.ReadWrite.Directory` covers every path it can take. |
+
+### Re-running the audit
+
+The scope table below is generated from `$script:GkScopeMap` and the extracted call inventory. It is
+pinned by `tests/Unit/ScopeMap.Tests.ps1`, so an accidental edit fails the suite. When Microsoft
+changes a permission, update the map, re-run the tests, and regenerate this table.
+
+### The table
+
+| Cmdlet | Graph calls | Capability groups (any one scope per group) |
+|---|---|---|
+| `Add-GkGroupMember` | `POST /groups/{id}/members/$ref` | **manage group membership**: `GroupMember.ReadWrite.All`, `Group.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Connect-GkGraph` | _(no direct Graph call)_ | _(none — validates the session only)_ |
+| `Disable-GkStaleDevice` | `DELETE /devices/{id}`<br>`PATCH /devices/{id}` | **disable or delete a device**: `Directory.AccessAsUser.All`, `Device.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Disable-GkStaleUser` | `PATCH /users/{id}` | **block user sign-in (accountEnabled)**: `User.EnableDisableAccount.All`, `User.ReadUpdate.All`, `User.ReadWrite.All`, `Directory.ReadWrite.All`<br>**read the target user**: `User.Read.All`, `User.ReadUpdate.All`, `User.ReadWrite.All`, `Directory.Read.All`, `Directory.ReadWrite.All` |
+| `Export-GkTenantAssessment` | _(no direct Graph call)_ | _(none — validates the session only)_ |
+| `Get-GkAdministrativeUnit` | `GET /directory/administrativeUnits/{id}/members`<br>`GET /directory/administrativeUnits` | **read administrative units**: `AdministrativeUnit.Read.All`, `Directory.Read.All` |
+| `Get-GkAdminRoleAssignment` | `GET /roleManagement/directory/roleAssignments`<br>`GET /roleManagement/directory/roleAssignmentScheduleInstances`<br>`GET /roleManagement/directory/roleDefinitions/{id}`<br>`GET /roleManagement/directory/roleDefinitions`<br>`GET /roleManagement/directory/roleEligibilityScheduleInstances` | **read role assignments and PIM schedules**: `RoleManagement.Read.Directory`, `RoleManagement.Read.All`, `Directory.Read.All` |
+| `Get-GkAppRegistrationReport` | `GET /applications`<br>`GET /servicePrincipals({id})` | **read app registrations**: `Application.Read.All`, `Directory.Read.All` |
+| `Get-GkAuthMethodPolicy` | `GET /policies/authenticationMethodsPolicy` | **read the authentication methods policy**: `Policy.Read.AuthenticationMethod`, `Policy.Read.All` |
+| `Get-GkAuthStrengthPolicy` | `GET /policies/authenticationStrengthPolicies` | **read authentication strength policies**: `Policy.Read.AuthenticationMethod`, `Policy.Read.All` |
+| `Get-GkCaPolicyReport` | `GET /identity/conditionalAccess/policies` | **read Conditional Access policies**: `Policy.Read.All` |
+| `Get-GkConditionalAccessTemplate` | `GET /identity/conditionalAccess/templates` | **read Conditional Access templates**: `Policy.Read.All` |
+| `Get-GkConnectionInfo` | _(no direct Graph call)_ | _(none — validates the session only)_ |
+| `Get-GkConsentRequest` | `GET /identityGovernance/appConsent/appConsentRequests` | **read admin-consent requests**: `ConsentRequest.Read.All` |
+| `Get-GkCrossTenantAccess` | `GET /policies/crossTenantAccessPolicy/default`<br>`GET /policies/crossTenantAccessPolicy/partners` | **read cross-tenant access policy**: `Policy.Read.All` |
+| `Get-GkCustomRole` | `GET /roleManagement/directory/roleDefinitions` | **read role definitions**: `RoleManagement.Read.Directory`, `Directory.Read.All` |
+| `Get-GkDeviceInventory` | `GET /devices` | **read devices**: `Device.Read.All`, `Directory.Read.All` |
+| `Get-GkDirectoryAudit` | `GET /auditLogs/directoryAudits` | **read directory audit logs**: `AuditLog.Read.All` |
+| `Get-GkDomain` | `GET /domains` | **read domains**: `Domain.Read.All`, `Directory.Read.All` |
+| `Get-GkExternalCollaborationSetting` | `GET /policies/authorizationPolicy` | **read the authorization policy**: `Policy.Read.All` |
+| `Get-GkGroupExpirationPolicy` | `GET /groupLifecyclePolicies` | **read group lifecycle policies**: `Directory.Read.All` |
+| `Get-GkGroupReport` | `GET /groups/{id}/members`<br>`GET /groups` | **read groups**: `Group.Read.All`, `Directory.Read.All`, `GroupMember.Read.All`<br>**read group members and owners**: `GroupMember.Read.All`, `Group.Read.All`, `Directory.Read.All` |
+| `Get-GkGuestInventory` | `GET /users/{id}/sponsors`<br>`GET /users` | **read guest users and sponsors**: `User.Read.All`, `Directory.Read.All` |
+| `Get-GkInactiveApp` | `GET /reports/servicePrincipalSignInActivities`<br>`GET /servicePrincipals` | **read service principal sign-in activity**: `AuditLog.Read.All`<br>**read service principals**: `Application.Read.All`, `Directory.Read.All` |
+| `Get-GkLegacyAuthSignIn` | `GET /auditLogs/signIns` | **read sign-in logs**: `AuditLog.Read.All` |
+| `Get-GkLicenseAssignmentError` | `GET /subscribedSkus`<br>`GET /users` | **read users**: `User.Read.All`, `Directory.Read.All`<br>**read subscribed SKUs**: `Organization.Read.All`, `LicenseAssignment.Read.All`, `Directory.Read.All` |
+| `Get-GkLicenseOverview` | `GET /subscribedSkus`<br>`GET /users` | **read subscribed SKUs**: `Organization.Read.All`, `LicenseAssignment.Read.All`, `Directory.Read.All`<br>**enumerate users per SKU**: `User.Read.All`, `Directory.Read.All` |
+| `Get-GkNamedLocation` | `GET /identity/conditionalAccess/namedLocations` | **read named locations**: `Policy.Read.All` |
+| `Get-GkPrivilegedRoleMember` | _(no direct Graph call)_ | **read role assignments**: `RoleManagement.Read.All`, `RoleManagement.Read.Directory` |
+| `Get-GkRiskDetection` | `GET /identityProtection/riskDetections` | **read risk detections**: `IdentityRiskEvent.Read.All` |
+| `Get-GkRiskyUser` | `GET /identityProtection/riskyUsers` | **read risky users**: `IdentityRiskyUser.Read.All` |
+| `Get-GkRoleAssignableGroup` | `GET /groups/{id}/owners`<br>`GET /groups` | **read groups and owners**: `GroupMember.Read.All`, `Group.Read.All`, `Directory.Read.All` |
+| `Get-GkSecureScore` | `GET /security/secureScores` | **read Secure Score**: `SecurityEvents.Read.All` |
+| `Get-GkServicePrincipalReport` | `GET /oauth2PermissionGrants`<br>`GET /servicePrincipals` | **read service principals (and consent grants)**: `Application.Read.All`, `Directory.Read.All` |
+| `Get-GkSignInReport` | `GET /auditLogs/signIns` | **read sign-in logs**: `AuditLog.Read.All` |
+| `Get-GkStaleAppCredential` | `GET /reports/appCredentialSignInActivities`<br>`GET /servicePrincipals` | **read app credential sign-in activity**: `AuditLog.Read.All`<br>**read service principals**: `Application.Read.All`, `Directory.Read.All` |
+| `Get-GkStaleUser` | `GET /users` | **read user objects**: `User.Read.All`, `Directory.Read.All`<br>**read signInActivity**: `AuditLog.Read.All` |
+| `Get-GkSubscription` | `GET /directory/subscriptions` | **read directory subscriptions**: `Organization.Read.All`, `Directory.Read.All` |
+| `Get-GkTenantInfo` | `GET /organization` | **read organization info**: `Organization.Read.All`, `Directory.Read.All` |
+| `Get-GkUserAccessReport` _(delegated-only)_ | `GET /users/{id}/appRoleAssignments`<br>`GET /users/{id}/licenseDetails`<br>`GET /users/{id}/transitiveMemberOf`<br>`GET /users/{id}` | **read group and role memberships**: `User.Read.All`, `GroupMember.Read.All`, `Directory.Read.All`<br>**read app role assignments**: `Directory.Read.All`, `AppRoleAssignment.ReadWrite.All`<br>**read license details**: `LicenseAssignment.Read.All`, `User.Read.All`, `Directory.Read.All` |
+| `Get-GkUserMfaStatus` | `GET /reports/authenticationMethods/userRegistrationDetails` | **read authentication method registration report**: `AuditLog.Read.All` |
+| `New-GkGuestInvitation` | `POST /invitations` | **invite guests**: `User.Invite.All`, `User.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Remove-GkAdminRoleAssignment` | `DELETE /roleManagement/directory/roleAssignments/{id}`<br>`POST /roleManagement/directory/roleAssignmentScheduleRequests`<br>`POST /roleManagement/directory/roleEligibilityScheduleRequests` | **remove role assignments (active and PIM)**: `RoleManagement.ReadWrite.Directory` |
+| `Remove-GkConsentGrant` | `DELETE /oauth2PermissionGrants/{id}` | **revoke delegated consent grants**: `DelegatedPermissionGrant.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Remove-GkGroupMember` | `DELETE /groups/{id}/members/{id}/$ref` | **manage group membership**: `GroupMember.ReadWrite.All`, `Group.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Remove-GkStaleGuest` | `DELETE /users/{id}`<br>`GET /users/{id}`<br>`PATCH /users/{id}` | **disable a guest (accountEnabled)**: `User.EnableDisableAccount.All`, `User.ReadUpdate.All`, `User.ReadWrite.All`, `Directory.ReadWrite.All`<br>**read the target user (guest-type check)**: `User.Read.All`, `User.ReadUpdate.All`, `User.ReadWrite.All`, `Directory.Read.All`, `Directory.ReadWrite.All` |
+| `Remove-GkStaleGuest:Delete` | `DELETE /users/{id}`<br>`GET /users/{id}`<br>`PATCH /users/{id}` | **delete a user (30-day soft-delete)**: `User.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Remove-GkUserLicense` | `POST /users/{id}/assignLicense` | **remove license assignments**: `LicenseAssignment.ReadWrite.All`, `User.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Reset-GkAppCredential` | `POST /applications/{id}/addPassword`<br>`POST /applications/{id}/removePassword` | **manage application secrets**: `Application.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Revoke-GkUserSession` | `POST /users/{id}/revokeSignInSessions` | **revoke sign-in sessions**: `User.RevokeSessions.All`, `User.ReadWrite.All`, `Directory.ReadWrite.All` |
+| `Set-GkGroupOwner` | `POST /groups/{id}/owners/$ref` | **add a group owner**: `Group.ReadWrite.All`, `Directory.ReadWrite.All` |
+

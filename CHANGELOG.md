@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Full scope audit: every cmdlet's declared scopes reconciled against Microsoft's permission tables
+for every Graph call it makes — 70 calls across 59 endpoints. No cmdlet behavior changes.
+
+### Fixed
+- `Get-GkCustomRole` accepted `RoleManagement.Read.All`, which the directory provider's table for
+  `GET /roleManagement/directory/roleDefinitions` does not list. A session holding only that scope
+  passed the pre-flight check and then took a 403 from Graph.
+- `Get-GkRoleAssignableGroup` rejected `GroupMember.Read.All`, the documented least-privileged scope
+  for reading group owners and a valid scope for listing groups — it serves both of the cmdlet's
+  calls on its own.
+- `Get-GkGroupReport` rejected `GroupMember.Read.All` for its group-list call.
+- `Get-GkAdminRoleAssignment` rejected `Directory.Read.All`, which the directory provider documents
+  for both the role-assignment and role-definition reads.
+
+### Added
+- `DESIGN.md` section 7: the verified scope model for the whole surface — per-cmdlet Graph calls and
+  capability groups, the method used to verify them, and the deliberate deviations from Microsoft's
+  least-privileged recommendation (with the reason for each).
+- `tests/Unit/ScopeMap.Tests.ps1`: pins the scope map so a Graph permission change or a hand edit
+  surfaces as a failing test rather than a 403 in a customer tenant.
+- `build/scope-audit/`: the tooling to re-run the audit, and a README on how to read its output and
+  where it is known to be wrong.
+
 ## [0.3.6] - 2026-08-07
 
 Scope-map corrections from a review of the module's Graph surface against Microsoft's API changes,
