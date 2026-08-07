@@ -4,6 +4,13 @@ on:
   push:
     tags: [ 'v*' ]
 
+# A tag push has been observed firing this workflow twice seconds apart (seen on v0.3.7). The
+# first run publishes; the second takes a 409 "version already exists" and reports failure, which
+# leaves a red cross on a release that actually succeeded. One run per tag, and let it finish.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     name: Publish

@@ -1,6 +1,6 @@
 @{
     RootModule        = 'PSGraphKit.psm1'
-    ModuleVersion     = '0.3.7'
+    ModuleVersion     = '0.4.0'
     GUID              = 'b4e2f1a7-9c3d-4e6b-8a1f-2d5c7e9b0a44'
     Author            = 'Martin Welen'
     CompanyName       = 'Welen'

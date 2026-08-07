@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-08
+
 Seven read-only cmdlets, taking the module to 57. Every endpoint was verified against Microsoft
 Learn before implementation and reconciled by `build/scope-audit` afterwards; the whole surface —
 all 53 cmdlets that call Graph — now declares only scopes Graph accepts.
@@ -40,6 +42,9 @@ all 53 cmdlets that call Graph — now declares only scopes Graph accepts.
   silently empty endpoint instead of an explicit unresolved marker.
 - `Merge-GkCallInventory.ps1` replaces the ad-hoc merge step: the hand-verified supplement now wins
   per cmdlet, and anything unresolved without a supplement entry is reported as a gap.
+- The publish workflow takes a concurrency group. A tag push was seen firing it twice seconds apart
+  on v0.3.7; the second run took a 409 "version already exists" and reported failure, leaving a red
+  cross on a release that had in fact published correctly.
 
 ## [0.3.7] - 2026-08-07
 
@@ -320,7 +325,8 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.3.7...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.4.0
 [0.3.7]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.7
 [0.3.6]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.6
 [0.3.5]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.5
