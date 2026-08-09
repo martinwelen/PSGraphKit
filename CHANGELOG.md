@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Four cmdlets that touch authentication or return secrets, held back from 0.4.0 so they could be
+designed rather than batched. 61 cmdlets total. Every endpoint was verified against Microsoft Learn
+and reconciled by `build/scope-audit`; the whole surface still declares only scopes Graph accepts.
+
+### Added
+- `Reset-GkUserPassword` — reset a password, forcing a change at next sign-in by default. A strong
+  password is generated per user with the cryptographic RNG, so a bulk reset never hands two
+  accounts the same credential. Takes `-NewPassword` as a `SecureString` when you supply your own.
+- `New-GkTemporaryAccessPass` — issue a time-boxed passcode that satisfies MFA once, for onboarding
+  someone to a passkey or recovering an account with no working method. Single-use and one hour by
+  default; `-Reusable` opts out.
+- `Get-GkLapsPassword` — retrieve a device's Windows LAPS local administrator password, or list
+  which devices have credentials at all. Graph splits these across two permissions and so does the
+  cmdlet: listing needs only `DeviceLocalCredential.ReadBasic.All` and returns no password.
+- `Restore-GkDeletedObject` — restore a soft-deleted directory object. The write counterpart to
+  `Get-GkDeletedItem`, and the recovery path for anything the module's delete paths removed by
+  mistake. Accepts `Get-GkDeletedItem` output directly, including its object type.
+
+### Notes on secret handling
+Secrets follow the convention `Reset-GkAppCredential` established: the value rides on the result
+object so it can be captured deliberately, and the default view omits it so it never lands in a
+screenshot or transcript. A test pins that for every secret-bearing type.
+
+`New-GkTemporaryAccessPass` rejects the read-only permissions Graph lists as least privileged for
+its endpoint — a pass is created, not read — and `Get-GkLapsPassword` rejects the basic scope when
+retrieving a password. Both are pinned as explicit exclusions.
+
+`Reset-GkUserPassword` does **not** accept `User.ReadUpdate.All`, which the endpoint's table lists,
+because the same page names `User-PasswordProfile.ReadWrite.All` as least privileged for the
+`passwordProfile` property specifically and does not say whether the generic permission carries it.
+Resolved conservatively and recorded as an open question in DESIGN.md section 7.
+
 ## [0.4.0] - 2026-08-08
 
 Seven read-only cmdlets, taking the module to 57. Every endpoint was verified against Microsoft

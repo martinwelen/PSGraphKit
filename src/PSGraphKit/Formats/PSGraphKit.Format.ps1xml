@@ -1066,5 +1066,80 @@
         </TableColumnItems></TableRowEntry></TableRowEntries>
       </TableControl>
     </View>
+    <View>
+      <Name>PSGraphKit.PasswordResetResult</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.PasswordResetResult</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserId</Label><Width>36</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>MustChange</Label><Width>11</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>UserId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ForceChangeNextSignIn</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.TemporaryAccessPassResult</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.TemporaryAccessPassResult</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>UserId</Label><Width>32</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>9</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Minutes</Label><Width>8</Width><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>OneTime</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Expires</Label><Width>20</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>UserId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>LifetimeInMinutes</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsUsableOnce</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.ExpiresDateTime) { $_.ExpiresDateTime.ToString('yyyy-MM-dd HH:mm') }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.LapsCredential</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.LapsCredential</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DeviceName</Label><Width>28</Width></TableColumnHeader>
+          <TableColumnHeader><Label>AccountName</Label><Width>20</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Current</Label><Width>8</Width></TableColumnHeader>
+          <TableColumnHeader><Label>LastBackup</Label><Width>20</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DeviceName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>AccountName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsCurrent</PropertyName></TableColumnItem>
+          <TableColumnItem><ScriptBlock>if ($_.LastBackupDateTime) { $_.LastBackupDateTime.ToString('yyyy-MM-dd HH:mm') }</ScriptBlock></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>PSGraphKit.RestoreResult</Name>
+      <ViewSelectedBy><TypeName>PSGraphKit.RestoreResult</TypeName></ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>DisplayName</Label><Width>30</Width></TableColumnHeader>
+          <TableColumnHeader><Label>ObjectType</Label><Width>18</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Outcome</Label><Width>10</Width></TableColumnHeader>
+          <TableColumnHeader><Label>Id</Label><Width>38</Width></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>DisplayName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ObjectType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Outcome</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Id</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>

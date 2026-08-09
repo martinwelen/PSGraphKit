@@ -32,6 +32,7 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkGroupReport](Get-GkGroupReport.md) | Report groups with their type (Microsoft 365 / security / distribution / dynamic), membership count, owners, and an ownerless flag. |
 | [Get-GkGuestInventory](Get-GkGuestInventory.md) | Inventory guest (external) accounts with their sponsor, invitation state, last sign-in, and inactivity/age in days. |
 | [Get-GkInactiveApp](Get-GkInactiveApp.md) | Report enterprise apps / service principals with no recent sign-in activity (decommission candidates). |
+| [Get-GkLapsPassword](Get-GkLapsPassword.md) | Retrieve the Windows LAPS local administrator password for a device. |
 | [Get-GkLegacyAuthSignIn](Get-GkLegacyAuthSignIn.md) | Report sign-ins that used legacy authentication clients — a prime attack vector. |
 | [Get-GkLicenseAssignmentError](Get-GkLicenseAssignmentError.md) | Report users whose license assignments are in an error state. |
 | [Get-GkLicenseOverview](Get-GkLicenseOverview.md) | Report subscribed license SKUs with enabled/assigned/available counts, and optionally the number of disabled-but-licensed users per SKU. |
@@ -54,11 +55,14 @@ Do not edit these files by hand — edit the function help and regenerate.
 | [Get-GkUserAuthMethod](Get-GkUserAuthMethod.md) | List the authentication methods registered on a user's account. |
 | [Get-GkUserMfaStatus](Get-GkUserMfaStatus.md) | Report per-user authentication-method registration and MFA capability from the authentication methods registration report. |
 | [New-GkGuestInvitation](New-GkGuestInvitation.md) | Invite one or more external users as B2B guests. |
+| [New-GkTemporaryAccessPass](New-GkTemporaryAccessPass.md) | Issue a Temporary Access Pass so a user can register a strong credential. |
 | [Remove-GkAdminRoleAssignment](Remove-GkAdminRoleAssignment.md) | Remove a directory role assignment — direct active, PIM-eligible, or PIM active. |
 | [Remove-GkConsentGrant](Remove-GkConsentGrant.md) | Revoke a delegated OAuth2 permission grant (consent). |
 | [Remove-GkGroupMember](Remove-GkGroupMember.md) | Remove a member from one or more groups. |
 | [Remove-GkStaleGuest](Remove-GkStaleGuest.md) | Disable (default) or delete stale guest accounts, with a guest-type safety check. |
 | [Remove-GkUserLicense](Remove-GkUserLicense.md) | Remove one or more license SKUs from users, reclaiming the seats. |
 | [Reset-GkAppCredential](Reset-GkAppCredential.md) | Add or remove an app registration's client secret. |
+| [Reset-GkUserPassword](Reset-GkUserPassword.md) | Reset a user's password, optionally forcing a change at next sign-in. |
+| [Restore-GkDeletedObject](Restore-GkDeletedObject.md) | Restore a soft-deleted directory object from the 30-day recycle window. |
 | [Revoke-GkUserSession](Revoke-GkUserSession.md) | Revoke the active sign-in sessions (refresh tokens) of one or more users, forcing re-authentication. |
 | [Set-GkGroupOwner](Set-GkGroupOwner.md) | Add an owner to one or more groups (e.g. to remediate ownerless groups). |

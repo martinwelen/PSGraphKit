@@ -90,23 +90,22 @@ implementation and reconciled by `build/scope-audit` afterwards.
 | `Get-GkServiceMessage` | `GET /admin/serviceAnnouncement/messages` | ServiceMessage.Read.All |
 | `Get-GkGroupBasedLicense` | `GET /groups?$select=assignedLicenses,licenseProcessingState` | Group.Read.All |
 
-## v0.4.1 — write / sensitive reads (idea)
+## Phase 7 — write / sensitive reads (shipped, v0.4.1)
 
-Deliberately held back from v0.4.0: all four touch authentication or return secrets, and want
-design attention rather than a place in a batch.
+Held back from v0.4.0 so they could be designed rather than batched: all four touch authentication
+or return secrets.
 
-| Cmdlet | Endpoint | Scope | Channel |
-|--------|----------|-------|---------|
-| `New-GkTemporaryAccessPass` (write) | `POST /users/{id}/authentication/temporaryAccessPassMethods` | UserAuthenticationMethod.ReadWrite.All | v1.0 |
-| `Reset-GkUserPassword` (write) | `PATCH /users/{id}` (passwordProfile) | User-PasswordProfile.ReadWrite.All | v1.0 |
-| `Get-GkLapsPassword` | `GET /directory/deviceLocalCredentials/{deviceId}` | DeviceLocalCredential.Read.All (+ Device.Read.All) | v1.0 |
-| `Restore-GkDeletedObject` (write) | `POST /directory/deletedItems/{id}/restore` | per type, as `Get-GkDeletedItem` | v1.0 |
+| Cmdlet | Endpoint | Least-privileged scope |
+|--------|----------|------------------------|
+| `Reset-GkUserPassword` (write) | `PATCH /users/{id}` (passwordProfile) | User-PasswordProfile.ReadWrite.All |
+| `New-GkTemporaryAccessPass` (write) | `POST /users/{id}/authentication/temporaryAccessPassMethods` | UserAuthMethod-TAP.ReadWrite.All |
+| `Get-GkLapsPassword` | `GET /directory/deviceLocalCredentials/{deviceId}` | DeviceLocalCredential.Read.All (list: ReadBasic.All) |
+| `Restore-GkDeletedObject` (write) | `POST /directory/deletedItems/{id}/restore` | per type, validated by `-Variant` |
 
-Notes: `Get-GkLapsPassword` and `New-GkTemporaryAccessPass` return clear-text secrets and need a
-masking decision before implementation (a `-AsPlainText` switch, or `SecureString` by default).
-`Reset-GkUserPassword` should use the narrow `User-PasswordProfile.ReadWrite.All` documented for the
-`passwordProfile` property, not the blanket `User.ReadWrite.All`. `Restore-GkDeletedObject` is the
-write counterpart to the shipped `Get-GkDeletedItem`.
+The masking question resolved to the convention `Reset-GkAppCredential` already set: the secret
+rides on the result object, and the default view omits it. No `SecureString` on output — it is not
+meaningfully protective on PowerShell 7 — but `-NewPassword` takes one on input, which is the
+conventional shape for a credential the caller already holds.
 
 ## Connection UX / error DX (shipped, except auto-connect)
 

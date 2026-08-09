@@ -137,6 +137,7 @@ you — no need to look up which scope goes with which cmdlet.
 | `Get-GkServiceHealth` | Microsoft 365 service health, with the open incidents behind it. |
 | `Get-GkServiceMessage` | Message center posts, filterable by action deadline. |
 | `Get-GkGroupBasedLicense` | Groups that assign licences, and whether assignment has finished. |
+| `Get-GkLapsPassword` | Windows LAPS local administrator password for a device (or which devices have one). |
 
 **Remediation (write — `-WhatIf`/`-Confirm`)**
 
@@ -150,6 +151,9 @@ you — no need to look up which scope goes with which cmdlet.
 | `Disable-GkStaleDevice` | Disable (default) or delete a device. |
 | `Reset-GkAppCredential` | Add or remove an app registration client secret. |
 | `Remove-GkAdminRoleAssignment` | Remove an active or PIM role assignment. |
+| `Reset-GkUserPassword` | Reset a password, forcing a change at next sign-in by default. |
+| `New-GkTemporaryAccessPass` | Issue a time-boxed passcode that satisfies MFA once. |
+| `Restore-GkDeletedObject` | Restore a soft-deleted user, group, app or administrative unit. |
 
 **Deliverable**
 

@@ -49,6 +49,16 @@ foreach ($t in $deletedItemPerms.Keys) {
     }
 }
 
+# POST /directory/deletedItems/{id}/restore uses the same per-resource-type matrix. The union of
+# every restorable type is what the cmdlet's base entry may legitimately offer; the per-type
+# variants are checked against their own row. Read manually from directory-deleteditems-restore.md.
+$perms['POST /directory/deletedItems/{id}/restore'] = [pscustomobject]@{
+    All   = @('User.DeleteRestore.All', 'User.ReadWrite.All', 'Group.ReadWrite.All',
+              'Application.ReadWrite.All', 'AdministrativeUnit.ReadWrite.All', 'Directory.ReadWrite.All')
+    Least = @('User.DeleteRestore.All')
+    Doc   = 'directory-deleteditems-restore.md (resource-type matrix, read manually)'
+}
+
 # POST /groups/{id}/members/$ref uses a per-resource-type matrix rather than a least/higher table.
 # For adding a user (what Add-GkGroupMember does) the documented least privileged permission is
 # GroupMember.ReadWrite.All; the broader group/directory write scopes also serve it.

@@ -91,6 +91,12 @@ InModuleScope PSGraphKit {
             @{ Cmdlet = 'Get-GkServiceHealth';          Group = 'read service health';                  Expected = 'ServiceHealth.Read.All' }
             @{ Cmdlet = 'Get-GkServiceMessage';         Group = 'read message center posts';            Expected = 'ServiceMessage.Read.All' }
             @{ Cmdlet = 'Get-GkGroupBasedLicense:ResolveSkuName'; Group = 'resolve SKU names from subscribedSkus'; Expected = 'LicenseAssignment.Read.All,Organization.Read.All,Directory.Read.All' }
+            @{ Cmdlet = 'Reset-GkUserPassword';        Group = "reset a user's password";              Expected = 'User-PasswordProfile.ReadWrite.All,User.ReadWrite.All,Directory.ReadWrite.All' }
+            @{ Cmdlet = 'New-GkTemporaryAccessPass';   Group = 'issue a Temporary Access Pass';        Expected = 'UserAuthMethod-TAP.ReadWrite.All,UserAuthenticationMethod.ReadWrite.All' }
+            @{ Cmdlet = 'Get-GkLapsPassword';          Group = 'list devices with LAPS credentials';   Expected = 'DeviceLocalCredential.ReadBasic.All,DeviceLocalCredential.Read.All' }
+            @{ Cmdlet = 'Get-GkLapsPassword:Password'; Group = 'retrieve a LAPS password';             Expected = 'DeviceLocalCredential.Read.All' }
+            @{ Cmdlet = 'Restore-GkDeletedObject:User';  Group = 'restore a deleted user';             Expected = 'User.DeleteRestore.All,User.ReadWrite.All,Directory.ReadWrite.All' }
+            @{ Cmdlet = 'Restore-GkDeletedObject:Group'; Group = 'restore a deleted group';            Expected = 'Group.ReadWrite.All,Directory.ReadWrite.All' }
         )
 
         It '<Cmdlet> / <Group>' -TestCases $cases {
@@ -127,6 +133,24 @@ InModuleScope PSGraphKit {
         It 'does not accept UserAuthenticationMethod.Read for Get-GkUserAuthMethod' {
             # Same trap: the non-.All scope grants only the signed-in user's own methods.
             @($script:GkScopeMap['Get-GkUserAuthMethod'].Groups.Any) | Should -Not -Contain 'UserAuthenticationMethod.Read'
+        }
+
+        It 'does not accept a read-only or own-profile scope for New-GkTemporaryAccessPass' {
+            # Graph lists UserAuthMethod-TAP.Read as least privileged, but a TAP is created, not
+            # read, and the non-.All scopes cover only the signed-in user.
+            $any = @($script:GkScopeMap['New-GkTemporaryAccessPass'].Groups.Any)
+            foreach ($s in 'UserAuthMethod-TAP.Read', 'UserAuthMethod-TAP.ReadWrite',
+                           'UserAuthenticationMethod.Read', 'UserAuthenticationMethod.Read.All',
+                           'UserAuthenticationMethod.ReadWrite') {
+                $any | Should -Not -Contain $s
+            }
+        }
+
+        It 'does not accept the basic LAPS scope for retrieving a password' {
+            # DeviceLocalCredential.ReadBasic.All is enough to list devices, but Graph excludes the
+            # credentials property from that response — accepting it would 403 on retrieval.
+            @($script:GkScopeMap['Get-GkLapsPassword:Password'].Groups.Any) |
+                Should -Not -Contain 'DeviceLocalCredential.ReadBasic.All'
         }
     }
 }

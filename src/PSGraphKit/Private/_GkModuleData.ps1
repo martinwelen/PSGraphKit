@@ -318,6 +318,77 @@ $script:GkScopeMap = @{
         RoleHints     = @('Global Reader', 'Directory Readers')
     }
 
+    # Graph documents User-PasswordProfile.ReadWrite.All as the least-privileged permission for the
+    # passwordProfile property specifically — narrower than the blanket user write scopes.
+    'Reset-GkUserPassword' = @{
+        Groups = @(
+            @{ For = "reset a user's password"; Any = @('User-PasswordProfile.ReadWrite.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
+    }
+
+    # The read-only and non-.All permissions Graph lists for this endpoint cannot serve it: a TAP
+    # is created, not read, and the non-.All scopes cover only the signed-in user's own methods.
+    'New-GkTemporaryAccessPass' = @{
+        Groups = @(
+            @{ For = 'issue a Temporary Access Pass'; Any = @('UserAuthMethod-TAP.ReadWrite.All', 'UserAuthenticationMethod.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Authentication Administrator', 'Privileged Authentication Administrator')
+    }
+
+    # Listing which devices hold LAPS credentials needs only ReadBasic; the list endpoint excludes
+    # passwords by design. Retrieving one needs the full read, so it is a separate entry.
+    'Get-GkLapsPassword' = @{
+        Groups = @(
+            @{ For = 'list devices with LAPS credentials'; Any = @('DeviceLocalCredential.ReadBasic.All', 'DeviceLocalCredential.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Cloud Device Administrator', 'Intune Administrator')
+    }
+    'Get-GkLapsPassword:Password' = @{
+        Groups = @(
+            @{ For = 'retrieve a LAPS password'; Any = @('DeviceLocalCredential.Read.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('Cloud Device Administrator', 'Intune Administrator')
+    }
+
+    # Restoring is a per-type permission, mirroring Get-GkDeletedItem's read side.
+    'Restore-GkDeletedObject' = @{
+        Groups = @(
+            @{ For = 'restore a deleted directory object'; Any = @('User.DeleteRestore.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All', 'AdministrativeUnit.ReadWrite.All', 'Directory.ReadWrite.All') }
+        )
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Groups Administrator', 'Application Administrator')
+    }
+    'Restore-GkDeletedObject:User' = @{
+        Groups = @(@{ For = 'restore a deleted user'; Any = @('User.DeleteRestore.All', 'User.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('User Administrator', 'Privileged Authentication Administrator')
+    }
+    'Restore-GkDeletedObject:Group' = @{
+        Groups = @(@{ For = 'restore a deleted group'; Any = @('Group.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Groups Administrator')
+    }
+    'Restore-GkDeletedObject:Application' = @{
+        Groups = @(@{ For = 'restore a deleted application'; Any = @('Application.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Application Administrator', 'Cloud Application Administrator')
+    }
+    'Restore-GkDeletedObject:ServicePrincipal' = @{
+        Groups = @(@{ For = 'restore a deleted service principal'; Any = @('Application.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Application Administrator', 'Cloud Application Administrator')
+    }
+    'Restore-GkDeletedObject:AdministrativeUnit' = @{
+        Groups = @(@{ For = 'restore a deleted administrative unit'; Any = @('AdministrativeUnit.ReadWrite.All', 'Directory.ReadWrite.All') })
+        DelegatedOnly = $false
+        RoleHints     = @('Privileged Role Administrator')
+    }
+
     'Get-GkGroupMember' = @{
         Groups = @(
             @{ For = 'read group members'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') }
