@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-08-09
+
 Four cmdlets that touch authentication or return secrets, held back from 0.4.0 so they could be
 designed rather than batched. 61 cmdlets total. Every endpoint was verified against Microsoft Learn
 and reconciled by `build/scope-audit`; the whole surface still declares only scopes Graph accepts.
@@ -357,7 +359,8 @@ against a live tenant. Dependency: Microsoft.Graph.Authentication only.
 - `Get-GkUserAccessReport` no longer requests `@odata.type` in the `transitiveMemberOf` `$select`
   (Graph rejects it; it is auto-included for derived types). (Found by live smoke test — Graph 400.)
 
-[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/martinwelen/PSGraphKit/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.4.1
 [0.4.0]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.4.0
 [0.3.7]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.7
 [0.3.6]: https://github.com/martinwelen/PSGraphKit/releases/tag/v0.3.6
