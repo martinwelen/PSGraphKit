@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `build/Invoke-GkWriteProtocol.ps1`: live validation for the write cmdlets against disposable
+  objects in a dev tenant. Each scenario runs the cmdlet with `-WhatIf` and asserts nothing changed,
+  runs it for real, then verifies the resulting **server state** by reading the object back through
+  `Invoke-MgGraphRequest` — deliberately bypassing the module, so the check does not depend on the
+  code under test. Teardown runs in a `finally`, and `-CleanOrphans` sweeps anything a crashed run
+  left behind.
+- `-ScopePlan` prints the least-privilege connect line per scenario. Connecting with exactly that
+  and running `-Only <scenario>` validates the scope map against Graph rather than against the
+  documentation — including the open `User.ReadUpdate.All` question in DESIGN.md section 7.
+- `docs/protocol-runs/`: committed run reports, so "we tested the writes" is a checkable claim.
+
+### Changed
+- `docs/TEST-PROTOCOL.md` documents the write lane as Layer 4 and adds it to the release gate for
+  any release that touches a write cmdlet. It also states plainly why this cannot run in CI —
+  a real tenant and interactive auth — so the gate is a referenced run, not an automatic check.
+
 ## [0.4.1] - 2026-08-09
 
 Four cmdlets that touch authentication or return secrets, held back from 0.4.0 so they could be

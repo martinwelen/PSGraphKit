@@ -121,16 +121,69 @@ protocol against the richest tenant you have access to for the widest live cover
 
 ---
 
-## Write cmdlets
+## Layer 4 — Live write validation
 
-Write cmdlets (`Disable-*`, `Remove-*`, `Set-*`, `Add-*`, `New-*`, `Revoke-*`, `Reset-*`) mutate state
-and take mandatory targets, and `-WhatIf` short-circuits before a result object is produced — so they
-are **not** part of the live protocol. Validate them by:
+`build/Invoke-GkWriteProtocol.ps1`
 
-1. Unit tests (all mock the seam and assert on the returned result object + the `ShouldProcess` call).
-2. A manual pass against **disposable** objects (a throwaway user/group/app) in a test tenant: run once
-   with `-WhatIf`, then for real, and confirm the returned `PSGraphKit.*Result` object is fully
-   populated and the change actually happened.
+Unit tests mock the HTTP seam, so they prove the module builds the right request. They cannot prove
+Graph *accepts* it, and they cannot see tenant preconditions — Temporary Access Pass enabled in the
+authentication methods policy, Windows LAPS deployed, the signed-in admin's role outranking the
+target. Those only fail in a real tenant.
+
+```powershell
+Connect-GkGraph -ForCommand Reset-GkUserPassword, New-GkTemporaryAccessPass, Restore-GkDeletedObject
+./build/Invoke-GkWriteProtocol.ps1
+```
+
+### The shape of every scenario
+
+1. Create a disposable object named `<Prefix>-<runstamp>-...`.
+2. Run the cmdlet with `-WhatIf` and assert **nothing changed**.
+3. Run it for real.
+4. **Verify server state, not the return code** — read the object back through
+   `Invoke-MgGraphRequest`, deliberately bypassing the module, and check the property actually
+   moved. A 2xx that changed nothing is exactly what this catches.
+5. Tear down in a `finally`, so a mid-run failure still cleans up.
+
+### Safety
+
+It resets passwords, issues MFA-satisfying credentials, and deletes objects. **Dev tenant only.**
+
+Every write is guarded: `Assert-GkDisposable` refuses to touch an object whose name does not carry
+the run prefix, so a scenario that loses track of what it created fails loudly instead of acting on
+a real object. `-CleanOrphans` sweeps anything left behind by a run that died before its teardown.
+
+### Scenarios
+
+| Scenario | What it proves |
+|---|---|
+| `ResetPassword` | `lastPasswordChangeDateTime` advanced on the server |
+| `TemporaryAccess` | the pass is registered on the account, and a **second** concurrent pass is rejected |
+| `DeleteRestore` | full round trip: delete → appears in `Get-GkDeletedItem` → restore → live again |
+| `DisableUser` | `accountEnabled` is `false` on the server |
+| `GroupMembership` | the member is added, resolves as `User`, and is removed again |
+| `GroupOwner` | the right principal owns the group |
+| `AppCredential` | the secret exists on the application, then does not |
+| `LapsRead` | the password decodes; **`SKIPPED` without `-LapsDeviceId`**, never a pass on no evidence |
+
+### The scope matrix
+
+This is the part that validates the scope map against Graph rather than against the documentation.
+
+```powershell
+./build/Invoke-GkWriteProtocol.ps1 -ScopePlan
+```
+
+prints the least-privilege connect line per scenario. Connect with exactly that, then run
+`-Only <scenario>`. Green means the declared scope is sufficient. A 403 means the map is too strict
+or too permissive, and you now know which.
+
+Graph's interactive auth replaces the whole session on each connect, so this cannot be swept
+automatically in one process — it is a deliberate pass, worked through one scenario at a time.
+
+The open question in DESIGN.md section 7 — whether `User.ReadUpdate.All` carries the
+`passwordProfile` property — is settled by connecting with only that scope and running
+`-Only ResetPassword`.
 
 ---
 
@@ -142,5 +195,15 @@ Before tagging `vX.Y.Z`:
 - [ ] Fidelity check reviewed — every single-item consumer's test mocks the seam.
 - [ ] `./build/Invoke-GkTestProtocol.ps1` against a real tenant — no `FAIL` / `HOLLOW` / `KEYFIELD` /
       `BADTYPE`; `EMPTY`/`WARN` understood.
+- [ ] **When the release touches a write cmdlet:** `./build/Invoke-GkWriteProtocol.ps1` against the
+      dev tenant — no `FAIL`; every `SKIPPED` understood. Commit the run report from
+      `docs/protocol-runs/` so the release names the evidence behind it.
 - [ ] `Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1` version bumped and matches the tag.
 - [ ] `CHANGELOG.md` updated.
+
+### Why this is not in CI
+
+The write protocol needs a real tenant and interactive delegated auth, neither of which exists in a
+GitHub Actions runner. So the gate is *"the release commit references an approved protocol run"*,
+not an automatic check. That is weaker than a true gate — and stated plainly here rather than
+implied — but it replaces an undocumented manual pass with a repeatable, reviewable artefact.
