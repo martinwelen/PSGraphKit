@@ -5,7 +5,7 @@
     Author            = 'Martin Welen'
     CompanyName       = 'Welen'
     Copyright         = '(c) 2026 Martin Welen. MIT License.'
-    Description       = 'Curated PowerShell cmdlets for everyday Entra ID / Microsoft Graph administration and reporting. A hand-built, admin-intention layer over the Microsoft Graph SDK. Phase 1: read-only reporting and inventory.'
+    Description       = 'Curated PowerShell cmdlets for everyday Entra ID / Microsoft Graph administration: reporting, inventory, and remediation. A hand-built, admin-intention layer over the Microsoft Graph SDK, with ShouldProcess support on every write cmdlet.'
 
     PowerShellVersion = '7.4'
 
