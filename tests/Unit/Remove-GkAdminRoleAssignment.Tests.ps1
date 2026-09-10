@@ -39,10 +39,13 @@ InModuleScope PSGraphKit {
         }
 
         It 'fails an Active removal that lacks an AssignmentId' {
-            $warnings = @()
             $r = Remove-GkAdminRoleAssignment -AssignmentKind Active -RoleName 'x' -Confirm:$false -WarningVariable warnings -WarningAction SilentlyContinue
             $r.Outcome | Should -Be 'Failed'
             $r.Error   | Should -Match 'AssignmentId'
+            # The result object carries the failure, but a bulk pipeline run is read on screen, so
+            # the warning is the part the operator actually sees. Pin it too.
+            $warnings | Should -Not -BeNullOrEmpty
+            "$warnings" | Should -Match 'AssignmentId'
         }
 
         It 'makes no call under -WhatIf' {

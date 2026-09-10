@@ -1,10 +1,19 @@
 # PSGraphKit — Design (Phase 2+)
 
-Status: **Planning.** Extends the Phase 1 baseline (`DESIGN.md`, v0.1.0) with write/remediation
-cmdlets (Phase 2), broader reports (Phase 3), and an assessment export (Phase 4). Every endpoint,
-scope, HTTP method, and request body below was verified against Microsoft Learn (URLs cited);
-nothing is invented. Constraints that change the approach are called out under **Notable
-constraints**.
+Status: **Shipped — kept as the design record.** Everything below was delivered in v0.2.0 and
+v0.3.0: the write/remediation cmdlets (Phase 2), the broader reports (Phase 3), and the assessment
+export (Phase 4). It is preserved because it documents *why* each endpoint, method and body was
+chosen, which the code cannot show; it is no longer a plan, and the build sequencing in section 7 is
+history rather than instruction.
+
+**For the current scope model, read `DESIGN.md` section 7, not this file.** The scopes named here
+were correct when written, but the whole surface was re-audited afterwards and the capability groups
+have since widened — notably to accept `ReadWrite` scopes wherever Graph treats them as covering the
+corresponding read. Where the two documents disagree, DESIGN.md wins and this one is out of date.
+
+Extends the Phase 1 baseline (`DESIGN.md`, v0.1.0). Every endpoint, scope, HTTP method, and request
+body below was verified against Microsoft Learn (URLs cited); nothing is invented. Constraints that
+change the approach are called out under **Notable constraints**.
 
 The dependency constraint holds: **Microsoft.Graph.Authentication only**. Exports use
 `Microsoft.PowerShell.Utility` (`ConvertTo-Html`, `Export-Csv`), which ships with PowerShell.

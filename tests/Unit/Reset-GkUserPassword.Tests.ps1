@@ -1,3 +1,11 @@
+# -NewPassword takes a SecureString, and a test has to build one from a literal to exercise it.
+# The rule exists to stop plaintext credentials reaching production code; a fixed, fake password in
+# a unit test is the case it does not mean. Suppressing beats rewriting the test into something that
+# no longer covers the parameter.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText', '',
+    Justification = 'A test-only literal used to construct the SecureString parameter under test.')]
+param()
+
 Import-Module (Join-Path $PSScriptRoot '..' '..' 'src' 'PSGraphKit' 'PSGraphKit.psd1') -Force
 
 InModuleScope PSGraphKit {

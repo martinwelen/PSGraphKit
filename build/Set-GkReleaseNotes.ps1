@@ -91,8 +91,12 @@ if ($PSCmdlet.ShouldProcess($ManifestPath, "Write ReleaseNotes for $version ($($
     # code page. Writing without one here would undo that for the one file most likely to be read.
     [System.IO.File]::WriteAllText($ManifestPath, $updated, (New-Object System.Text.UTF8Encoding $true))
 
-    $check = (Test-ModuleManifest -Path $ManifestPath).PrivateData.PSData.ReleaseNotes
-    if ($check -notlike "*$(($notes -split "`n")[0])*") {
+    # Import-PowerShellDataFile, not Test-ModuleManifest: the latter serves a cached result for a
+    # path it has already seen in this session, so it reports the PREVIOUS ReleaseNotes and the check
+    # fails on a write that actually succeeded. This parses the file as it now stands.
+    $check = (Import-PowerShellDataFile -Path $ManifestPath).PrivateData.PSData.ReleaseNotes
+    $firstLine = ($notes -split "`r?`n")[0]
+    if ($check -notlike "*$([System.Management.Automation.WildcardPattern]::Escape($firstLine))*") {
         throw "The manifest no longer reports the notes that were written; check $ManifestPath."
     }
     Write-Information "ReleaseNotes for $version written: $($notes.Length) characters." -InformationAction Continue
