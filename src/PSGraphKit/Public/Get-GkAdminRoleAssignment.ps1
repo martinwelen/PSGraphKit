@@ -1,4 +1,4 @@
-function Get-GkAdminRoleAssignment {
+﻿function Get-GkAdminRoleAssignment {
     <#
     .SYNOPSIS
         Report Entra directory role assignments — active, PIM-eligible, and PIM active/time-bound —

@@ -1,4 +1,4 @@
-function Get-GkGroupReport {
+﻿function Get-GkGroupReport {
     <#
     .SYNOPSIS
         Report groups with their type (Microsoft 365 / security / distribution / dynamic),

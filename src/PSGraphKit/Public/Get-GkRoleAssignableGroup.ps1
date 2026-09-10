@@ -1,4 +1,4 @@
-function Get-GkRoleAssignableGroup {
+﻿function Get-GkRoleAssignableGroup {
     <#
     .SYNOPSIS
         Report role-assignable ("privileged") groups and their owners, flagging ownerless ones.

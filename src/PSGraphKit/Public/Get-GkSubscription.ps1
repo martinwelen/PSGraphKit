@@ -1,4 +1,4 @@
-function Get-GkSubscription {
+﻿function Get-GkSubscription {
     <#
     .SYNOPSIS
         Report tenant subscriptions with their renewal/expiry date and status.

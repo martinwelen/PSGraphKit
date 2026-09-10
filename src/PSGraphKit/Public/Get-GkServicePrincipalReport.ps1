@@ -1,4 +1,4 @@
-function Get-GkServicePrincipalReport {
+﻿function Get-GkServicePrincipalReport {
     <#
     .SYNOPSIS
         Report service principals (enterprise apps) with type, state, and optionally their

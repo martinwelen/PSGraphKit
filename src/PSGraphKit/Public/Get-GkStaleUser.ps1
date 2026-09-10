@@ -1,4 +1,4 @@
-function Get-GkStaleUser {
+﻿function Get-GkStaleUser {
     <#
     .SYNOPSIS
         Report users with no sign-in activity for a threshold number of days, flagging disabled

@@ -1,4 +1,4 @@
-function Get-GkServiceHealth {
+﻿function Get-GkServiceHealth {
     <#
     .SYNOPSIS
         Report the current health of each Microsoft 365 service, with active incidents.

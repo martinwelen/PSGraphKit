@@ -1,4 +1,4 @@
-function Get-GkRoleDefinition {
+﻿function Get-GkRoleDefinition {
     <#
     .SYNOPSIS
         List directory role definitions — built-in and custom — with their permission counts.

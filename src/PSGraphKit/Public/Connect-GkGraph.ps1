@@ -1,4 +1,4 @@
-function Connect-GkGraph {
+﻿function Connect-GkGraph {
     <#
     .SYNOPSIS
         Connect to Microsoft Graph for PSGraphKit — a thin wrapper over Connect-MgGraph that can

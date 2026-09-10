@@ -1,4 +1,4 @@
-function Get-GkLapsPassword {
+﻿function Get-GkLapsPassword {
     <#
     .SYNOPSIS
         Retrieve the Windows LAPS local administrator password for a device.

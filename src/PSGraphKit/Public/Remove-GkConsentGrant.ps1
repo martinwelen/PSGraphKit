@@ -1,4 +1,4 @@
-function Remove-GkConsentGrant {
+﻿function Remove-GkConsentGrant {
     <#
     .SYNOPSIS
         Revoke a delegated OAuth2 permission grant (consent).

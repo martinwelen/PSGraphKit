@@ -1,4 +1,4 @@
-function Get-GkCurrentUserRole {
+﻿function Get-GkCurrentUserRole {
     <#
     .SYNOPSIS
         Return the signed-in admin's *active* directory role display names (delegated sessions),

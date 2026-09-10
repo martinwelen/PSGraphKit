@@ -1,4 +1,4 @@
-function Get-GkUserMfaStatus {
+﻿function Get-GkUserMfaStatus {
     <#
     .SYNOPSIS
         Report per-user authentication-method registration and MFA capability from the

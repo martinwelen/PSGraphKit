@@ -1,4 +1,4 @@
-#Requires -Version 7.4
+﻿#Requires -Version 7.4
 #Requires -Modules Microsoft.Graph.Authentication
 
 # Root loader: dot-source Private (helpers) then Public (exported cmdlets).

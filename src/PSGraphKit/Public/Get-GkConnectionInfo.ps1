@@ -1,4 +1,4 @@
-function Get-GkConnectionInfo {
+﻿function Get-GkConnectionInfo {
     <#
     .SYNOPSIS
         Show the current Microsoft Graph session: identity, auth type, granted scopes, and

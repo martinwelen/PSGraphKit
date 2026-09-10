@@ -1,4 +1,4 @@
-function Disable-GkStaleUser {
+﻿function Disable-GkStaleUser {
     <#
     .SYNOPSIS
         Block sign-in for one or more users by setting accountEnabled = false.

@@ -1,4 +1,4 @@
-function Get-GkRiskyUser {
+﻿function Get-GkRiskyUser {
     <#
     .SYNOPSIS
         Report users flagged by Microsoft Entra ID Protection with their risk level and state.

@@ -1,4 +1,4 @@
-function Get-GkAuthMethodPolicy {
+﻿function Get-GkAuthMethodPolicy {
     <#
     .SYNOPSIS
         Report the tenant authentication-methods policy: which methods are enabled or disabled.

@@ -1,4 +1,4 @@
-function ConvertTo-GkDateTime {
+﻿function ConvertTo-GkDateTime {
     <#
     .SYNOPSIS
         Convert a Graph ISO-8601 DateTimeOffset string to [datetime] (UTC), or $null.

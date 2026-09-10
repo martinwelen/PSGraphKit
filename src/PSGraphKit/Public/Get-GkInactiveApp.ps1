@@ -1,4 +1,4 @@
-function Get-GkInactiveApp {
+﻿function Get-GkInactiveApp {
     <#
     .SYNOPSIS
         Report enterprise apps / service principals with no recent sign-in activity (decommission

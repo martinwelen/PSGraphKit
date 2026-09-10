@@ -1,4 +1,4 @@
-function Get-GkCustomRole {
+﻿function Get-GkCustomRole {
     <#
     .SYNOPSIS
         Report custom (non-built-in) directory role definitions and their permissions.

@@ -3,6 +3,15 @@ name: Publish to PowerShell Gallery
 on:
   push:
     tags: [ 'v*' ]
+  # Runs the whole signing chain — OIDC login, Authenticode, catalog, verification, and a package
+  # build against a throwaway local repository — and stops before the Gallery. Turns "the signing
+  # pipeline should work" into something observed, without spending a version number to find out.
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Sign and verify, but do NOT publish to the Gallery'
+        type: boolean
+        default: true
 
 # A tag push has been observed firing this workflow twice seconds apart (seen on v0.3.7). The
 # first run publishes; the second takes a 409 "version already exists" and reports failure, which
@@ -39,13 +48,22 @@ jobs:
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
           Install-Module Microsoft.Graph.Authentication -MinimumVersion 2.10.0 -Force -Scope CurrentUser
 
+      # github.ref_name is a BRANCH name on workflow_dispatch, so this comparison is meaningless
+      # there and would fail every dry run. It stays mandatory for the path that actually publishes.
       - name: Verify manifest matches tag
+        if: github.event_name == 'push'
         shell: pwsh
         run: |
           $version = (Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1).Version.ToString()
           $tag = '${{ github.ref_name }}'.TrimStart('v')
           Write-Host "Manifest: $version   Tag: $tag"
           if ($version -ne $tag) { throw "Manifest version ($version) does not match tag ($tag)." }
+
+      - name: Report manifest version
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: |
+          Write-Host "Manifest version: $((Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1).Version)"
 
       # Every step that MODIFIES a file in ./src/PSGraphKit must run before signing. A signature
       # covers file content byte for byte, so a later edit silently invalidates it and the module
@@ -55,6 +73,25 @@ jobs:
         run: |
           # Ship README/LICENSE/CHANGELOG inside the module so the Gallery page is complete.
           Copy-Item README.md, LICENSE, CHANGELOG.md ./src/PSGraphKit/ -Force
+
+      # An Authenticode signature on a BOM-less PowerShell file is hashed after decoding it with the
+      # SIGNING machine's ANSI code page. This runner is 1252, so a file containing an em dash would
+      # verify here and fail HashMismatch on a machine running 1251, 932, 936, 949 or the UTF-8 beta
+      # option — and the verify step below cannot see it, because it agrees with the code page that
+      # produced the hash. Refuse to sign anything ambiguous.
+      - name: Guard against code-page-dependent signatures
+        if: vars.SIGNING_ENABLED == 'true'
+        shell: pwsh
+        run: |
+          $missing = foreach ($f in Get-ChildItem ./src/PSGraphKit -Recurse -Include *.ps1, *.psm1, *.psd1, *.ps1xml) {
+            $bytes = [System.IO.File]::ReadAllBytes($f.FullName)
+            if (-not ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)) { $f.FullName }
+          }
+          if ($missing) {
+            $missing | ForEach-Object { Write-Host "::error file=$_::missing UTF-8 BOM; its signature would not verify outside code page 1252" }
+            throw "$($missing.Count) file(s) would carry a code-page-dependent signature."
+          }
+          Write-Host "All signable files are UTF-8 with a BOM."
 
       - name: Azure login
         if: vars.SIGNING_ENABLED == 'true'
@@ -132,16 +169,61 @@ jobs:
           if ($failed) { $failed | ForEach-Object { Write-Host "::error::$_" }; throw "Signature verification failed on $($failed.Count) item(s)." }
           Write-Host "Verified $($signable.Count) signed file(s) plus the catalog, all timestamped."
 
-      - name: Warn when publishing unsigned
+      # Signing is a one-way door. v0.4.2 shipped signed, so PowerShellGet's publisher check now
+      # refuses to install any later unsigned version over it without -SkipPublisherCheck. A
+      # mistyped or deleted repository variable must therefore stop the release, not narrate it:
+      # every signing step above is conditional, while the publish step below is not, so without
+      # this the pipeline would happily push an upgrade-breaking package.
+      - name: Refuse to publish unsigned
         if: vars.SIGNING_ENABLED != 'true'
         shell: pwsh
         run: |
-          # Signing is a one-way door: once a version is signed, PowerShellGet's publisher check
-          # makes every later version that is unsigned, or signed by a different publisher, fail to
-          # install over it without -SkipPublisherCheck. So this is a loud warning, not a silent skip.
-          Write-Host "::warning::SIGNING_ENABLED is not 'true' — publishing an UNSIGNED module. If a previous version was signed, this release will fail to install over it."
+          throw "SIGNING_ENABLED is not 'true', so nothing was signed. Published versions from v0.4.2 onward are signed, and an unsigned release fails PowerShellGet's publisher check on upgrade. Set the repository variable, or publish deliberately by hand if this is genuinely intended."
 
+      # Skipping the package build entirely would leave the riskiest untested thing untested: that a
+      # signed module, catalog and all, still packages. Publishing to a throwaway local repository
+      # exercises the real nupkg build without touching the Gallery.
+      - name: Build the package (dry run)
+        if: github.event_name == 'workflow_dispatch' && inputs.dry-run == true
+        shell: pwsh
+        run: |
+          $local = Join-Path $env:RUNNER_TEMP 'dryrun-repo'
+          New-Item -ItemType Directory -Path $local -Force | Out-Null
+          Register-PSResourceRepository -Name DryRun -Uri $local -Trusted -Force
+          Publish-PSResource -Path ./src/PSGraphKit -Repository DryRun -Verbose
+          $pkg = Get-ChildItem $local -Filter *.nupkg
+          if (-not $pkg) { throw 'Dry run produced no package.' }
+          Write-Host "Package built: $($pkg.Name) ($([math]::Round($pkg.Length / 1KB)) KB)"
+          "PACKAGE=$($pkg.Name)" | Out-File $env:GITHUB_ENV -Append
+
+      - name: Dry run summary
+        if: github.event_name == 'workflow_dispatch' && inputs.dry-run == true
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature ./src/PSGraphKit/PSGraphKit.psd1
+          $lines = @(
+            '## Dry run — nothing was published'
+            ''
+            "| | |"
+            "|---|---|"
+            "| Module version | $((Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1).Version) |"
+            "| Package | $env:PACKAGE |"
+            "| Signing enabled | ${{ vars.SIGNING_ENABLED }} |"
+            "| Signature status | $($sig.Status) |"
+            "| Signer | $($sig.SignerCertificate.Subject) |"
+            "| Thumbprint | $($sig.SignerCertificate.Thumbprint) |"
+            "| Certificate expires | $($sig.SignerCertificate.NotAfter) |"
+            "| Timestamped by | $($sig.TimeStamperCertificate.Subject) |"
+            ''
+            'A 72-hour signing certificate is expected. What matters is the timestamp: with it the'
+            'signature outlives the certificate, without it every signature expires in three days.'
+          )
+          $lines -join "`n" | Out-File $env:GITHUB_STEP_SUMMARY -Append
+
+      # Belt and braces. A tag push always publishes; the dry-run input only exists on a manual run,
+      # where it defaults to true. Stating both conditions beats relying on `null != true`.
       - name: Publish to PSGallery
+        if: github.event_name == 'push' || inputs.dry-run != true
         shell: pwsh
         env:
           PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}

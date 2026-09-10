@@ -1,4 +1,4 @@
-function Get-GkTenantInfo {
+﻿function Get-GkTenantInfo {
     <#
     .SYNOPSIS
         Report high-level tenant information: name, type, directory size, sync status, contacts.

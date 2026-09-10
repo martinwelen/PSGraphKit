@@ -1,4 +1,4 @@
-function Get-GkGroupMember {
+﻿function Get-GkGroupMember {
     <#
     .SYNOPSIS
         List the members of a group, classified by object type.

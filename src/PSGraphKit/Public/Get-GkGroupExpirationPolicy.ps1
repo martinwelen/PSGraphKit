@@ -1,4 +1,4 @@
-function Get-GkGroupExpirationPolicy {
+﻿function Get-GkGroupExpirationPolicy {
     <#
     .SYNOPSIS
         Report the Microsoft 365 group expiration (lifecycle) policy, if one is configured.

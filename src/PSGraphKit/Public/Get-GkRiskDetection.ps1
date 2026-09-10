@@ -1,4 +1,4 @@
-function Get-GkRiskDetection {
+﻿function Get-GkRiskDetection {
     <#
     .SYNOPSIS
         Report Microsoft Entra ID Protection risk detections (e.g. impossible travel, leaked

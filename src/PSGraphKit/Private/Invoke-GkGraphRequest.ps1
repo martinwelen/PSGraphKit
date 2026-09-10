@@ -1,4 +1,4 @@
-function Invoke-GkGraphRequest {
+﻿function Invoke-GkGraphRequest {
     <#
     .SYNOPSIS
         Single internal chokepoint for all Microsoft Graph traffic in PSGraphKit.

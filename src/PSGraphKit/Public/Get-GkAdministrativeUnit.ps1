@@ -1,4 +1,4 @@
-function Get-GkAdministrativeUnit {
+﻿function Get-GkAdministrativeUnit {
     <#
     .SYNOPSIS
         Report administrative units with membership type, visibility, and member count.

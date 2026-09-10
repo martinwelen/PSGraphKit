@@ -1,4 +1,4 @@
-function Get-GkExternalCollaborationSetting {
+﻿function Get-GkExternalCollaborationSetting {
     <#
     .SYNOPSIS
         Report the tenant's external-collaboration and default-user-permission settings.

@@ -1,4 +1,4 @@
-function Get-GkNamedLocation {
+﻿function Get-GkNamedLocation {
     <#
     .SYNOPSIS
         Report Conditional Access named locations (IP ranges and countries).

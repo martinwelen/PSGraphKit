@@ -1,4 +1,4 @@
-function Get-GkAppRegistrationReport {
+﻿function Get-GkAppRegistrationReport {
     <#
     .SYNOPSIS
         Report app registrations with credential (secret/certificate) expiry and high-privilege

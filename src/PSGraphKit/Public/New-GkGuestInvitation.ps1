@@ -1,4 +1,4 @@
-function New-GkGuestInvitation {
+﻿function New-GkGuestInvitation {
     <#
     .SYNOPSIS
         Invite one or more external users as B2B guests.

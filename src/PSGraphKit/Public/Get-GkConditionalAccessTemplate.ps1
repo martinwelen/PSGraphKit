@@ -1,4 +1,4 @@
-function Get-GkConditionalAccessTemplate {
+﻿function Get-GkConditionalAccessTemplate {
     <#
     .SYNOPSIS
         Report Microsoft's built-in Conditional Access policy templates.

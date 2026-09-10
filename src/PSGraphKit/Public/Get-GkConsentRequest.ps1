@@ -1,4 +1,4 @@
-function Get-GkConsentRequest {
+﻿function Get-GkConsentRequest {
     <#
     .SYNOPSIS
         Report pending admin-consent requests (apps waiting for an administrator to grant

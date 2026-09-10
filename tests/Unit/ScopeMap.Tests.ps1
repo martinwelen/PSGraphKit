@@ -79,14 +79,14 @@ InModuleScope PSGraphKit {
             @{ Cmdlet = 'Disable-GkStaleUser';          Group = 'read the target user';                Expected = 'User.Read.All,User.ReadUpdate.All,User.ReadWrite.All,Directory.Read.All,Directory.ReadWrite.All' }
             @{ Cmdlet = 'Remove-GkStaleGuest';          Group = 'disable a guest (accountEnabled)';    Expected = 'User.EnableDisableAccount.All,User.ReadUpdate.All,User.ReadWrite.All,Directory.ReadWrite.All' }
             @{ Cmdlet = 'Remove-GkStaleGuest:Delete';   Group = 'delete a user (30-day soft-delete)';  Expected = 'User.ReadWrite.All,Directory.ReadWrite.All' }
-            @{ Cmdlet = 'Get-GkCustomRole';             Group = 'read role definitions';               Expected = 'RoleManagement.Read.Directory,Directory.Read.All,Directory.ReadWrite.All' }
-            @{ Cmdlet = 'Get-GkAdminRoleAssignment';    Group = 'read role assignments and PIM schedules'; Expected = 'RoleManagement.Read.Directory,RoleManagement.Read.All,Directory.Read.All,Directory.ReadWrite.All' }
+            @{ Cmdlet = 'Get-GkCustomRole';             Group = 'read role definitions';               Expected = 'RoleManagement.Read.Directory,RoleManagement.ReadWrite.Directory,Directory.Read.All,Directory.ReadWrite.All' }
+            @{ Cmdlet = 'Get-GkAdminRoleAssignment';    Group = 'read role assignments and PIM schedules'; Expected = 'RoleManagement.Read.Directory,RoleManagement.ReadWrite.Directory,RoleManagement.Read.All,Directory.Read.All,Directory.ReadWrite.All' }
             @{ Cmdlet = 'Get-GkRoleAssignableGroup';    Group = 'read groups and owners';              Expected = 'GroupMember.Read.All,GroupMember.ReadWrite.All,Group.Read.All,Group.ReadWrite.All,Directory.Read.All,Directory.ReadWrite.All' }
             @{ Cmdlet = 'Get-GkGroupReport';            Group = 'read groups';                         Expected = 'Group.Read.All,Group.ReadWrite.All,Directory.Read.All,Directory.ReadWrite.All,GroupMember.Read.All,GroupMember.ReadWrite.All' }
             @{ Cmdlet = 'Get-GkUserMfaStatus';          Group = 'read authentication method registration report'; Expected = 'AuditLog.Read.All' }
             @{ Cmdlet = 'Remove-GkAdminRoleAssignment'; Group = 'remove role assignments (active and PIM)'; Expected = 'RoleManagement.ReadWrite.Directory' }
             @{ Cmdlet = 'Get-GkGroupMember';            Group = 'read group members';                   Expected = 'GroupMember.Read.All,GroupMember.ReadWrite.All,Group.Read.All,Group.ReadWrite.All,Directory.Read.All,Directory.ReadWrite.All' }
-            @{ Cmdlet = 'Get-GkRoleDefinition';         Group = 'read role definitions';                Expected = 'RoleManagement.Read.Directory,Directory.Read.All,Directory.ReadWrite.All' }
+            @{ Cmdlet = 'Get-GkRoleDefinition';         Group = 'read role definitions';                Expected = 'RoleManagement.Read.Directory,RoleManagement.ReadWrite.Directory,Directory.Read.All,Directory.ReadWrite.All' }
             @{ Cmdlet = 'Get-GkUserAuthMethod';         Group = "read a user's authentication methods"; Expected = 'UserAuthenticationMethod.Read.All,UserAuthenticationMethod.ReadWrite.All' }
             @{ Cmdlet = 'Get-GkDeletedItem:User';       Group = 'read deleted users';                   Expected = 'User.Read.All,User.ReadWrite.All,Directory.Read.All,Directory.ReadWrite.All' }
             @{ Cmdlet = 'Get-GkDeletedItem:Group';      Group = 'read deleted groups';                  Expected = 'Group.Read.All,Group.ReadWrite.All,Directory.Read.All,Directory.ReadWrite.All' }

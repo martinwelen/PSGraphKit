@@ -1,4 +1,4 @@
-function Get-GkCaPolicyReport {
+﻿function Get-GkCaPolicyReport {
     <#
     .SYNOPSIS
         Report Conditional Access policies with their state and human-readable summaries of the

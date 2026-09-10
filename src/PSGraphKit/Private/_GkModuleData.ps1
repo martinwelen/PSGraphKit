@@ -149,7 +149,7 @@ $script:GkScopeMap = @{
 
     'Get-GkAdminRoleAssignment' = @{
         Groups = @(
-            @{ For = 'read role assignments and PIM schedules'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.Read.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read role assignments and PIM schedules'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.ReadWrite.Directory', 'RoleManagement.Read.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator', 'Security Reader')
@@ -251,7 +251,7 @@ $script:GkScopeMap = @{
     # pass the pre-flight check and then take a 403 from Graph.
     'Get-GkCustomRole' = @{
         Groups = @(
-            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.ReadWrite.Directory', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator')
@@ -299,7 +299,7 @@ $script:GkScopeMap = @{
     }
 
     'Get-GkPrivilegedRoleMember' = @{
-        Groups = @(@{ For = 'read role assignments'; Any = @('RoleManagement.Read.All', 'RoleManagement.Read.Directory') })
+        Groups = @(@{ For = 'read role assignments'; Any = @('RoleManagement.Read.All', 'RoleManagement.Read.Directory', 'RoleManagement.ReadWrite.Directory') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator', 'Security Reader')
     }
@@ -399,7 +399,7 @@ $script:GkScopeMap = @{
 
     'Get-GkRoleDefinition' = @{
         Groups = @(
-            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.ReadWrite.Directory', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator')

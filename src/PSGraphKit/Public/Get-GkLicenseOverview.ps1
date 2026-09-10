@@ -1,4 +1,4 @@
-function Get-GkLicenseOverview {
+﻿function Get-GkLicenseOverview {
     <#
     .SYNOPSIS
         Report subscribed license SKUs with enabled/assigned/available counts, and optionally the

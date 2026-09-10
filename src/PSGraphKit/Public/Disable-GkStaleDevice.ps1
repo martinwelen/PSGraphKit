@@ -1,4 +1,4 @@
-function Disable-GkStaleDevice {
+﻿function Disable-GkStaleDevice {
     <#
     .SYNOPSIS
         Disable (default) or delete stale Entra devices.

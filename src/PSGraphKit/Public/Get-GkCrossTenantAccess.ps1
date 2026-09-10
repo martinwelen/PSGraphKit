@@ -1,4 +1,4 @@
-function Get-GkCrossTenantAccess {
+﻿function Get-GkCrossTenantAccess {
     <#
     .SYNOPSIS
         Report cross-tenant access (B2B) settings: the default policy and any partner overrides.

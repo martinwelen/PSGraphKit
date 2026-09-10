@@ -1,4 +1,4 @@
-function Add-GkGroupMember {
+﻿function Add-GkGroupMember {
     <#
     .SYNOPSIS
         Add a member (user, group, or service principal) to one or more groups.

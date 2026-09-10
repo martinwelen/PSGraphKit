@@ -1,4 +1,4 @@
-function Remove-GkAdminRoleAssignment {
+﻿function Remove-GkAdminRoleAssignment {
     <#
     .SYNOPSIS
         Remove a directory role assignment — direct active, PIM-eligible, or PIM active.

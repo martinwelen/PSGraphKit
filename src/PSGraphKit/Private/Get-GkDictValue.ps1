@@ -1,4 +1,4 @@
-function Get-GkDictValue {
+﻿function Get-GkDictValue {
     <#
     .SYNOPSIS
         Safely read a key from a Graph response item (Invoke-GkGraphRequest returns items as

@@ -1,4 +1,4 @@
-function Invoke-GkRawGraphCall {
+﻿function Invoke-GkRawGraphCall {
     <#
     .SYNOPSIS
         Thin seam over Invoke-MgGraphRequest that normalizes a single HTTP call to

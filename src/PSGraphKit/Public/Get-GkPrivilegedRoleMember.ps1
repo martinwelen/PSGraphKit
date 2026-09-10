@@ -1,4 +1,4 @@
-function Get-GkPrivilegedRoleMember {
+﻿function Get-GkPrivilegedRoleMember {
     <#
     .SYNOPSIS
         Report members of highly privileged directory roles, flagging permanent (non-PIM)

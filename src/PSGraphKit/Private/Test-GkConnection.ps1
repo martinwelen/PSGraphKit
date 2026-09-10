@@ -1,4 +1,4 @@
-function Test-GkConnection {
+﻿function Test-GkConnection {
     <#
     .SYNOPSIS
         Pre-flight validation before a public function makes Graph calls: confirms an active

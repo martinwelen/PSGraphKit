@@ -1,4 +1,4 @@
-function Get-GkUserAccessReport {
+﻿function Get-GkUserAccessReport {
     <#
     .SYNOPSIS
         Report a single user's full access footprint: group memberships, directory roles,

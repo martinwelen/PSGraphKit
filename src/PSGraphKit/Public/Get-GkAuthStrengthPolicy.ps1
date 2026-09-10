@@ -1,4 +1,4 @@
-function Get-GkAuthStrengthPolicy {
+﻿function Get-GkAuthStrengthPolicy {
     <#
     .SYNOPSIS
         Report authentication strength policies (built-in and custom) and their allowed method

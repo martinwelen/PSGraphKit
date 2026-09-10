@@ -1,4 +1,4 @@
-function Set-GkGroupOwner {
+﻿function Set-GkGroupOwner {
     <#
     .SYNOPSIS
         Add an owner to one or more groups (e.g. to remediate ownerless groups).

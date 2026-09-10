@@ -1,4 +1,4 @@
-function Remove-GkUserLicense {
+﻿function Remove-GkUserLicense {
     <#
     .SYNOPSIS
         Remove one or more license SKUs from users, reclaiming the seats.

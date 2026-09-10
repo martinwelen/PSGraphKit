@@ -1,4 +1,4 @@
-function Get-GkLegacyAuthSignIn {
+﻿function Get-GkLegacyAuthSignIn {
     <#
     .SYNOPSIS
         Report sign-ins that used legacy authentication clients — a prime attack vector.

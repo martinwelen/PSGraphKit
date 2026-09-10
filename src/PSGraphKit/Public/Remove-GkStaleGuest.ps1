@@ -1,4 +1,4 @@
-function Remove-GkStaleGuest {
+﻿function Remove-GkStaleGuest {
     <#
     .SYNOPSIS
         Disable (default) or delete stale guest accounts, with a guest-type safety check.

@@ -1,4 +1,4 @@
-function Reset-GkUserPassword {
+﻿function Reset-GkUserPassword {
     <#
     .SYNOPSIS
         Reset a user's password, optionally forcing a change at next sign-in.

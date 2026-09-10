@@ -1,4 +1,4 @@
-function Get-GkDirectoryAudit {
+﻿function Get-GkDirectoryAudit {
     <#
     .SYNOPSIS
         Report directory audit events (who changed what) over a recent window.

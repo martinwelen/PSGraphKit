@@ -1,4 +1,4 @@
-function Get-GkDeletedItem {
+﻿function Get-GkDeletedItem {
     <#
     .SYNOPSIS
         List soft-deleted directory objects still inside the 30-day restore window.

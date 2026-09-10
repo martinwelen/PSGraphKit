@@ -1,4 +1,4 @@
-function Get-GkDomain {
+﻿function Get-GkDomain {
     <#
     .SYNOPSIS
         Report the tenant's domains with verification status and authentication (managed/federated)

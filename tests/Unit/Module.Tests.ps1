@@ -51,6 +51,26 @@ Describe 'PSGraphKit module' {
         }
     }
 
+    It 'ships every signable file as UTF-8 with a BOM' {
+        # Not cosmetic — it is what makes the release signature portable. Authenticode for
+        # PowerShell files goes through a Subject Interface Package that decodes a BOM-less file
+        # using the SIGNING machine's ANSI code page before hashing it. The release runner is
+        # en-US (1252), so a file containing an em dash hashes one way there and a different way
+        # on a machine running 1251, 932, 936, 949 or the UTF-8 beta option — where the signature
+        # then fails with HashMismatch and the module will not import under AllSigned.
+        #
+        # A BOM removes the ambiguity: the file is decoded as UTF-8 everywhere. The release
+        # workflow cannot catch a regression here, because verification on the signing machine
+        # always agrees with itself — so the check has to live where the files are edited.
+        $moduleDir = Join-Path $PSScriptRoot '..' '..' 'src' 'PSGraphKit'
+        $missing = foreach ($f in Get-ChildItem $moduleDir -Recurse -Include *.ps1, *.psm1, *.psd1, *.ps1xml) {
+            $bytes = [System.IO.File]::ReadAllBytes($f.FullName)
+            $hasBom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+            if (-not $hasBom) { $f.Name }
+        }
+        $missing | Should -BeNullOrEmpty -Because "these files would carry a code-page-dependent signature: $($missing -join ', ')"
+    }
+
     It 'every public function declares required scopes in the scope map' {
         $names = @((Get-Command -Module PSGraphKit).Name)   # exported functions only (outside module scope)
         InModuleScope PSGraphKit -Parameters @{ Names = $names } {

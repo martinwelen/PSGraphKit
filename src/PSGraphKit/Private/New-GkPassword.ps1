@@ -1,4 +1,4 @@
-function New-GkPassword {
+﻿function New-GkPassword {
     <#
     .SYNOPSIS
         Generate a random password that satisfies the default Entra complexity policy.

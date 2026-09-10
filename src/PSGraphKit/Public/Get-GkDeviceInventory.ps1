@@ -1,4 +1,4 @@
-function Get-GkDeviceInventory {
+﻿function Get-GkDeviceInventory {
     <#
     .SYNOPSIS
         Inventory Entra-registered/joined devices with OS, join type, last activity, and a stale flag.

@@ -1,4 +1,4 @@
-function Get-GkSecureScore {
+﻿function Get-GkSecureScore {
     <#
     .SYNOPSIS
         Report the tenant's latest Microsoft Secure Score, or the per-control breakdown.

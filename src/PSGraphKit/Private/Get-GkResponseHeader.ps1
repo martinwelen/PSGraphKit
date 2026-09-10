@@ -1,4 +1,4 @@
-function Get-GkResponseHeader {
+﻿function Get-GkResponseHeader {
     <#
     .SYNOPSIS
         Read a single response-header value case-insensitively from an Invoke-MgGraphRequest

@@ -1,4 +1,4 @@
-function Get-GkStaleAppCredential {
+﻿function Get-GkStaleAppCredential {
     <#
     .SYNOPSIS
         Report app credentials (secrets/certificates) that have never been used or are long unused.

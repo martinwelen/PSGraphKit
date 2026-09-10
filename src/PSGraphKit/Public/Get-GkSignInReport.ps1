@@ -1,4 +1,4 @@
-function Get-GkSignInReport {
+﻿function Get-GkSignInReport {
     <#
     .SYNOPSIS
         Report Entra sign-ins over a recent window, with risk and Conditional Access status.

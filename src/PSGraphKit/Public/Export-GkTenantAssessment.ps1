@@ -1,4 +1,4 @@
-function Export-GkTenantAssessment {
+﻿function Export-GkTenantAssessment {
     <#
     .SYNOPSIS
         Run the PSGraphKit read suite and export a single self-contained HTML assessment (and

@@ -1,4 +1,4 @@
-function Remove-GkGroupMember {
+﻿function Remove-GkGroupMember {
     <#
     .SYNOPSIS
         Remove a member from one or more groups.

@@ -1,4 +1,4 @@
-function Restore-GkDeletedObject {
+﻿function Restore-GkDeletedObject {
     <#
     .SYNOPSIS
         Restore a soft-deleted directory object from the 30-day recycle window.

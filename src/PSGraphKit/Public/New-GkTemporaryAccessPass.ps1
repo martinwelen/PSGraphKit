@@ -1,4 +1,4 @@
-function New-GkTemporaryAccessPass {
+﻿function New-GkTemporaryAccessPass {
     <#
     .SYNOPSIS
         Issue a Temporary Access Pass so a user can register a strong credential.

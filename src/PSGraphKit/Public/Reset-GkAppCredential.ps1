@@ -1,4 +1,4 @@
-function Reset-GkAppCredential {
+﻿function Reset-GkAppCredential {
     <#
     .SYNOPSIS
         Add or remove an app registration's client secret.

@@ -1,4 +1,4 @@
-function Get-GkLicenseAssignmentError {
+﻿function Get-GkLicenseAssignmentError {
     <#
     .SYNOPSIS
         Report users whose license assignments are in an error state.

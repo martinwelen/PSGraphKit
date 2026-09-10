@@ -1,4 +1,4 @@
-function Revoke-GkUserSession {
+﻿function Revoke-GkUserSession {
     <#
     .SYNOPSIS
         Revoke the active sign-in sessions (refresh tokens) of one or more users, forcing

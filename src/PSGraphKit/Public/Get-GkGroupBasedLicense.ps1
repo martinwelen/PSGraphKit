@@ -1,4 +1,4 @@
-function Get-GkGroupBasedLicense {
+﻿function Get-GkGroupBasedLicense {
     <#
     .SYNOPSIS
         Report groups that assign licenses, and whether their assignment has finished processing.

@@ -1,4 +1,4 @@
-function Get-GkGuestInventory {
+﻿function Get-GkGuestInventory {
     <#
     .SYNOPSIS
         Inventory guest (external) accounts with their sponsor, invitation state, last sign-in,

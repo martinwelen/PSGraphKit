@@ -126,6 +126,10 @@ if ($ScopePlan) {
     return
 }
 
+if ($Only -and $Only -notin $scenarioScopes.Keys) {
+    throw "Unknown scenario '$Only'. Known scenarios: $(($scenarioScopes.Keys) -join ', ')."
+}
+
 if ($Login) {
     $all = @($scenarioScopes.Values | ForEach-Object { $_ } | Select-Object -Unique)
     Write-Information "Connecting (interactive) with $($all.Count) scopes..." -InformationAction Continue
@@ -258,6 +262,37 @@ function Test-GkStable {
     return $true
 }
 
+function Test-GkGone {
+    <#
+    .SYNOPSIS
+        Return $true only when an object is definitely absent, $false when it is still there, and
+        throw when the answer is unknown.
+    .DESCRIPTION
+        "Deleted" and "the read failed" are different facts, and Get-GkRawProperty conflates them by
+        returning $null for both. Polling on that accepts a throttled or 5xx response as proof of a
+        deletion. This requires several consecutive reads that each fail with a genuine 404; any
+        other failure rethrows, so a caller polling through Wait-GkUntil keeps waiting rather than
+        recording a success it did not observe.
+    #>
+    param(
+        [Parameter(Mandatory)] [string] $Uri,
+        [int] $Samples = 3,
+        [int] $IntervalSeconds = 2
+    )
+    for ($i = 0; $i -lt $Samples; $i++) {
+        try {
+            Invoke-MgGraphRequest -Method GET -Uri $Uri -OutputType Hashtable | Out-Null
+            return $false
+        }
+        catch {
+            $m = $_.Exception.Message
+            if ($m -notmatch '(?i)NotFound|Request_ResourceNotFound|\b404\b') { throw }
+        }
+        if ($i -lt $Samples - 1) { Start-Sleep -Seconds $IntervalSeconds }
+    }
+    return $true
+}
+
 function Get-GkRawCollectionCount {
     <#
     .SYNOPSIS
@@ -316,6 +351,25 @@ function Test-GkNoChange {
         [int] $IntervalSeconds = 3
     )
     return -not (Wait-GkUntil -Condition $WrittenState -TimeoutSeconds $WatchSeconds -IntervalSeconds $IntervalSeconds)
+}
+
+function Wait-GkUriStable {
+    <#
+    .SYNOPSIS
+        Block until a URI answers successfully on several consecutive reads.
+    .DESCRIPTION
+        Test-GkGone cannot distinguish "deleted" from "created moments ago and not yet on this
+        replica" — both are a 404. So absence only becomes evidence once the object has been seen
+        consistently first. Staging steps that create an object the scenario will later assert the
+        removal of must go through this.
+    #>
+    param([Parameter(Mandatory)] [string] $Uri, [int] $TimeoutSeconds = 180)
+    $ok = Wait-GkUntil -TimeoutSeconds $TimeoutSeconds -Condition {
+        Test-GkStable -Samples 3 -IntervalSeconds 1 -Condition {
+            $null -ne (Invoke-MgGraphRequest -Method GET -Uri $Uri -OutputType Hashtable)
+        }
+    }
+    if (-not $ok) { throw "Precondition: $Uri never became consistently readable." }
 }
 
 function Wait-GkObjectReadable {
@@ -419,6 +473,7 @@ Invoke-GkScenario -Name 'ResetPassword' -Body {
         Wait-GkObjectReadable -Collection 'users' -Id $user.Id
         $uri = "v1.0/users/$($user.Id)?`$select=lastPasswordChangeDateTime"
         $before = Get-GkRawProperty -Uri $uri -Property 'lastPasswordChangeDateTime'
+        if ($null -eq $before) { throw 'Precondition: could not read lastPasswordChangeDateTime before the reset.' }
 
         Reset-GkUserPassword -UserId $user.Id -WhatIf | Out-Null
         Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'lastPasswordChangeDateTime') -ne $before }) '-WhatIf changed nothing'
@@ -445,6 +500,9 @@ Invoke-GkScenario -Name 'TemporaryAccess' -Body {
         $r = New-GkTemporaryAccessPass -UserId $user.Id -LifetimeInMinutes 60 -Confirm:$false
         if ($r.Outcome -ne 'Created') {
             # A tenant with TAP disabled in the auth methods policy cannot run this scenario.
+            # Same trap as GuestInvitation: the runner only reports SKIPPED when EVERY check is
+            # a skip, so the -WhatIf check recorded above would turn a proved-nothing run green.
+            $checks.Clear()
             $checks.Add("SKIP: TAP not issued — $($r.Error)")
             return
         }
@@ -486,7 +544,7 @@ Invoke-GkScenario -Name 'DeleteRestore' -Body {
         # Not "the user is not live": a soft-deleted user still answers on /users/{id} for a while,
         # so that would be true without any restore. Wait for it to be present in deletedItems
         # instead — had -WhatIf actually restored it, it would never appear there again.
-        Assert-GkTrue $checks (Wait-GkUntil { @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id).Count -eq 1 }) '-WhatIf restored nothing'
+        Assert-GkTrue $checks (Test-GkNoChange { Test-GkStable -Samples 2 -IntervalSeconds 1 -Condition { @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id).Count -eq 0 } }) '-WhatIf restored nothing'
 
         # The restore endpoint 404s on a replica that has not caught up ('Unable to read the
         # company information'), so wait for the deleted item to be consistently visible before
@@ -619,6 +677,7 @@ Invoke-GkScenario -Name 'RevokeSession' -Body {
         Wait-GkObjectReadable -Collection 'users' -Id $user.Id
         $uri = "v1.0/users/$($user.Id)?`$select=signInSessionsValidFromDateTime"
         $before = Get-GkRawProperty -Uri $uri -Property 'signInSessionsValidFromDateTime'
+        if ($null -eq $before) { throw 'Precondition: could not read signInSessionsValidFromDateTime before the revoke.' }
 
         Revoke-GkUserSession -UserId $user.Id -WhatIf | Out-Null
         Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'signInSessionsValidFromDateTime') -ne $before }) '-WhatIf revoked nothing'
@@ -658,7 +717,10 @@ Invoke-GkScenario -Name 'UserLicense' -Body {
         Assert-GkTrue $checks (Wait-GkUntil -TimeoutSeconds 180 -Condition { Test-GkStable -Samples 3 -IntervalSeconds 2 -Condition { (Get-GkRawCollectionCount -Uri $licUri -Property 'assignedLicenses') -eq 1 } }) 'the licence was staged'
 
         Remove-GkUserLicense -UserId $user.Id -SkuId $sku.skuId -WhatIf | Out-Null
-        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $licUri -Property 'assignedLicenses') -eq 1 }) '-WhatIf removed no licence'
+        # Watch for the licence actually going away, confirmed by two consecutive reads so a
+        # lagging replica is not mistaken for a removal. Asserting it is 'still there' would pass
+        # on the first read whether -WhatIf wrote or not.
+        Assert-GkTrue $checks (Test-GkNoChange { Test-GkStable -Samples 2 -IntervalSeconds 1 -Condition { (Get-GkRawCollectionCount -Uri $licUri -Property 'assignedLicenses') -eq 0 } }) '-WhatIf removed no licence'
 
         $r = Remove-GkUserLicense -UserId $user.Id -SkuId $sku.skuId -Confirm:$false
         Assert-GkTrue $checks ($r.Outcome -eq 'Removed') 'removal reported success'
@@ -782,11 +844,19 @@ Invoke-GkScenario -Name 'AdminRole' -Body {
         if (-not $assign) { $checks.Add('SKIP: could not stage a role assignment'); return }
         $assignmentId = $assign.id
         $roleUri = "v1.0/roleManagement/directory/roleAssignments/$assignmentId"
+        Wait-GkUriStable -Uri $roleUri
 
         Remove-GkAdminRoleAssignment -AssignmentKind Active -AssignmentId $assignmentId -WhatIf | Out-Null
         # Proven by the assignment still being retrievable. Watching for its absence would fail on
         # any transient 404, because Get-GkRawProperty cannot tell 'deleted' from 'read failed'.
-        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $roleUri -Property 'id') -eq $assignmentId }) '-WhatIf removed no assignment'
+        # Falsifiable AND robust, which the two obvious phrasings are not. Asserting the object is
+        # still there fails to detect a -WhatIf that wrongly deleted, because the first read happens
+        # before the deletion has propagated. Asserting it is never definitely-absent is unreliable:
+        # these endpoints return two consecutive 404s for a live object often enough to fail runs at
+        # random. So settle first — a real deletion reaches every replica within seconds — and only
+        # then poll for retrievability, which tolerates a lagging replica without accepting absence.
+        Start-Sleep -Seconds 10
+        Assert-GkTrue $checks (Wait-GkUntil -TimeoutSeconds 90 -Condition { -not (Test-GkGone -Uri $roleUri -Samples 1) }) '-WhatIf removed no assignment'
 
         # Same transient as the restore endpoint: the DELETE can 404 on a replica that has not
         # seen the freshly staged assignment. Bounded retry — a removal that never succeeds still fails.
@@ -795,7 +865,7 @@ Invoke-GkScenario -Name 'AdminRole' -Body {
             if ($a.Outcome -eq 'Removed') { $a }
         }
         Assert-GkTrue $checks ($null -ne $r) 'removal reported success'
-        Assert-GkTrue $checks (Wait-GkUntil { $null -eq (Get-GkRawProperty -Uri $roleUri -Property 'id') }) 'the assignment is gone from the server'
+        Assert-GkTrue $checks (Wait-GkUntil { Test-GkGone -Uri $roleUri }) 'the assignment is gone from the server'
         $assignmentId = $null
     }
     finally {
@@ -829,16 +899,24 @@ Invoke-GkScenario -Name 'ConsentGrant' -Body {
         if (-not $grant) { $checks.Add('SKIP: could not stage a consent grant'); return }
         $grantId = $grant.id
         $grantUri = "v1.0/oauth2PermissionGrants/$grantId"
+        Wait-GkUriStable -Uri $grantUri
 
         Remove-GkConsentGrant -GrantId $grantId -WhatIf | Out-Null
-        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $grantUri -Property 'id') -eq $grantId }) '-WhatIf revoked nothing'
+        # Falsifiable AND robust, which the two obvious phrasings are not. Asserting the object is
+        # still there fails to detect a -WhatIf that wrongly deleted, because the first read happens
+        # before the deletion has propagated. Asserting it is never definitely-absent is unreliable:
+        # these endpoints return two consecutive 404s for a live object often enough to fail runs at
+        # random. So settle first — a real deletion reaches every replica within seconds — and only
+        # then poll for retrievability, which tolerates a lagging replica without accepting absence.
+        Start-Sleep -Seconds 10
+        Assert-GkTrue $checks (Wait-GkUntil -TimeoutSeconds 90 -Condition { -not (Test-GkGone -Uri $grantUri -Samples 1) }) '-WhatIf revoked nothing'
 
         $r = Wait-GkFor -TimeoutSeconds 120 -Producer {
             $a = Remove-GkConsentGrant -GrantId $grantId -Confirm:$false -WarningAction SilentlyContinue
             if ($a.Outcome -eq 'Revoked') { $a }
         }
         Assert-GkTrue $checks ($null -ne $r) 'revoke reported success'
-        Assert-GkTrue $checks (Wait-GkUntil { $null -eq (Get-GkRawProperty -Uri $grantUri -Property 'id') }) 'the grant is gone from the server'
+        Assert-GkTrue $checks (Wait-GkUntil { Test-GkGone -Uri $grantUri }) 'the grant is gone from the server'
         $grantId = $null
     }
     finally {

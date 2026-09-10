@@ -1,4 +1,4 @@
-function Get-GkServiceMessage {
+﻿function Get-GkServiceMessage {
     <#
     .SYNOPSIS
         Report Microsoft 365 message center posts — the change announcements that need action.

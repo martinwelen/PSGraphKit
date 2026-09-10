@@ -1,4 +1,4 @@
-function Get-GkUserAuthMethod {
+﻿function Get-GkUserAuthMethod {
     <#
     .SYNOPSIS
         List the authentication methods registered on a user's account.
