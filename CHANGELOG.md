@@ -22,9 +22,9 @@ rather than what request the module builds.
   at all**, in every tenant. The request now selects the field explicitly (and `userPrincipalName`
   only for the User type, where it exists). Found by the first live run of the write protocol.
 - The scope map's read capability groups accepted only `X.Read.All` where `X.ReadWrite.All` grants
-  the same read. 39 groups were affected, so `Test-GkConnection` rejected sessions that Graph itself
+  the same read. 40 groups were affected, so `Test-GkConnection` rejected sessions that Graph itself
   accepts — for example connecting with `Group.ReadWrite.All` for a remediation workflow and then
-  piping into `Get-GkGroupMember`. 83 scopes were added, each verified to exist against a live Graph
+  piping into `Get-GkGroupMember`. 87 scopes were added, each verified to exist against a live Graph
   service principal, and the subsumption itself was confirmed empirically rather than from the docs.
   Ordering is unchanged, so `-ForCommand` still requests the least-privileged scope; only what is
   accepted widened. See DESIGN.md section 7.
@@ -61,10 +61,14 @@ rather than what request the module builds.
   Entra reads are eventually consistent: reading one freshly written property four times returned
   False, False, True, False. Single-shot verification therefore failed runs that were correct, and
   the failure moved between scenarios from run to run. Positive assertions now wait for the expected
-  state; `-WhatIf` assertions watch for the *written* state and require that it never appears, so a
-  transient read miss on an untouched object is no longer mistaken for evidence of a write; and
-  assertions describing one object inspect the snapshot that satisfied the wait instead of issuing a
-  fresh read that can land on a different replica.
+  state. `-WhatIf` assertions watch for the *written* state and require that it never appears, so a
+  transient read miss on an untouched object is no longer mistaken for evidence of a write — except
+  where the written state is a deletion, which cannot be distinguished from a lagging replica by a
+  404 alone: those settle first, letting a real deletion propagate, and only then require the object
+  to still be retrievable. Assertions describing one object inspect the snapshot that satisfied the
+  wait instead of issuing a fresh read that can land on a different replica, and collection counts go
+  through a helper that lets a failed read throw rather than counting as one element, since
+  `@($null).Count` is `1` in PowerShell.
 
 ## [0.4.1] - 2026-08-09
 

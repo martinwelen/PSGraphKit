@@ -437,7 +437,14 @@ Verified empirically rather than from the documentation: an app-only token holdi
 `Group.ReadWrite.All` and `Application.ReadWrite.All` and **no** `.Read.All` or `Directory.Read.All`
 successfully served `GET /groups` and `GET /applications`.
 
-83 scopes were added across those 39 groups, each one confirmed to exist as a real permission by
+A first pass covered `X.Read.All` only, which missed `RoleManagement.Read.Directory` — precisely the
+scope `Remove-GkAdminRoleAssignment` tells callers to connect with, so the role workflow still failed
+the exact case this correction exists to fix. Four more groups gained
+`RoleManagement.ReadWrite.Directory`. The remaining unpaired read scopes (`Policy.Read.All`,
+`AuditLog.Read.All`, `ServiceHealth.Read.All`, `DeviceLocalCredential.Read.All`) have no `ReadWrite`
+sibling in Graph, so those omissions are correct rather than oversights.
+
+87 scopes were added across 40 of the map's 82 groups, each one confirmed to exist as a real permission by
 querying the Microsoft Graph service principal's `appRoles` and `oauth2PermissionScopes` in a live
 tenant. Ordering was preserved — the least-privileged option stays first, so `Get-GkConnectScopeHint`
 and the `-ForCommand` connect line still request the narrow scope. Only what is *accepted* widened;

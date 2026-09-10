@@ -204,6 +204,20 @@ which is far worse than failing outright. The rules:
   wait. A fresh read per assertion can land on a different replica and contradict the one before it.
 - **Counting a collection** → `Get-GkRawCollectionCount`, never `@(Get-GkRawProperty ...).Count`.
   `@($null).Count` is `1` in PowerShell, so a failed read otherwise counts as one element.
+- **An object is gone** → `Test-GkGone`, which requires consecutive genuine 404s and rethrows
+  anything else. `Get-GkRawProperty` returns `$null` for a 403, a 429 or a 5xx just as readily as
+  for a 404, so polling on it accepts a throttled response as proof of a deletion.
+- **Before asserting a deletion at all** → `Wait-GkUriStable`. A 404 on a freshly created object
+  means "not replicated yet", not "absent", so absence is only evidence once the object has been
+  seen consistently first.
+
+The deletion assertions are the awkward case, and worth stating explicitly because both obvious
+phrasings are wrong. *"It is still there"* cannot fail: the check runs immediately after the object
+was observed present, so a `-WhatIf` that wrongly deleted would not have propagated yet. *"It is
+never definitely absent"* is unreliable in the other direction: `oauth2PermissionGrants` and
+`roleManagement` return two consecutive 404s for a live object often enough to fail runs at random.
+What works is to settle first — a real deletion reaches every replica within seconds — and only then
+require the object to be retrievable. Falsifiable and stable at once.
 
 ### The scope matrix
 

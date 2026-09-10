@@ -31,6 +31,23 @@ Install-PSResource PSGraphKit      # or: Install-Module PSGraphKit
 See [DESIGN.md](DESIGN.md) / [DESIGN-phase2.md](DESIGN-phase2.md) for the endpoint/scope plan,
 [ROADMAP.md](ROADMAP.md) for what's planned, and [CHANGELOG.md](CHANGELOG.md) for history.
 
+### Signed releases
+
+From **v0.4.2** every published version is Authenticode-signed with a publicly trusted certificate
+through Azure Artifact Signing, and ships a signed file catalog covering the whole module. The
+module imports under an execution policy of `AllSigned`, and you can check what you installed:
+
+```powershell
+$m = (Get-Module PSGraphKit -ListAvailable)[0].ModuleBase
+Get-AuthenticodeSignature "$m/PSGraphKit.psd1" | Format-List Status, SignerCertificate
+Test-FileCatalog -Path $m -CatalogFilePath "$m/PSGraphKit.cat"
+```
+
+Both should report `Valid`. The signing certificate itself is valid for only 72 hours by design —
+what keeps the signature good is the RFC 3161 timestamp, so `TimeStamperCertificate` on the result
+should be populated. An expired signing certificate with a valid timestamp is normal and expected;
+a missing timestamp is not.
+
 ## Requirements
 
 - **PowerShell 7.4+** (Windows PowerShell 5.1 is not supported)
