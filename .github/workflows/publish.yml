@@ -190,7 +190,10 @@ jobs:
           $local = Join-Path $env:RUNNER_TEMP 'dryrun-repo'
           New-Item -ItemType Directory -Path $local -Force | Out-Null
           Register-PSResourceRepository -Name DryRun -Uri $local -Trusted -Force
-          Publish-PSResource -Path ./src/PSGraphKit -Repository DryRun -Verbose
+          # -SkipDependenciesCheck is required here and only here: publishing resolves declared
+          # dependencies against the TARGET repository, and Microsoft.Graph.Authentication is not in
+          # this empty local folder. The real Gallery publish keeps the check, where it is meaningful.
+          Publish-PSResource -Path ./src/PSGraphKit -Repository DryRun -SkipDependenciesCheck -Verbose
           $pkg = Get-ChildItem $local -Filter *.nupkg
           if (-not $pkg) { throw 'Dry run produced no package.' }
           Write-Host "Package built: $($pkg.Name) ($([math]::Round($pkg.Length / 1KB)) KB)"
