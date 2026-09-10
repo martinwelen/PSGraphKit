@@ -11,10 +11,18 @@ concurrency:
   group: publish-${{ github.ref }}
   cancel-in-progress: false
 
+# id-token is what lets azure/login federate without storing a client secret. Nothing else here
+# needs write access.
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   publish:
     name: Publish
-    runs-on: ubuntu-latest
+    # Windows, not ubuntu: Authenticode signing goes through SignTool, which is Windows-only. The
+    # test matrix still covers Linux and macOS in ci.yml — only the release path is pinned here.
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -33,11 +41,99 @@ jobs:
           Write-Host "Manifest: $version   Tag: $tag"
           if ($version -ne $tag) { throw "Manifest version ($version) does not match tag ($tag)." }
 
+      # Every step that MODIFIES a file in ./src/PSGraphKit must run before signing. A signature
+      # covers file content byte for byte, so a later edit silently invalidates it and the module
+      # ships looking signed while failing verification on the installing machine.
       - name: Stage package docs
         shell: pwsh
         run: |
           # Ship README/LICENSE/CHANGELOG inside the module so the Gallery page is complete.
           Copy-Item README.md, LICENSE, CHANGELOG.md ./src/PSGraphKit/ -Force
+
+      - name: Azure login
+        if: vars.SIGNING_ENABLED == 'true'
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Pass 1: Authenticode-sign the script files themselves. This is what an execution policy of
+      # AllSigned checks when the module is dot-sourced or imported.
+      - name: Sign module files
+        if: vars.SIGNING_ENABLED == 'true'
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ vars.ARTIFACT_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.ARTIFACT_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.ARTIFACT_SIGNING_PROFILE }}
+          files-folder: ${{ github.workspace }}\src\PSGraphKit
+          files-folder-filter: ps1,psm1,psd1,ps1xml
+          files-folder-recurse: true
+          file-digest: SHA256
+          # Not optional. Artifact Signing certificates live 72 hours; without an RFC 3161
+          # countersignature every signature we ship expires within three days.
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      # Pass 2: the catalog hashes every file in the module, including the ones Authenticode cannot
+      # sign (README, LICENSE, .cat aside). It must be built AFTER pass 1, because signing changed
+      # the script files and the catalog records their post-signature hashes.
+      - name: Build file catalog
+        if: vars.SIGNING_ENABLED == 'true'
+        shell: pwsh
+        run: |
+          $cat = './src/PSGraphKit/PSGraphKit.cat'
+          if (Test-Path $cat) { Remove-Item $cat -Force }
+          New-FileCatalog -Path ./src/PSGraphKit -CatalogFilePath $cat -CatalogVersion 2 | Out-Null
+          Write-Host "Catalog built: $((Get-Item $cat).Length) bytes"
+
+      - name: Sign the catalog
+        if: vars.SIGNING_ENABLED == 'true'
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ vars.ARTIFACT_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.ARTIFACT_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.ARTIFACT_SIGNING_PROFILE }}
+          files-folder: ${{ github.workspace }}\src\PSGraphKit
+          files-folder-filter: cat
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      # Verify before publishing, not after. Once a version is on the Gallery it cannot be replaced,
+      # and a module that installs but fails signature validation is worse than an unsigned one.
+      - name: Verify signatures
+        if: vars.SIGNING_ENABLED == 'true'
+        shell: pwsh
+        run: |
+          $failed = @()
+
+          $signable = Get-ChildItem ./src/PSGraphKit -Recurse -Include *.ps1, *.psm1, *.psd1, *.ps1xml
+          foreach ($f in $signable) {
+            $sig = Get-AuthenticodeSignature $f.FullName
+            if ($sig.Status -ne 'Valid') { $failed += "$($f.Name): $($sig.Status) - $($sig.StatusMessage)" }
+            elseif (-not $sig.TimeStamperCertificate) { $failed += "$($f.Name): signed but NOT timestamped (expires with the 72h certificate)" }
+          }
+
+          $catSig = Get-AuthenticodeSignature ./src/PSGraphKit/PSGraphKit.cat
+          if ($catSig.Status -ne 'Valid') { $failed += "PSGraphKit.cat: $($catSig.Status) - $($catSig.StatusMessage)" }
+
+          # Does the catalog actually match what is on disk?
+          $test = Test-FileCatalog -Path ./src/PSGraphKit -CatalogFilePath ./src/PSGraphKit/PSGraphKit.cat -Detailed
+          if ($test.Status -ne 'Valid') { $failed += "Catalog does not match the module contents: $($test.Status)" }
+
+          if ($failed) { $failed | ForEach-Object { Write-Host "::error::$_" }; throw "Signature verification failed on $($failed.Count) item(s)." }
+          Write-Host "Verified $($signable.Count) signed file(s) plus the catalog, all timestamped."
+
+      - name: Warn when publishing unsigned
+        if: vars.SIGNING_ENABLED != 'true'
+        shell: pwsh
+        run: |
+          # Signing is a one-way door: once a version is signed, PowerShellGet's publisher check
+          # makes every later version that is unsigned, or signed by a different publisher, fail to
+          # install over it without -SkipPublisherCheck. So this is a loud warning, not a silent skip.
+          Write-Host "::warning::SIGNING_ENABLED is not 'true' — publishing an UNSIGNED module. If a previous version was signed, this release will fail to install over it."
 
       - name: Publish to PSGallery
         shell: pwsh

@@ -23,6 +23,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   accepted widened. See DESIGN.md section 7.
 
 ### Added
+- Release artefacts are Authenticode-signed through Azure Artifact Signing, with an RFC 3161
+  countersignature and a signed file catalog covering the whole module. Verification runs before the
+  Gallery push, not after — a published version cannot be replaced, and a module that installs but
+  fails signature validation is worse than an unsigned one. The publish job moved to a Windows runner
+  because SignTool is Windows-only; the test matrix still covers Linux and macOS. Note that signing
+  is a one-way door: once a version ships signed, a later unsigned one fails PowerShellGet's
+  publisher check on upgrade.
+- The write protocol covers all 15 write cmdlets, up from 8. New scenarios: `RevokeSession`,
+  `UserLicense`, `GuestInvitation`, `StaleGuest`, `StaleDevice`, `AdminRole` and `ConsentGrant`,
+  each staging its own disposable object — a licence assignment, a role assignment, a consent grant
+  — and verifying server state afterwards. Four report `SKIPPED` in a developer sandbox for tenant
+  reasons rather than code reasons, documented in `docs/TEST-PROTOCOL.md`.
 - `build/Invoke-GkWriteProtocol.ps1`: live validation for the write cmdlets against disposable
   objects in a dev tenant. Each scenario runs the cmdlet with `-WhatIf` and asserts nothing changed,
   runs it for real, then verifies the resulting **server state** by reading the object back through

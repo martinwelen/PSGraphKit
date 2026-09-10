@@ -164,7 +164,46 @@ a real object. `-CleanOrphans` sweeps anything left behind by a run that died be
 | `GroupMembership` | the member is added, resolves as `User`, and is removed again |
 | `GroupOwner` | the right principal owns the group |
 | `AppCredential` | the secret exists on the application, then does not |
+| `RevokeSession` | `signInSessionsValidFromDateTime` advanced — the only externally visible trace of a revocation |
+| `UserLicense` | a staged licence is assigned, then gone from `assignedLicenses` |
+| `GuestInvitation` | the invited object exists and is `userType = Guest` |
+| `StaleGuest` | the guest is disabled, then soft-deleted into the recycle bin (both scope variants) |
+| `StaleDevice` | `accountEnabled` is `false` on the device |
+| `AdminRole` | a staged Directory Readers assignment is removed and no longer retrievable |
+| `ConsentGrant` | a staged `oauth2PermissionGrant` is revoked and no longer retrievable |
 | `LapsRead` | the password decodes; **`SKIPPED` without `-LapsDeviceId`**, never a pass on no evidence |
+
+All 15 write cmdlets are covered. Four scenarios report `SKIPPED` in a Microsoft 365 developer
+sandbox, and the reason is the tenant rather than the code: `GuestInvitation` and `StaleGuest`
+because such tenants refuse B2B outright (*"Guest invitations not allowed for your company"*, with
+`allowInvitesFrom` already set to `everyone`), `StaleDevice` because Graph will not accept a
+synthetic device object and a real Entra-joined device cannot be staged from an API, and `LapsRead`
+because a LAPS credential only exists once a real device has backed one up. A `SKIPPED` scenario
+proves nothing — treat it as untested, not as passed.
+
+### Reading a result honestly
+
+The runner reports `SKIPPED` only when **every** check in a scenario is a skip. A scenario that
+records a real assertion and *then* discovers the tenant cannot stage it would report `PASS` while
+proving nothing, so a scenario that bails out mid-way clears its collected checks first. If you add
+a scenario, do the same.
+
+### Eventual consistency
+
+Directory reads are eventually consistent. Reading one freshly written property four times in a row
+returned `False, False, True, False`. Nothing in this protocol may verify by sleeping and reading
+once — that fails runs that are correct, and the failure moves between scenarios from run to run,
+which is far worse than failing outright. The rules:
+
+- **A write happened** → `Wait-GkUntil`: poll until the expected state appears. The value we wrote is
+  the one that eventually wins, so the first replica to report it is proof enough.
+- **A write did NOT happen** (`-WhatIf`) → watch for the *written* state and require that it never
+  appears, or wait for the untouched object to still be there. Never assert "the old value is still
+  present on every read": a transient read miss says nothing about whether we wrote.
+- **Several assertions about one object** → `Wait-GkFor`, and inspect the snapshot that satisfied the
+  wait. A fresh read per assertion can land on a different replica and contradict the one before it.
+- **Counting a collection** → `Get-GkRawCollectionCount`, never `@(Get-GkRawProperty ...).Count`.
+  `@($null).Count` is `1` in PowerShell, so a failed read otherwise counts as one element.
 
 ### The scope matrix
 
@@ -200,6 +239,33 @@ Before tagging `vX.Y.Z`:
       `docs/protocol-runs/` so the release names the evidence behind it.
 - [ ] `Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1` version bumped and matches the tag.
 - [ ] `CHANGELOG.md` updated.
+- [ ] **Signing is on.** The repository variable `SIGNING_ENABLED` is `true`. Once any version ships
+      signed, every later version must be signed by the same publisher or PowerShellGet's publisher
+      check makes it fail to install over the previous one without `-SkipPublisherCheck`. Publishing
+      unsigned after that point breaks upgrades for existing users; the workflow emits a warning
+      rather than failing, because the very first signed release has to come from somewhere.
+- [ ] The GitHub Release is created from the CHANGELOG section — a tag alone is not a release.
+
+### Code signing
+
+Release artefacts are Authenticode-signed through Azure Artifact Signing, in `publish.yml`. Two
+things about the arrangement are easy to get wrong:
+
+**Order.** Signing covers file content byte for byte. Every step that modifies anything under
+`src/PSGraphKit` — the version stamp, the README/LICENSE/CHANGELOG copy — must run *before* signing,
+or the module ships looking signed and fails verification on the installing machine. The catalog is
+built after the script files are signed, because it records their post-signature hashes.
+
+**Timestamping.** Artifact Signing certificates are valid for 72 hours and are renewed daily. Without
+an RFC 3161 countersignature from `http://timestamp.acs.microsoft.com`, every signature we publish
+expires within three days. The verify step fails the release if any file is signed but not
+timestamped, and verification runs *before* publishing — a Gallery version cannot be replaced, and a
+module that installs but fails signature validation is worse than an unsigned one.
+
+Configuration lives in repository variables (`ARTIFACT_SIGNING_ENDPOINT`, `ARTIFACT_SIGNING_ACCOUNT`,
+`ARTIFACT_SIGNING_PROFILE`, `SIGNING_ENABLED`) and secrets (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`,
+`AZURE_SUBSCRIPTION_ID`). Authentication is OIDC workload identity federation, so no client secret is
+stored. The signing identity needs the **Artifact Signing Certificate Profile Signer** role.
 
 ### Why this is not in CI
 

@@ -102,6 +102,16 @@ $scenarioScopes = [ordered]@{
     GroupMembership  = @('GroupMember.ReadWrite.All', 'Group.ReadWrite.All')
     GroupOwner       = @('Group.ReadWrite.All')
     AppCredential    = @('Application.ReadWrite.All')
+    RevokeSession    = @('User.RevokeSessions.All', 'User.ReadWrite.All')
+    # Staging a licence needs a write on the user and a read of subscribedSkus; the removal itself
+    # only needs the licence scope.
+    UserLicense      = @('LicenseAssignment.ReadWrite.All', 'User.ReadWrite.All', 'Organization.Read.All')
+    GuestInvitation  = @('User.Invite.All', 'User.ReadWrite.All')
+    StaleGuest       = @('User.Invite.All', 'User.EnableDisableAccount.All', 'User.Read.All', 'User.ReadWrite.All')
+    StaleDevice      = @('Device.ReadWrite.All')
+    # RoleManagement.ReadWrite.Directory covers both staging the assignment and removing it.
+    AdminRole        = @('RoleManagement.ReadWrite.Directory', 'User.ReadWrite.All')
+    ConsentGrant     = @('DelegatedPermissionGrant.ReadWrite.All', 'Application.ReadWrite.All')
     LapsRead         = @('DeviceLocalCredential.Read.All')
 }
 
@@ -331,7 +341,7 @@ function Wait-GkObjectReadable {
 if ($CleanOrphans) {
     Write-Information "Sweeping objects matching '$Prefix-*'..." -InformationAction Continue
     $swept = 0
-    foreach ($c in 'users', 'groups', 'applications') {
+    foreach ($c in 'users', 'groups', 'applications', 'devices', 'servicePrincipals') {
         $filter = [uri]::EscapeDataString("startswith(displayName,'$Prefix-')")
         $items = (Invoke-MgGraphRequest -Method GET -Uri "v1.0/${c}?`$filter=$filter&`$select=id,displayName" -OutputType Hashtable).value
         foreach ($i in @($items)) {
@@ -588,13 +598,259 @@ Invoke-GkScenario -Name 'AppCredential' -Body {
 
         Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -eq 1 }) 'the secret exists on the application'
 
-        Reset-GkAppCredential -ApplicationId $app.Id -RemoveKeyId $r.KeyId -Confirm:$false | Out-Null
-        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -eq 0 }) 'the secret was removed'
+        # removePassword rejects a keyId the replica serving it has not seen yet ("No password
+        # credential found with keyId as ..."), so the removal is retried rather than issued once.
+        # The condition is the server state, not the call's return, so a removal that never takes
+        # effect still fails.
+        Assert-GkTrue $checks (Wait-GkUntil -TimeoutSeconds 150 -Condition {
+            if ((Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -eq 0) { return $true }
+            Reset-GkAppCredential -ApplicationId $app.Id -RemoveKeyId $r.KeyId -Confirm:$false -WarningAction SilentlyContinue | Out-Null
+            (Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -eq 0
+        }) 'the secret was removed'
     }
     finally { Remove-GkDisposable -Collection 'applications' -Id $app.Id -Name $app.DisplayName }
 }
 
-# --- 8. LAPS read -------------------------------------------------------------------------------
+# --- 8. Revoke sign-in sessions -----------------------------------------------------------------
+Invoke-GkScenario -Name 'RevokeSession' -Body {
+    param($checks)
+    $user = New-GkDisposableUser -Tag 'revoke'
+    try {
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
+        $uri = "v1.0/users/$($user.Id)?`$select=signInSessionsValidFromDateTime"
+        $before = Get-GkRawProperty -Uri $uri -Property 'signInSessionsValidFromDateTime'
+
+        Revoke-GkUserSession -UserId $user.Id -WhatIf | Out-Null
+        Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'signInSessionsValidFromDateTime') -ne $before }) '-WhatIf revoked nothing'
+
+        $r = Revoke-GkUserSession -UserId $user.Id -Confirm:$false
+        Assert-GkTrue $checks ($r.Outcome -eq 'Revoked') 'revoke reported success'
+        # This is the only externally visible trace of a revocation: every token issued before this
+        # stamp is refused. If it does not move, nothing was actually revoked.
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $uri -Property 'signInSessionsValidFromDateTime') -ne $before }) 'signInSessionsValidFromDateTime advanced on the server'
+    }
+    finally { Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName }
+}
+
+# --- 9. Remove a license ------------------------------------------------------------------------
+Invoke-GkScenario -Name 'UserLicense' -Body {
+    param($checks)
+    $user = New-GkDisposableUser -Tag 'lic'
+    try {
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
+
+        # A licence cannot be assigned without a usage location, and needs a SKU with a free seat.
+        Invoke-MgGraphRequest -Method PATCH -Uri "v1.0/users/$($user.Id)" -Body @{ usageLocation = 'SE' } | Out-Null
+        $sku = @((Invoke-MgGraphRequest -Method GET -Uri 'v1.0/subscribedSkus' -OutputType Hashtable).value |
+            Where-Object { $_.prepaidUnits.enabled -gt $_.consumedUnits }) | Select-Object -First 1
+        if (-not $sku) { $checks.Add('SKIP: no SKU with a free seat in this tenant'); return }
+
+        $assigned = Wait-GkUntil -TimeoutSeconds 120 -Condition {
+            try {
+                Invoke-MgGraphRequest -Method POST -Uri "v1.0/users/$($user.Id)/assignLicense" `
+                    -Body @{ addLicenses = @(@{ skuId = $sku.skuId; disabledPlans = @() }); removeLicenses = @() } | Out-Null
+                $true
+            } catch { $false }
+        }
+        if (-not $assigned) { $checks.Add('SKIP: could not assign a licence to stage the scenario'); return }
+
+        $licUri = "v1.0/users/$($user.Id)?`$select=assignedLicenses"
+        Assert-GkTrue $checks (Wait-GkUntil -TimeoutSeconds 180 -Condition { Test-GkStable -Samples 3 -IntervalSeconds 2 -Condition { (Get-GkRawCollectionCount -Uri $licUri -Property 'assignedLicenses') -eq 1 } }) 'the licence was staged'
+
+        Remove-GkUserLicense -UserId $user.Id -SkuId $sku.skuId -WhatIf | Out-Null
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $licUri -Property 'assignedLicenses') -eq 1 }) '-WhatIf removed no licence'
+
+        $r = Remove-GkUserLicense -UserId $user.Id -SkuId $sku.skuId -Confirm:$false
+        Assert-GkTrue $checks ($r.Outcome -eq 'Removed') 'removal reported success'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $licUri -Property 'assignedLicenses') -eq 0 }) 'the licence is gone from the server'
+    }
+    finally { Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName }
+}
+
+# --- 10. Guest invitation -----------------------------------------------------------------------
+# -SendInvitationMessage is deliberately never passed: the protocol must not send mail to anyone.
+# The address is at example.com, reserved by RFC 2606 and unroutable, so even a mistake goes nowhere.
+Invoke-GkScenario -Name 'GuestInvitation' -Body {
+    param($checks)
+    $invited = $null
+    try {
+        $mail = "$runPrefix-guest@example.com"
+        New-GkGuestInvitation -EmailAddress $mail -WhatIf | Out-Null
+        Assert-GkTrue $checks (Test-GkNoChange { @(Invoke-MgGraphRequest -Method GET -Uri "v1.0/users?`$filter=mail eq '$mail'" -OutputType Hashtable).value.Count -ge 1 }) '-WhatIf invited nobody'
+
+        $r = New-GkGuestInvitation -EmailAddress $mail -Confirm:$false
+        if ($r.Outcome -ne 'Invited') {
+            # A tenant can forbid B2B outright ("Guest invitations not allowed for your company"),
+            # which no amount of permission fixes. That is a tenant capability, not a defect, so
+            # report it as unproven rather than failed — the same treatment as LapsRead.
+            # Drop the -WhatIf check first: the runner only reports SKIPPED when EVERY check is a
+            # SKIP, so leaving a real check alongside would report PASS for a scenario that proved
+            # nothing about inviting anyone.
+            $checks.Clear()
+            $checks.Add("SKIP: the tenant does not allow guest invitations — $($r.Error)")
+            return
+        }
+        Assert-GkTrue $checks (-not [string]::IsNullOrWhiteSpace($r.InvitedUserId)) 'the created guest id was returned'
+        $invited = $r.InvitedUserId
+
+        $guest = Wait-GkFor { $g = Get-GkRawProperty -Uri "v1.0/users/$invited`?`$select=id,userType" -Property 'userType'; if ($g) { $g } }
+        Assert-GkTrue $checks ($guest -eq 'Guest') 'the created object is a Guest'
+    }
+    finally {
+        if ($invited) { try { Invoke-MgGraphRequest -Method DELETE -Uri "v1.0/users/$invited" | Out-Null } catch { Write-Warning "Teardown: could not delete guest $invited" } }
+    }
+}
+
+# --- 11. Stale guest: disable, then delete ------------------------------------------------------
+Invoke-GkScenario -Name 'StaleGuest' -Body {
+    param($checks)
+    $invited = $null
+    try {
+        $mail = "$runPrefix-stale@example.com"
+        $inv = New-GkGuestInvitation -EmailAddress $mail -Confirm:$false
+        if ($inv.Outcome -ne 'Invited') { $checks.Add("SKIP: could not stage a guest — $($inv.Error)"); return }
+        $invited = $inv.InvitedUserId
+        Wait-GkObjectReadable -Collection 'users' -Id $invited
+        $uri = "v1.0/users/$invited`?`$select=accountEnabled"
+
+        Remove-GkStaleGuest -UserId $invited -WhatIf | Out-Null
+        Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'accountEnabled') -eq $false }) '-WhatIf left the guest enabled'
+
+        $r = Remove-GkStaleGuest -UserId $invited -Confirm:$false
+        Assert-GkTrue $checks ($r.Outcome -eq 'Disabled') 'disable reported success'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $uri -Property 'accountEnabled') -eq $false }) 'the guest is disabled on the server'
+
+        # -Delete is a separate capability group in the scope map, so exercise it too.
+        $d = Remove-GkStaleGuest -UserId $invited -Delete -Confirm:$false
+        Assert-GkTrue $checks ($d.Outcome -eq 'Deleted') 'delete reported success'
+        Assert-GkTrue $checks (Wait-GkUntil { @(Get-GkDeletedItem -Type User | Where-Object Id -eq $invited).Count -eq 1 }) 'the guest is in the recycle bin'
+        $invited = $null   # already deleted; teardown would only log a 404
+    }
+    finally {
+        if ($invited) { try { Invoke-MgGraphRequest -Method DELETE -Uri "v1.0/users/$invited" | Out-Null } catch { Write-Warning "Teardown: could not delete guest $invited" } }
+    }
+}
+
+# --- 12. Stale device ---------------------------------------------------------------------------
+Invoke-GkScenario -Name 'StaleDevice' -Body {
+    param($checks)
+    $deviceId = $null
+    try {
+        $key = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("X509:<SHA1-TP-PUBKEY>$([guid]::NewGuid())"))
+        $body = @{
+            accountEnabled         = $true
+            alternativeSecurityIds = @(@{ type = 2; key = $key })
+            deviceId               = [guid]::NewGuid().ToString()
+            displayName            = "$runPrefix-device"
+            operatingSystem        = 'Windows'
+            operatingSystemVersion = '10.0.19045'
+            profileType            = 'RegisteredDevice'
+        }
+        try { $dev = Invoke-MgGraphRequest -Method POST -Uri 'v1.0/devices' -Body $body -OutputType Hashtable }
+        catch { $checks.Add("SKIP: this tenant will not accept a synthetic device object, and a real Entra-joined device cannot be staged from Graph — $($_.Exception.Message.Split([char]10)[0])"); return }
+        $deviceId = $dev.id
+        Wait-GkObjectReadable -Collection 'devices' -Id $deviceId
+        $uri = "v1.0/devices/$deviceId`?`$select=accountEnabled"
+
+        Disable-GkStaleDevice -Id $deviceId -WhatIf | Out-Null
+        Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'accountEnabled') -eq $false }) '-WhatIf left the device enabled'
+
+        $r = Disable-GkStaleDevice -Id $deviceId -Confirm:$false
+        Assert-GkTrue $checks ($r.Outcome -eq 'Disabled') 'disable reported success'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $uri -Property 'accountEnabled') -eq $false }) 'the device is disabled on the server'
+    }
+    finally {
+        if ($deviceId) { Remove-GkDisposable -Collection 'devices' -Id $deviceId -Name "$runPrefix-device" }
+    }
+}
+
+# --- 13. Admin role assignment ------------------------------------------------------------------
+Invoke-GkScenario -Name 'AdminRole' -Body {
+    param($checks)
+    $user = New-GkDisposableUser -Tag 'role'
+    $assignmentId = $null
+    try {
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
+        # Directory Readers: the least consequential built-in role that can still be assigned.
+        $roleDefId = '88d8e3e3-8f55-4a1e-953a-9b9898b8876b'
+        $assign = Wait-GkFor -TimeoutSeconds 120 -Producer {
+            try {
+                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignments' `
+                    -Body @{ principalId = $user.Id; roleDefinitionId = $roleDefId; directoryScopeId = '/' } -OutputType Hashtable
+            } catch { $null }
+        }
+        if (-not $assign) { $checks.Add('SKIP: could not stage a role assignment'); return }
+        $assignmentId = $assign.id
+        $roleUri = "v1.0/roleManagement/directory/roleAssignments/$assignmentId"
+
+        Remove-GkAdminRoleAssignment -AssignmentKind Active -AssignmentId $assignmentId -WhatIf | Out-Null
+        # Proven by the assignment still being retrievable. Watching for its absence would fail on
+        # any transient 404, because Get-GkRawProperty cannot tell 'deleted' from 'read failed'.
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $roleUri -Property 'id') -eq $assignmentId }) '-WhatIf removed no assignment'
+
+        # Same transient as the restore endpoint: the DELETE can 404 on a replica that has not
+        # seen the freshly staged assignment. Bounded retry — a removal that never succeeds still fails.
+        $r = Wait-GkFor -TimeoutSeconds 120 -Producer {
+            $a = Remove-GkAdminRoleAssignment -AssignmentKind Active -AssignmentId $assignmentId -Confirm:$false -WarningAction SilentlyContinue
+            if ($a.Outcome -eq 'Removed') { $a }
+        }
+        Assert-GkTrue $checks ($null -ne $r) 'removal reported success'
+        Assert-GkTrue $checks (Wait-GkUntil { $null -eq (Get-GkRawProperty -Uri $roleUri -Property 'id') }) 'the assignment is gone from the server'
+        $assignmentId = $null
+    }
+    finally {
+        if ($assignmentId) { try { Invoke-MgGraphRequest -Method DELETE -Uri "v1.0/roleManagement/directory/roleAssignments/$assignmentId" | Out-Null } catch { Write-Warning 'Teardown: could not remove the staged role assignment.' } }
+        Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName
+    }
+}
+
+# --- 14. Consent grant --------------------------------------------------------------------------
+Invoke-GkScenario -Name 'ConsentGrant' -Body {
+    param($checks)
+    $app = New-GkDisposableApp -Tag 'consent'
+    $grantId = $null
+    $spId = $null
+    try {
+        Wait-GkObjectReadable -Collection 'applications' -Id $app.Id
+        $appId = Get-GkRawProperty -Uri "v1.0/applications/$($app.Id)?`$select=appId" -Property 'appId'
+        $sp = Wait-GkFor -TimeoutSeconds 120 -Producer {
+            try { Invoke-MgGraphRequest -Method POST -Uri 'v1.0/servicePrincipals' -Body @{ appId = $appId } -OutputType Hashtable } catch { $null }
+        }
+        if (-not $sp) { $checks.Add('SKIP: could not stage a service principal'); return }
+        $spId = $sp.id
+
+        $graphSpId = @((Invoke-MgGraphRequest -Method GET -Uri "v1.0/servicePrincipals?`$filter=appId eq '00000003-0000-0000-c000-000000000000'" -OutputType Hashtable).value)[0].id
+        $grant = Wait-GkFor -TimeoutSeconds 120 -Producer {
+            try {
+                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/oauth2PermissionGrants' -OutputType Hashtable `
+                    -Body @{ clientId = $sp.id; consentType = 'AllPrincipals'; resourceId = $graphSpId; scope = 'User.Read' }
+            } catch { $null }
+        }
+        if (-not $grant) { $checks.Add('SKIP: could not stage a consent grant'); return }
+        $grantId = $grant.id
+        $grantUri = "v1.0/oauth2PermissionGrants/$grantId"
+
+        Remove-GkConsentGrant -GrantId $grantId -WhatIf | Out-Null
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $grantUri -Property 'id') -eq $grantId }) '-WhatIf revoked nothing'
+
+        $r = Wait-GkFor -TimeoutSeconds 120 -Producer {
+            $a = Remove-GkConsentGrant -GrantId $grantId -Confirm:$false -WarningAction SilentlyContinue
+            if ($a.Outcome -eq 'Revoked') { $a }
+        }
+        Assert-GkTrue $checks ($null -ne $r) 'revoke reported success'
+        Assert-GkTrue $checks (Wait-GkUntil { $null -eq (Get-GkRawProperty -Uri $grantUri -Property 'id') }) 'the grant is gone from the server'
+        $grantId = $null
+    }
+    finally {
+        if ($grantId) { try { Invoke-MgGraphRequest -Method DELETE -Uri "v1.0/oauth2PermissionGrants/$grantId" | Out-Null } catch { Write-Warning 'Teardown: could not remove the staged consent grant.' } }
+        # Deleting the application does NOT delete its service principal — they are separate
+        # directory objects. Without this the scenario leaks one enterprise app per run.
+        if ($spId) { Remove-GkDisposable -Collection 'servicePrincipals' -Id $spId -Name $app.DisplayName }
+        Remove-GkDisposable -Collection 'applications' -Id $app.Id -Name $app.DisplayName
+    }
+}
+
+# --- 15. LAPS read ------------------------------------------------------------------------------
 # Purely a read, and it cannot be staged: a LAPS credential only exists if Windows LAPS is deployed
 # and a real device has backed one up. Without -LapsDeviceId this reports SKIPPED, never PASS.
 Invoke-GkScenario -Name 'LapsRead' -Body {
