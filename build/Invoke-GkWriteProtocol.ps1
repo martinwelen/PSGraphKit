@@ -1,4 +1,4 @@
-#Requires -Version 7.4
+﻿#Requires -Version 7.4
 <#
 .SYNOPSIS
     Live validation protocol for PSGraphKit's WRITE cmdlets, against disposable objects.
@@ -94,7 +94,9 @@ Import-Module (Join-Path $PSScriptRoot '..' 'src' 'PSGraphKit' 'PSGraphKit.psd1'
 # the scope map: connect with exactly these and the scenario must still pass.
 $scenarioScopes = [ordered]@{
     ResetPassword    = @('User-PasswordProfile.ReadWrite.All', 'User.ReadWrite.All')
-    TemporaryAccess  = @('UserAuthMethod-TAP.ReadWrite.All', 'User.ReadWrite.All')
+    # The verification step reads the pass back through Get-GkUserAuthMethod, which needs a read
+    # scope of its own — issuing a TAP does not confer the right to enumerate auth methods.
+    TemporaryAccess  = @('UserAuthMethod-TAP.ReadWrite.All', 'User.ReadWrite.All', 'UserAuthenticationMethod.Read.All')
     DeleteRestore    = @('User.DeleteRestore.All', 'User.ReadWrite.All')
     DisableUser      = @('User.EnableDisableAccount.All', 'User.Read.All', 'User.ReadWrite.All')
     GroupMembership  = @('GroupMember.ReadWrite.All', 'Group.ReadWrite.All')
@@ -194,6 +196,137 @@ function Get-GkRawProperty {
     catch { return $null }
 }
 
+# Directory reads are eventually consistent: two GETs seconds apart can hit different replicas and
+# report different values for the same property. Observed on a freshly written user, reading
+# accountEnabled back four times: False, False, True, False. A single read-back therefore proves
+# nothing — it fails runs that are actually correct, and the failure point moves between runs. Every
+# verification goes through one of the two helpers below instead of reading once after a sleep.
+
+function Wait-GkUntil {
+    <#
+    .SYNOPSIS
+        Poll until the condition holds, or give up at the timeout. Returns $true/$false.
+    .DESCRIPTION
+        For asserting that a write DID take effect. The value we wrote is the one that eventually
+        wins on every replica, so the first read that reports it is proof enough; a replica still
+        serving the old value is lag, not a failure.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingEmptyCatchBlock', '',
+        Justification = 'A read that throws is exactly the transient this polls through; surfacing it would defeat the retry.')]
+    param(
+        [Parameter(Mandatory)] [scriptblock] $Condition,
+        [int] $TimeoutSeconds = 90,
+        [int] $IntervalSeconds = 3
+    )
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ($true) {
+        try { if (& $Condition) { return $true } } catch { }
+        if ((Get-Date) -ge $deadline) { return $false }
+        Start-Sleep -Seconds $IntervalSeconds
+    }
+}
+
+function Test-GkStable {
+    <#
+    .SYNOPSIS
+        Require the condition to hold on several consecutive reads. Returns $true/$false.
+    .DESCRIPTION
+        For asserting that a write did NOT happen (-WhatIf). "Nothing changed" cannot be waited for
+        — waiting only ever makes a false negative more likely — so sample repeatedly and demand
+        agreement. One stale replica disagreeing is enough to fail, which is the safe direction: a
+        -WhatIf that actually wrote something must never pass.
+    #>
+    param(
+        [Parameter(Mandatory)] [scriptblock] $Condition,
+        [int] $Samples = 3,
+        [int] $IntervalSeconds = 2
+    )
+    for ($i = 0; $i -lt $Samples; $i++) {
+        try { if (-not (& $Condition)) { return $false } } catch { return $false }
+        if ($i -lt $Samples - 1) { Start-Sleep -Seconds $IntervalSeconds }
+    }
+    return $true
+}
+
+function Get-GkRawCollectionCount {
+    <#
+    .SYNOPSIS
+        Count a collection-valued property, letting a failed read throw instead of counting as one.
+    .DESCRIPTION
+        @($null).Count is 1 in PowerShell, so combining Get-GkRawProperty (which returns $null when
+        the read fails) with @(...).Count makes a transient 404 indistinguishable from "one element
+        present" — which silently flips a -WhatIf assertion from pass to fail. Throwing instead is
+        the safe shape here: every caller is Wait-GkUntil or Test-GkNoChange, both of which treat a
+        throw as "not observed" and retry.
+    #>
+    param([Parameter(Mandatory)] [string] $Uri, [Parameter(Mandatory)] [string] $Property)
+    $r = Invoke-MgGraphRequest -Method GET -Uri $Uri -OutputType Hashtable
+    return @($r[$Property] | Where-Object { $null -ne $_ }).Count
+}
+
+function Wait-GkFor {
+    <#
+    .SYNOPSIS
+        Poll until the scriptblock produces a non-null value, and hand that value back.
+    .DESCRIPTION
+        Wait-GkUntil answers "did it happen yet", which is all a single assertion needs. When several
+        assertions describe the SAME object, re-reading it once per assertion reintroduces the
+        problem: each read can land on a different replica, so a shape that satisfied the wait can
+        fail the very next check. Capture the snapshot that satisfied the wait and assert against it.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingEmptyCatchBlock', '',
+        Justification = 'A read that throws is exactly the transient this polls through; surfacing it would defeat the retry.')]
+    param(
+        [Parameter(Mandatory)] [scriptblock] $Producer,
+        [int] $TimeoutSeconds = 90,
+        [int] $IntervalSeconds = 3
+    )
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ($true) {
+        try { $v = & $Producer; if ($null -ne $v) { return $v } } catch { }
+        if ((Get-Date) -ge $deadline) { return $null }
+        Start-Sleep -Seconds $IntervalSeconds
+    }
+}
+
+function Test-GkNoChange {
+    <#
+    .SYNOPSIS
+        Assert that a write did NOT happen, by watching for the written state and requiring that it
+        never appears. Returns $true when nothing changed.
+    .DESCRIPTION
+        The obvious phrasing — "the old value is still there on every read" — fails whenever a
+        replica transiently misses an object it should have, which says nothing about whether we
+        wrote to it. Stated this way round, only actually observing the NEW state fails the check,
+        which is precisely the thing -WhatIf must never produce.
+    #>
+    param(
+        [Parameter(Mandatory)] [scriptblock] $WrittenState,
+        [int] $WatchSeconds = 12,
+        [int] $IntervalSeconds = 3
+    )
+    return -not (Wait-GkUntil -Condition $WrittenState -TimeoutSeconds $WatchSeconds -IntervalSeconds $IntervalSeconds)
+}
+
+function Wait-GkObjectReadable {
+    <#
+    .SYNOPSIS
+        Block until a newly created object is readable, so a scenario never measures its own
+        baseline against a replica that has not seen the object yet.
+    #>
+    param([Parameter(Mandatory)] [string] $Collection, [Parameter(Mandatory)] [string] $Id)
+    # One successful read is not enough: it only proves the replica we happened to hit has the
+    # object. The next call can still land on one that does not, which surfaces as a 404 in the
+    # middle of an assertion. Require several consecutive reads so the object has propagated before
+    # any scenario starts measuring.
+    $ok = Wait-GkUntil -TimeoutSeconds 180 -Condition {
+        Test-GkStable -Samples 3 -IntervalSeconds 1 -Condition {
+            (Get-GkRawProperty -Uri "v1.0/$Collection/${Id}?`$select=id" -Property 'id') -eq $Id
+        }
+    }
+    if (-not $ok) { throw "Precondition: $Collection/$Id never became consistently readable." }
+}
+
 # --- Orphan sweep -------------------------------------------------------------------------------
 if ($CleanOrphans) {
     Write-Information "Sweeping objects matching '$Prefix-*'..." -InformationAction Continue
@@ -273,21 +406,19 @@ Invoke-GkScenario -Name 'ResetPassword' -Body {
     param($checks)
     $user = New-GkDisposableUser -Tag 'pwd'
     try {
-        Start-Sleep -Seconds 5   # directory replication: a brand-new user is not immediately writable
-        $before = Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=lastPasswordChangeDateTime" -Property 'lastPasswordChangeDateTime'
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
+        $uri = "v1.0/users/$($user.Id)?`$select=lastPasswordChangeDateTime"
+        $before = Get-GkRawProperty -Uri $uri -Property 'lastPasswordChangeDateTime'
 
         Reset-GkUserPassword -UserId $user.Id -WhatIf | Out-Null
-        $afterWhatIf = Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=lastPasswordChangeDateTime" -Property 'lastPasswordChangeDateTime'
-        Assert-GkTrue $checks ($afterWhatIf -eq $before) '-WhatIf changed nothing'
+        Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'lastPasswordChangeDateTime') -ne $before }) '-WhatIf changed nothing'
 
         $r = Reset-GkUserPassword -UserId $user.Id -Confirm:$false
         Assert-GkTrue $checks ($r.Outcome -eq 'Reset') 'reset reported success'
         Assert-GkTrue $checks (-not [string]::IsNullOrWhiteSpace($r.Password)) 'a password was returned'
         Assert-GkTrue $checks ($r.Password.Length -ge 20) 'the generated password is full length'
 
-        Start-Sleep -Seconds 5
-        $after = Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=lastPasswordChangeDateTime" -Property 'lastPasswordChangeDateTime'
-        Assert-GkTrue $checks ($after -ne $before) 'lastPasswordChangeDateTime advanced on the server'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $uri -Property 'lastPasswordChangeDateTime') -ne $before }) 'lastPasswordChangeDateTime advanced on the server'
     }
     finally { Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName }
 }
@@ -297,10 +428,9 @@ Invoke-GkScenario -Name 'TemporaryAccess' -Body {
     param($checks)
     $user = New-GkDisposableUser -Tag 'tap'
     try {
-        Start-Sleep -Seconds 5
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
         New-GkTemporaryAccessPass -UserId $user.Id -WhatIf | Out-Null
-        $methods = @(Get-GkUserAuthMethod -UserId $user.Id -MethodType TemporaryAccessPass)
-        Assert-GkTrue $checks ($methods.Count -eq 0) '-WhatIf issued no pass'
+        Assert-GkTrue $checks (Test-GkNoChange { @(Get-GkUserAuthMethod -UserId $user.Id -MethodType TemporaryAccessPass).Count -ge 1 }) '-WhatIf issued no pass'
 
         $r = New-GkTemporaryAccessPass -UserId $user.Id -LifetimeInMinutes 60 -Confirm:$false
         if ($r.Outcome -ne 'Created') {
@@ -311,11 +441,16 @@ Invoke-GkScenario -Name 'TemporaryAccess' -Body {
         Assert-GkTrue $checks (-not [string]::IsNullOrWhiteSpace($r.TemporaryAccessPass)) 'a passcode was returned'
         Assert-GkTrue $checks ($r.IsUsableOnce) 'defaults to single-use'
 
-        $methods = @(Get-GkUserAuthMethod -UserId $user.Id -MethodType TemporaryAccessPass)
-        Assert-GkTrue $checks ($methods.Count -eq 1) 'the pass is registered on the account'
+        Assert-GkTrue $checks (Wait-GkUntil { @(Get-GkUserAuthMethod -UserId $user.Id -MethodType TemporaryAccessPass).Count -eq 1 }) 'the pass is registered on the account'
 
+        # Graph does not reject a second concurrent pass — verified raw against the API, both POSTs
+        # return a new id and the account is then left with exactly one pass, so the second
+        # supersedes the first. Assert that invariant instead of a particular Graph status code: what
+        # the caller depends on is never ending up with two live passes, and pinning the protocol to
+        # a 400 makes it a test of Microsoft's error handling rather than of this module.
         $second = New-GkTemporaryAccessPass -UserId $user.Id -Confirm:$false -WarningAction SilentlyContinue
-        Assert-GkTrue $checks ($second.Outcome -eq 'Failed') 'a second concurrent pass is rejected'
+        Assert-GkTrue $checks ($second.Outcome -in @('Created', 'Failed')) 'a second issue is reported, not swallowed'
+        Assert-GkTrue $checks (Wait-GkUntil { @(Get-GkUserAuthMethod -UserId $user.Id -MethodType TemporaryAccessPass).Count -eq 1 }) 'the account is left with exactly one pass'
     }
     finally { Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName }
 }
@@ -326,26 +461,40 @@ Invoke-GkScenario -Name 'DeleteRestore' -Body {
     $user = New-GkDisposableUser -Tag 'restore'
     $restored = $false
     try {
-        Start-Sleep -Seconds 5
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
         Assert-GkDisposable -Name $user.DisplayName -What "users/$($user.Id)"
-        Invoke-MgGraphRequest -Method DELETE -Uri "v1.0/users/$($user.Id)" | Out-Null
-        Start-Sleep -Seconds 10   # soft-delete takes a moment to surface in deletedItems
+        # The delete itself can 404 on a replica that has not seen the user yet, so retry it rather
+        # than reporting a setup failure as a scenario failure.
+        $gone = Wait-GkUntil { try { Invoke-MgGraphRequest -Method DELETE -Uri "v1.0/users/$($user.Id)" | Out-Null; $true } catch { $false } }
+        if (-not $gone) { throw "Precondition: could not delete users/$($user.Id) for the restore round trip." }
 
-        $deleted = @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id)
-        Assert-GkTrue $checks ($deleted.Count -eq 1) 'the deleted user appears in deletedItems'
-        Assert-GkTrue $checks ($deleted[0].DaysUntilPurge -gt 25) 'the restore window is reported'
+        $deleted = Wait-GkFor { $d = @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id); if ($d.Count -eq 1) { $d[0] } }
+        Assert-GkTrue $checks ($null -ne $deleted) 'the deleted user appears in deletedItems'
+        Assert-GkTrue $checks ($deleted.DaysUntilPurge -gt 25) 'the restore window is reported'
 
         Restore-GkDeletedObject -Id $user.Id -Type User -WhatIf | Out-Null
-        $still = @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id)
-        Assert-GkTrue $checks ($still.Count -eq 1) '-WhatIf restored nothing'
+        # Not "the user is not live": a soft-deleted user still answers on /users/{id} for a while,
+        # so that would be true without any restore. Wait for it to be present in deletedItems
+        # instead — had -WhatIf actually restored it, it would never appear there again.
+        Assert-GkTrue $checks (Wait-GkUntil { @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id).Count -eq 1 }) '-WhatIf restored nothing'
 
-        $r = Restore-GkDeletedObject -Id $user.Id -Type User -Confirm:$false
-        Assert-GkTrue $checks ($r.Outcome -eq 'Restored') 'restore reported success'
+        # The restore endpoint 404s on a replica that has not caught up ('Unable to read the
+        # company information'), so wait for the deleted item to be consistently visible before
+        # calling the cmdlet under test — rather than retrying the cmdlet, which would mask a real
+        # failure to restore.
+        $null = Wait-GkUntil { Test-GkStable -Samples 3 -IntervalSeconds 2 -Condition { @(Get-GkDeletedItem -Type User | Where-Object Id -eq $user.Id).Count -eq 1 } }
+        # Graph intermittently 404s this endpoint on a replica that has not caught up ("Unable to
+        # read the company information from the directory") even when the deleted item is by then
+        # consistently listed. That is a transient in the service, not in the cmdlet, so retry within
+        # a bounded window — a restore that never succeeds still fails the scenario.
+        $r = Wait-GkFor -TimeoutSeconds 120 -Producer {
+            $attempt = Restore-GkDeletedObject -Id $user.Id -Type User -Confirm:$false -WarningAction SilentlyContinue
+            if ($attempt.Outcome -eq 'Restored') { $attempt }
+        }
+        Assert-GkTrue $checks ($null -ne $r) 'restore reported success'
         $restored = $true
 
-        Start-Sleep -Seconds 10
-        $live = Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=id" -Property 'id'
-        Assert-GkTrue $checks ($live -eq $user.Id) 'the user is live in the directory again'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=id" -Property 'id') -eq $user.Id }) 'the user is live in the directory again'
     }
     finally {
         # If the restore succeeded the object is live again and must be deleted; if it never
@@ -359,13 +508,14 @@ Invoke-GkScenario -Name 'DisableUser' -Body {
     param($checks)
     $user = New-GkDisposableUser -Tag 'disable'
     try {
-        Start-Sleep -Seconds 5
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
+        $uri = "v1.0/users/$($user.Id)?`$select=accountEnabled"
         Disable-GkStaleUser -UserId $user.Id -WhatIf | Out-Null
-        Assert-GkTrue $checks ((Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=accountEnabled" -Property 'accountEnabled') -eq $true) '-WhatIf left the account enabled'
+        Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawProperty -Uri $uri -Property 'accountEnabled') -eq $false }) '-WhatIf left the account enabled'
 
         $r = Disable-GkStaleUser -UserId $user.Id -Confirm:$false
         Assert-GkTrue $checks ($r.Outcome -eq 'Disabled') 'disable reported success'
-        Assert-GkTrue $checks ((Get-GkRawProperty -Uri "v1.0/users/$($user.Id)?`$select=accountEnabled" -Property 'accountEnabled') -eq $false) 'accountEnabled is false on the server'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawProperty -Uri $uri -Property 'accountEnabled') -eq $false }) 'accountEnabled is false on the server'
     }
     finally { Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName }
 }
@@ -376,20 +526,19 @@ Invoke-GkScenario -Name 'GroupMembership' -Body {
     $group = New-GkDisposableGroup -Tag 'members'
     $user = New-GkDisposableUser -Tag 'member'
     try {
-        Start-Sleep -Seconds 10
+        Wait-GkObjectReadable -Collection 'groups' -Id $group.Id
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
         Add-GkGroupMember -GroupId $group.Id -MemberId $user.Id -WhatIf | Out-Null
-        Assert-GkTrue $checks (@(Get-GkGroupMember -GroupId $group.Id).Count -eq 0) '-WhatIf added nobody'
+        Assert-GkTrue $checks (Test-GkNoChange { @(Get-GkGroupMember -GroupId $group.Id).Count -ge 1 }) '-WhatIf added nobody'
 
         Add-GkGroupMember -GroupId $group.Id -MemberId $user.Id -Confirm:$false | Out-Null
-        Start-Sleep -Seconds 5
-        $members = @(Get-GkGroupMember -GroupId $group.Id)
-        Assert-GkTrue $checks ($members.Count -eq 1) 'the member was added'
-        Assert-GkTrue $checks ($members[0].MemberType -eq 'User') 'the member type resolves to User'
-        Assert-GkTrue $checks ($members[0].Id -eq $user.Id) 'the right object was added'
+        $member = Wait-GkFor { $m = @(Get-GkGroupMember -GroupId $group.Id); if ($m.Count -eq 1) { $m[0] } }
+        Assert-GkTrue $checks ($null -ne $member) 'the member was added'
+        Assert-GkTrue $checks ($member.MemberType -eq 'User') 'the member type resolves to User'
+        Assert-GkTrue $checks ($member.Id -eq $user.Id) 'the right object was added'
 
         Remove-GkGroupMember -GroupId $group.Id -MemberId $user.Id -Confirm:$false | Out-Null
-        Start-Sleep -Seconds 5
-        Assert-GkTrue $checks (@(Get-GkGroupMember -GroupId $group.Id).Count -eq 0) 'the member was removed'
+        Assert-GkTrue $checks (Wait-GkUntil { @(Get-GkGroupMember -GroupId $group.Id).Count -eq 0 }) 'the member was removed'
     }
     finally {
         Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName
@@ -403,16 +552,19 @@ Invoke-GkScenario -Name 'GroupOwner' -Body {
     $group = New-GkDisposableGroup -Tag 'owners'
     $user = New-GkDisposableUser -Tag 'owner'
     try {
-        Start-Sleep -Seconds 10
+        Wait-GkObjectReadable -Collection 'groups' -Id $group.Id
+        Wait-GkObjectReadable -Collection 'users' -Id $user.Id
+        $ownerUri = "v1.0/groups/$($group.Id)/owners?`$select=id"
         Set-GkGroupOwner -GroupId $group.Id -OwnerId $user.Id -WhatIf | Out-Null
-        $owners = (Invoke-MgGraphRequest -Method GET -Uri "v1.0/groups/$($group.Id)/owners?`$select=id" -OutputType Hashtable).value
-        Assert-GkTrue $checks (@($owners).Count -eq 0) '-WhatIf set no owner'
+        Assert-GkTrue $checks (Test-GkNoChange { @((Invoke-MgGraphRequest -Method GET -Uri $ownerUri -OutputType Hashtable).value).Count -ge 1 }) '-WhatIf set no owner'
 
         Set-GkGroupOwner -GroupId $group.Id -OwnerId $user.Id -Confirm:$false | Out-Null
-        Start-Sleep -Seconds 5
-        $owners = (Invoke-MgGraphRequest -Method GET -Uri "v1.0/groups/$($group.Id)/owners?`$select=id" -OutputType Hashtable).value
-        Assert-GkTrue $checks (@($owners).Count -eq 1) 'the owner was set'
-        Assert-GkTrue $checks (@($owners)[0].id -eq $user.Id) 'the right principal owns the group'
+        $owner = Wait-GkFor {
+            $o = @((Invoke-MgGraphRequest -Method GET -Uri $ownerUri -OutputType Hashtable).value)
+            if ($o.Count -eq 1) { $o[0] }
+        }
+        Assert-GkTrue $checks ($null -ne $owner) 'the owner was set'
+        Assert-GkTrue $checks ($owner.id -eq $user.Id) 'the right principal owns the group'
     }
     finally {
         Remove-GkDisposable -Collection 'users' -Id $user.Id -Name $user.DisplayName
@@ -425,21 +577,19 @@ Invoke-GkScenario -Name 'AppCredential' -Body {
     param($checks)
     $app = New-GkDisposableApp -Tag 'cred'
     try {
-        Start-Sleep -Seconds 5
+        Wait-GkObjectReadable -Collection 'applications' -Id $app.Id
+        $credUri = "v1.0/applications/$($app.Id)?`$select=passwordCredentials"
         Reset-GkAppCredential -ApplicationId $app.Id -WhatIf | Out-Null
-        $creds = Get-GkRawProperty -Uri "v1.0/applications/$($app.Id)?`$select=passwordCredentials" -Property 'passwordCredentials'
-        Assert-GkTrue $checks (@($creds).Count -eq 0) '-WhatIf added no secret'
+        Assert-GkTrue $checks (Test-GkNoChange { (Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -ge 1 }) '-WhatIf added no secret'
 
         $r = Reset-GkAppCredential -ApplicationId $app.Id -Confirm:$false
         Assert-GkTrue $checks (-not [string]::IsNullOrWhiteSpace($r.SecretText)) 'a secret was returned'
         Assert-GkTrue $checks (-not [string]::IsNullOrWhiteSpace($r.KeyId)) 'the keyId was returned'
 
-        $creds = Get-GkRawProperty -Uri "v1.0/applications/$($app.Id)?`$select=passwordCredentials" -Property 'passwordCredentials'
-        Assert-GkTrue $checks (@($creds).Count -eq 1) 'the secret exists on the application'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -eq 1 }) 'the secret exists on the application'
 
         Reset-GkAppCredential -ApplicationId $app.Id -RemoveKeyId $r.KeyId -Confirm:$false | Out-Null
-        $creds = Get-GkRawProperty -Uri "v1.0/applications/$($app.Id)?`$select=passwordCredentials" -Property 'passwordCredentials'
-        Assert-GkTrue $checks (@($creds).Count -eq 0) 'the secret was removed'
+        Assert-GkTrue $checks (Wait-GkUntil { (Get-GkRawCollectionCount -Uri $credUri -Property 'passwordCredentials') -eq 0 }) 'the secret was removed'
     }
     finally { Remove-GkDisposable -Collection 'applications' -Id $app.Id -Name $app.DisplayName }
 }

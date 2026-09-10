@@ -33,15 +33,32 @@ InModuleScope PSGraphKit {
         It 'builds the type cast segment, not a filter' {
             Get-GkDeletedItem -Type Application | Out-Null
             Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter {
-                $Uri -eq '/directory/deletedItems/microsoft.graph.application'
+                $Uri -like '/directory/deletedItems/microsoft.graph.application`?*' -and $Uri -notlike '*$filter*'
             }
         }
 
         It 'lower-cases only the first letter of a compound type' {
             Get-GkDeletedItem -Type ServicePrincipal | Out-Null
             Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter {
-                $Uri -eq '/directory/deletedItems/microsoft.graph.servicePrincipal'
+                $Uri -like '/directory/deletedItems/microsoft.graph.servicePrincipal`?*' -and $Uri -notlike '*$filter*'
             }
+        }
+
+        It 'asks for deletedDateTime explicitly' {
+            # It is not in the endpoint's default property set. Without it every DeletedDateTime,
+            # DaysSinceDeleted and DaysUntilPurge is null and the two date filters drop every row.
+            Get-GkDeletedItem -Type User | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Uri -like '*$select=*deletedDateTime*'
+            }
+        }
+
+        It 'requests userPrincipalName only for the User type' {
+            # The property does not exist on groups or applications; selecting it there is a 400.
+            Get-GkDeletedItem -Type User | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter { $Uri -like '*userPrincipalName*' }
+            Get-GkDeletedItem -Type Group | Out-Null
+            Should -Invoke Invoke-GkGraphRequest -Times 1 -Exactly -ParameterFilter { $Uri -notlike '*userPrincipalName*' }
         }
 
         It 'computes the remaining restore window from the 30-day retention' {

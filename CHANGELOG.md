@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `Get-GkDeletedItem` returned `DeletedDateTime`, `DaysSinceDeleted` and `DaysUntilPurge` as `$null`
+  for every item. `deletedDateTime` is not in the default property set of
+  `/directory/deletedItems/{type}`, and the request did not ask for it. Because the two filters skip
+  any row whose date is unknown, `-DeletedWithinDays` and `-ExpiringInDays` also returned **nothing
+  at all**, in every tenant. The request now selects the field explicitly (and `userPrincipalName`
+  only for the User type, where it exists). Found by the first live run of the write protocol.
+- The scope map's read capability groups accepted only `X.Read.All` where `X.ReadWrite.All` grants
+  the same read. 39 groups were affected, so `Test-GkConnection` rejected sessions that Graph itself
+  accepts — for example connecting with `Group.ReadWrite.All` for a remediation workflow and then
+  piping into `Get-GkGroupMember`. 83 scopes were added, each verified to exist against a live Graph
+  service principal, and the subsumption itself was confirmed empirically rather than from the docs.
+  Ordering is unchanged, so `-ForCommand` still requests the least-privileged scope; only what is
+  accepted widened. See DESIGN.md section 7.
+
 ### Added
 - `build/Invoke-GkWriteProtocol.ps1`: live validation for the write cmdlets against disposable
   objects in a dev tenant. Each scenario runs the cmdlet with `-WhatIf` and asserts nothing changed,
@@ -23,6 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs/TEST-PROTOCOL.md` documents the write lane as Layer 4 and adds it to the release gate for
   any release that touches a write cmdlet. It also states plainly why this cannot run in CI —
   a real tenant and interactive auth — so the gate is a referenced run, not an automatic check.
+- The write protocol verifies server state by polling rather than by sleeping and reading once.
+  Entra reads are eventually consistent: reading one freshly written property four times returned
+  False, False, True, False. Single-shot verification therefore failed runs that were correct, and
+  the failure moved between scenarios from run to run. Positive assertions now wait for the expected
+  state; `-WhatIf` assertions watch for the *written* state and require that it never appears, so a
+  transient read miss on an untouched object is no longer mistaken for evidence of a write; and
+  assertions describing one object inspect the snapshot that satisfied the wait instead of issuing a
+  fresh read that can land on a different replica.
 
 ## [0.4.1] - 2026-08-09
 

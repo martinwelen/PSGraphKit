@@ -76,8 +76,16 @@ function Get-GkDeletedItem {
     process {
         # The type is a cast segment in the path, not a filter; Graph has no combined collection.
         $segment = 'microsoft.graph.' + $Type.Substring(0, 1).ToLower() + $Type.Substring(1)
+
+        # deletedDateTime is NOT in the default property set this endpoint returns, so it has to be
+        # asked for explicitly. Without it every DeletedDateTime/DaysSinceDeleted/DaysUntilPurge is
+        # null and -DeletedWithinDays / -ExpiringInDays filter every row away. userPrincipalName only
+        # exists on users; requesting it for another type is a 400.
+        $select = 'id,displayName,deletedDateTime'
+        if ($Type -eq 'User') { $select += ',userPrincipalName' }
+
         $params = @{
-            Uri            = "/directory/deletedItems/$segment"
+            Uri            = "/directory/deletedItems/$segment`?`$select=$select"
             CallerFunction = 'Get-GkDeletedItem'
         }
         if ($PSBoundParameters.ContainsKey('First')) { $params['MaxResult'] = $First }

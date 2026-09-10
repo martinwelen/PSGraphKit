@@ -423,6 +423,32 @@ Each is a judgment call, not an oversight:
 | `GET /roleManagement/directory/role{Assignment,Eligibility}ScheduleInstances` | `Role{Assignment,Eligibility}Schedule.Read.Directory` | These PIM reads are **optional** in `Get-GkAdminRoleAssignment` — it warns and continues when they fail. A caller holding only these scopes could not perform the cmdlet's required calls, so accepting them alone would trade a clear pre-flight error for a confusing partial result. |
 | `POST /roleManagement/directory/role{Assignment,Eligibility}ScheduleRequests` | `Role{Assignment,Eligibility}Schedule.ReadWrite.Directory` | Same reasoning for `Remove-GkAdminRoleAssignment`: `RoleManagement.ReadWrite.Directory` covers every path it can take. |
 
+### Correction: ReadWrite scopes now satisfy read capability groups
+
+The original audit checked that each group offered Graph's documented *least-privileged* option. It
+did not check the other direction — whether a caller holding a **broader** scope that subsumes the
+read would be accepted. In Graph, `X.ReadWrite.All` grants everything `X.Read.All` grants, but 39 of
+the map's capability groups listed only the `.Read.All` form. `Test-GkConnection` therefore rejected
+connections that Graph itself accepts, which is exactly the "false missing-scope failure" the
+capability-group design exists to prevent. It hit anyone who connected with write scopes for a
+remediation workflow and then piped into a `Get-` cmdlet.
+
+Verified empirically rather than from the documentation: an app-only token holding
+`Group.ReadWrite.All` and `Application.ReadWrite.All` and **no** `.Read.All` or `Directory.Read.All`
+successfully served `GET /groups` and `GET /applications`.
+
+83 scopes were added across those 39 groups, each one confirmed to exist as a real permission by
+querying the Microsoft Graph service principal's `appRoles` and `oauth2PermissionScopes` in a live
+tenant. Ordering was preserved — the least-privileged option stays first, so `Get-GkConnectScopeHint`
+and the `-ForCommand` connect line still request the narrow scope. Only what is *accepted* widened;
+nothing the module *asks for* changed.
+
+`tests/Unit/ScopeMap.Tests.ps1` was updated in the same change: the pinned declarations now include
+the ReadWrite variants, and the "does not lead with a directory-wide scope" guard now exempts a group
+in which *every* option is directory-wide (group lifecycle policies have no narrower permission)
+rather than exempting single-element groups, which was a proxy for the same thing that stopped
+holding once the groups grew.
+
 ### Re-running the audit
 
 The scope table below is generated from `$script:GkScopeMap` and the extracted call inventory. It is

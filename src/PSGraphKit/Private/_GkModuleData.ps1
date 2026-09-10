@@ -1,4 +1,4 @@
-# Module-level data: Graph base URI, scope map, role hints.
+﻿# Module-level data: Graph base URI, scope map, role hints.
 # Dot-sourced into module scope by PSGraphKit.psm1, so $script:* is module-wide state.
 
 $script:GkGraphBaseUri = 'https://graph.microsoft.com'
@@ -123,7 +123,7 @@ $script:GkScopeMap = @{
 
     'Get-GkStaleUser' = @{
         Groups = @(
-            @{ For = 'read user objects';   Any = @('User.Read.All', 'Directory.Read.All') }
+            @{ For = 'read user objects';   Any = @('User.Read.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
             @{ For = 'read signInActivity'; Any = @('AuditLog.Read.All') }
         )
         DelegatedOnly = $false
@@ -132,7 +132,7 @@ $script:GkScopeMap = @{
 
     'Get-GkGuestInventory' = @{
         Groups = @(
-            @{ For = 'read guest users and sponsors'; Any = @('User.Read.All', 'Directory.Read.All') }
+            @{ For = 'read guest users and sponsors'; Any = @('User.Read.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Guest Inviter', 'User Administrator')
@@ -140,8 +140,8 @@ $script:GkScopeMap = @{
 
     'Get-GkLicenseOverview' = @{
         Groups = @(
-            @{ For = 'read subscribed SKUs';       Any = @('Organization.Read.All', 'LicenseAssignment.Read.All', 'Directory.Read.All') }
-            @{ For = 'enumerate users per SKU';    Any = @('User.Read.All', 'Directory.Read.All') }
+            @{ For = 'read subscribed SKUs';       Any = @('Organization.Read.All', 'Organization.ReadWrite.All', 'LicenseAssignment.Read.All', 'LicenseAssignment.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+            @{ For = 'enumerate users per SKU';    Any = @('User.Read.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'License Administrator')
@@ -149,7 +149,7 @@ $script:GkScopeMap = @{
 
     'Get-GkAdminRoleAssignment' = @{
         Groups = @(
-            @{ For = 'read role assignments and PIM schedules'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.Read.All', 'Directory.Read.All') }
+            @{ For = 'read role assignments and PIM schedules'; Any = @('RoleManagement.Read.Directory', 'RoleManagement.Read.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator', 'Security Reader')
@@ -165,9 +165,9 @@ $script:GkScopeMap = @{
 
     'Get-GkUserAccessReport' = @{
         Groups = @(
-            @{ For = 'read group and role memberships'; Any = @('User.Read.All', 'GroupMember.Read.All', 'Directory.Read.All') }
-            @{ For = 'read app role assignments';       Any = @('Directory.Read.All', 'AppRoleAssignment.ReadWrite.All') }
-            @{ For = 'read license details';            Any = @('LicenseAssignment.Read.All', 'User.Read.All', 'Directory.Read.All') }
+            @{ For = 'read group and role memberships'; Any = @('User.Read.All', 'User.ReadWrite.All', 'GroupMember.Read.All', 'GroupMember.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read app role assignments';       Any = @('Directory.Read.All', 'Directory.ReadWrite.All', 'AppRoleAssignment.ReadWrite.All') }
+            @{ For = 'read license details';            Any = @('LicenseAssignment.Read.All', 'LicenseAssignment.ReadWrite.All', 'User.Read.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $true   # licenseDetails has no application permission
         RoleHints     = @('Global Reader', 'Directory Readers')
@@ -175,7 +175,7 @@ $script:GkScopeMap = @{
 
     'Get-GkAppRegistrationReport' = @{
         Groups = @(
-            @{ For = 'read app registrations'; Any = @('Application.Read.All', 'Directory.Read.All') }
+            @{ For = 'read app registrations'; Any = @('Application.Read.All', 'Application.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Application Administrator', 'Cloud Application Administrator')
@@ -183,8 +183,8 @@ $script:GkScopeMap = @{
 
     'Get-GkGroupReport' = @{
         Groups = @(
-            @{ For = 'read groups';                  Any = @('Group.Read.All', 'Directory.Read.All', 'GroupMember.Read.All') }
-            @{ For = 'read group members and owners'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') }
+            @{ For = 'read groups';                  Any = @('Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All', 'GroupMember.Read.All', 'GroupMember.ReadWrite.All') }
+            @{ For = 'read group members and owners'; Any = @('GroupMember.Read.All', 'GroupMember.ReadWrite.All', 'Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Groups Administrator')
@@ -200,7 +200,7 @@ $script:GkScopeMap = @{
 
     'Get-GkDeviceInventory' = @{
         Groups = @(
-            @{ For = 'read devices'; Any = @('Device.Read.All', 'Directory.Read.All') }
+            @{ For = 'read devices'; Any = @('Device.Read.All', 'Device.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Cloud Device Administrator', 'Intune Administrator')
@@ -208,7 +208,7 @@ $script:GkScopeMap = @{
 
     'Get-GkServicePrincipalReport' = @{
         Groups = @(
-            @{ For = 'read service principals (and consent grants)'; Any = @('Application.Read.All', 'Directory.Read.All') }
+            @{ For = 'read service principals (and consent grants)'; Any = @('Application.Read.All', 'Application.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Cloud Application Administrator')
@@ -251,7 +251,7 @@ $script:GkScopeMap = @{
     # pass the pre-flight check and then take a 403 from Graph.
     'Get-GkCustomRole' = @{
         Groups = @(
-            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All') }
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator')
@@ -259,7 +259,7 @@ $script:GkScopeMap = @{
 
     'Get-GkAdministrativeUnit' = @{
         Groups = @(
-            @{ For = 'read administrative units'; Any = @('AdministrativeUnit.Read.All', 'Directory.Read.All') }
+            @{ For = 'read administrative units'; Any = @('AdministrativeUnit.Read.All', 'AdministrativeUnit.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers')
@@ -267,27 +267,27 @@ $script:GkScopeMap = @{
 
     'Get-GkLicenseAssignmentError' = @{
         Groups = @(
-            @{ For = 'read users'; Any = @('User.Read.All', 'Directory.Read.All') }
-            @{ For = 'read subscribed SKUs'; Any = @('Organization.Read.All', 'LicenseAssignment.Read.All', 'Directory.Read.All') }
+            @{ For = 'read users'; Any = @('User.Read.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
+            @{ For = 'read subscribed SKUs'; Any = @('Organization.Read.All', 'Organization.ReadWrite.All', 'LicenseAssignment.Read.All', 'LicenseAssignment.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'License Administrator')
     }
 
     'Get-GkSecureScore' = @{
-        Groups = @(@{ For = 'read Secure Score'; Any = @('SecurityEvents.Read.All') })
+        Groups = @(@{ For = 'read Secure Score'; Any = @('SecurityEvents.Read.All', 'SecurityEvents.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Security Reader')
     }
 
     'Get-GkRiskyUser' = @{
-        Groups = @(@{ For = 'read risky users'; Any = @('IdentityRiskyUser.Read.All') })
+        Groups = @(@{ For = 'read risky users'; Any = @('IdentityRiskyUser.Read.All', 'IdentityRiskyUser.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Security Reader', 'Security Operator')
     }
 
     'Get-GkRiskDetection' = @{
-        Groups = @(@{ For = 'read risk detections'; Any = @('IdentityRiskEvent.Read.All') })
+        Groups = @(@{ For = 'read risk detections'; Any = @('IdentityRiskEvent.Read.All', 'IdentityRiskEvent.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Security Reader', 'Security Operator')
     }
@@ -313,7 +313,7 @@ $script:GkScopeMap = @{
     # GroupMember.Read.All is the documented least-privileged scope for GET /groups/{id}/owners and
     # is also valid for GET /groups, so it serves both of this cmdlet's calls on its own.
     'Get-GkRoleAssignableGroup' = @{
-        Groups = @(@{ For = 'read groups and owners'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read groups and owners'; Any = @('GroupMember.Read.All', 'GroupMember.ReadWrite.All', 'Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers')
     }
@@ -391,7 +391,7 @@ $script:GkScopeMap = @{
 
     'Get-GkGroupMember' = @{
         Groups = @(
-            @{ For = 'read group members'; Any = @('GroupMember.Read.All', 'Group.Read.All', 'Directory.Read.All') }
+            @{ For = 'read group members'; Any = @('GroupMember.Read.All', 'GroupMember.ReadWrite.All', 'Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers', 'Groups Administrator')
@@ -399,7 +399,7 @@ $script:GkScopeMap = @{
 
     'Get-GkRoleDefinition' = @{
         Groups = @(
-            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All') }
+            @{ For = 'read role definitions'; Any = @('RoleManagement.Read.Directory', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Privileged Role Administrator')
@@ -419,33 +419,33 @@ $script:GkScopeMap = @{
     # so every -Type gets its own entry and only the one in use is validated.
     'Get-GkDeletedItem' = @{
         Groups = @(
-            @{ For = 'read deleted directory objects'; Any = @('User.Read.All', 'Group.Read.All', 'Application.Read.All', 'AdministrativeUnit.Read.All', 'Directory.Read.All') }
+            @{ For = 'read deleted directory objects'; Any = @('User.Read.All', 'User.ReadWrite.All', 'Group.Read.All', 'Group.ReadWrite.All', 'Application.Read.All', 'Application.ReadWrite.All', 'AdministrativeUnit.Read.All', 'AdministrativeUnit.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers')
     }
     'Get-GkDeletedItem:User' = @{
-        Groups = @(@{ For = 'read deleted users'; Any = @('User.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read deleted users'; Any = @('User.Read.All', 'User.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'User Administrator')
     }
     'Get-GkDeletedItem:Group' = @{
-        Groups = @(@{ For = 'read deleted groups'; Any = @('Group.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read deleted groups'; Any = @('Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Groups Administrator')
     }
     'Get-GkDeletedItem:Application' = @{
-        Groups = @(@{ For = 'read deleted applications'; Any = @('Application.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read deleted applications'; Any = @('Application.Read.All', 'Application.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Application Administrator')
     }
     'Get-GkDeletedItem:ServicePrincipal' = @{
-        Groups = @(@{ For = 'read deleted service principals'; Any = @('Application.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read deleted service principals'; Any = @('Application.Read.All', 'Application.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Application Administrator')
     }
     'Get-GkDeletedItem:AdministrativeUnit' = @{
-        Groups = @(@{ For = 'read deleted administrative units'; Any = @('AdministrativeUnit.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read deleted administrative units'; Any = @('AdministrativeUnit.Read.All', 'AdministrativeUnit.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Directory Readers')
     }
@@ -465,14 +465,14 @@ $script:GkScopeMap = @{
     }
 
     'Get-GkGroupBasedLicense' = @{
-        Groups = @(@{ For = 'read groups and their assigned licenses'; Any = @('Group.Read.All', 'Directory.Read.All', 'GroupMember.Read.All') })
+        Groups = @(@{ For = 'read groups and their assigned licenses'; Any = @('Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All', 'GroupMember.Read.All', 'GroupMember.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'License Administrator', 'Groups Administrator')
     }
     'Get-GkGroupBasedLicense:ResolveSkuName' = @{
         Groups = @(
-            @{ For = 'read groups and their assigned licenses'; Any = @('Group.Read.All', 'Directory.Read.All', 'GroupMember.Read.All') }
-            @{ For = 'resolve SKU names from subscribedSkus';   Any = @('LicenseAssignment.Read.All', 'Organization.Read.All', 'Directory.Read.All') }
+            @{ For = 'read groups and their assigned licenses'; Any = @('Group.Read.All', 'Group.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All', 'GroupMember.Read.All', 'GroupMember.ReadWrite.All') }
+            @{ For = 'resolve SKU names from subscribedSkus';   Any = @('LicenseAssignment.Read.All', 'LicenseAssignment.ReadWrite.All', 'Organization.Read.All', 'Organization.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'License Administrator')
@@ -499,7 +499,7 @@ $script:GkScopeMap = @{
     'Get-GkInactiveApp' = @{
         Groups = @(
             @{ For = 'read service principal sign-in activity'; Any = @('AuditLog.Read.All') }
-            @{ For = 'read service principals'; Any = @('Application.Read.All', 'Directory.Read.All') }
+            @{ For = 'read service principals'; Any = @('Application.Read.All', 'Application.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
@@ -508,14 +508,14 @@ $script:GkScopeMap = @{
     'Get-GkStaleAppCredential' = @{
         Groups = @(
             @{ For = 'read app credential sign-in activity'; Any = @('AuditLog.Read.All') }
-            @{ For = 'read service principals'; Any = @('Application.Read.All', 'Directory.Read.All') }
+            @{ For = 'read service principals'; Any = @('Application.Read.All', 'Application.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') }
         )
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Reports Reader', 'Security Reader')
     }
 
     'Get-GkConsentRequest' = @{
-        Groups = @(@{ For = 'read admin-consent requests'; Any = @('ConsentRequest.Read.All') })
+        Groups = @(@{ For = 'read admin-consent requests'; Any = @('ConsentRequest.Read.All', 'ConsentRequest.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Cloud Application Administrator')
     }
@@ -527,25 +527,25 @@ $script:GkScopeMap = @{
     }
 
     'Get-GkTenantInfo' = @{
-        Groups = @(@{ For = 'read organization info'; Any = @('Organization.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read organization info'; Any = @('Organization.Read.All', 'Organization.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader')
     }
 
     'Get-GkDomain' = @{
-        Groups = @(@{ For = 'read domains'; Any = @('Domain.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read domains'; Any = @('Domain.Read.All', 'Domain.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Domain Name Administrator')
     }
 
     'Get-GkSubscription' = @{
-        Groups = @(@{ For = 'read directory subscriptions'; Any = @('Organization.Read.All', 'Directory.Read.All') })
+        Groups = @(@{ For = 'read directory subscriptions'; Any = @('Organization.Read.All', 'Organization.ReadWrite.All', 'Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Billing Administrator')
     }
 
     'Get-GkGroupExpirationPolicy' = @{
-        Groups = @(@{ For = 'read group lifecycle policies'; Any = @('Directory.Read.All') })
+        Groups = @(@{ For = 'read group lifecycle policies'; Any = @('Directory.Read.All', 'Directory.ReadWrite.All') })
         DelegatedOnly = $false
         RoleHints     = @('Global Reader', 'Groups Administrator')
     }
