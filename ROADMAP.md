@@ -126,7 +126,7 @@ Improvements to how `Test-GkConnection` reports a not-connected / missing-scope 
 
 ## Honorable mentions (idea)
 
-`Restore-GkDeletedObject`, `Set-GkUserManager`, `Get-GkEnterpriseAppAssignment`,
+`Set-GkUserManager`, `Get-GkEnterpriseAppAssignment`,
 `Get-GkBreakGlassAccount`, `Test-GkCaCoverage`, plus P2/governance reports (`Get-GkAccessReview`,
 `Get-GkTermsOfUse`, `Get-GkAccessPackage`) and `Get-GkDelegatedAdminRelationship` (GDAP).
 

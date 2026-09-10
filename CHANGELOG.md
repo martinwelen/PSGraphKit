@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-09-10
+
+The first release signed with a publicly trusted certificate, and the first validated end to end
+against a live tenant rather than against mocks alone. Both fixes below were found by that first
+run — neither was visible to 437 passing unit tests, because both concern what Graph actually does
+rather than what request the module builds.
+
 ### Fixed
 - `Get-GkDeletedItem` returned `DeletedDateTime`, `DaysSinceDeleted` and `DaysUntilPurge` as `$null`
   for every item. `deletedDateTime` is not in the default property set of
