@@ -23,6 +23,12 @@ jobs:
     # Windows, not ubuntu: Authenticode signing goes through SignTool, which is Windows-only. The
     # test matrix still covers Linux and macOS in ci.yml — only the release path is pinned here.
     runs-on: windows-latest
+    # Load-bearing, not decorative. The signing identity's federated credential is scoped to the
+    # subject 'repo:martinwelen/PSGraphKit:environment:release', so the OIDC token only matches while
+    # the job runs in this environment. Remove or rename it and azure/login fails with an
+    # audience/subject mismatch. It is also where a required reviewer would be attached, if the
+    # ability to sign should ever need a second pair of eyes.
+    environment: release
     steps:
       - name: Checkout
         uses: actions/checkout@v5
