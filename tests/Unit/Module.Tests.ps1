@@ -51,6 +51,16 @@ Describe 'PSGraphKit module' {
         }
     }
 
+    It 'has a CHANGELOG section for the manifest version' {
+        # The release workflow copies this section into PSData.ReleaseNotes, which the Gallery shows
+        # and which cannot be edited after publishing. A missing section fails the release at the
+        # worst moment — after signing, with a tag already pushed — so catch it at PR time instead.
+        $version = (Test-ModuleManifest (Join-Path $PSScriptRoot '..' '..' 'src' 'PSGraphKit' 'PSGraphKit.psd1')).Version.ToString()
+        $changelog = Get-Content (Join-Path $PSScriptRoot '..' '..' 'CHANGELOG.md')
+        $heading = @($changelog | Where-Object { $_ -match "^##\s+\[$([regex]::Escape($version))\]" })
+        $heading.Count | Should -Be 1 -Because "CHANGELOG.md needs exactly one '## [$version]' section"
+    }
+
     It 'ships every signable file as UTF-8 with a BOM' {
         # Not cosmetic — it is what makes the release signature portable. Authenticode for
         # PowerShell files goes through a Subject Interface Package that decodes a BOM-less file

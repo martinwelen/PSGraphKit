@@ -74,6 +74,13 @@ jobs:
           # Ship README/LICENSE/CHANGELOG inside the module so the Gallery page is complete.
           Copy-Item README.md, LICENSE, CHANGELOG.md ./src/PSGraphKit/ -Force
 
+      # PSData.ReleaseNotes is frozen at publish time and is what the Gallery page shows, so
+      # 'See CHANGELOG.md' would send every visitor somewhere else, permanently, for that version.
+      # Modifies the manifest, hence its place before signing.
+      - name: Write release notes into the manifest
+        shell: pwsh
+        run: ./build/Set-GkReleaseNotes.ps1 -InformationAction Continue
+
       # An Authenticode signature on a BOM-less PowerShell file is hashed after decoding it with the
       # SIGNING machine's ANSI code page. This runner is 1252, so a file containing an em dash would
       # verify here and fail HashMismatch on a machine running 1251, 932, 936, 949 or the UTF-8 beta

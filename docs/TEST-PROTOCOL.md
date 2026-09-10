@@ -252,7 +252,10 @@ Before tagging `vX.Y.Z`:
       dev tenant — no `FAIL`; every `SKIPPED` understood. Commit the run report from
       `docs/protocol-runs/` so the release names the evidence behind it.
 - [ ] `Test-ModuleManifest ./src/PSGraphKit/PSGraphKit.psd1` version bumped and matches the tag.
-- [ ] `CHANGELOG.md` updated.
+- [ ] `CHANGELOG.md` has a `## [x.y.z]` section for the new version. The release workflow copies it
+      into the manifest's `ReleaseNotes`, which is what the Gallery page shows and cannot be edited
+      after publishing. A unit test enforces the section exists, so this fails at PR time rather
+      than after a tag has been pushed and the artefacts signed.
 - [ ] **Signing is on.** The repository variable `SIGNING_ENABLED` is `true`. Once any version ships
       signed, every later version must be signed by the same publisher or PowerShellGet's publisher
       check makes it fail to install over the previous one without `-SkipPublisherCheck`. Publishing
